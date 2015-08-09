@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <inttypes.h>
 
+#include "tsvm.hpp"
+
 #define ECHO do { } while(0)
 
 void yyerror(void *scanner, const char *s);
@@ -19,10 +21,6 @@ void yyerror(void *scanner, const char *s);
 	} \
 }
 
-namespace trainscript {
-	class Module;
-}
-
 typedef struct 
 {
 	char *buffer;
@@ -32,23 +30,40 @@ typedef struct
 	void *scanner;
 } ParserData;
 
-typedef enum
+struct VariableDeclaration
 {
-	tidUNKNOWN = 0,
-	tidVOID = 1,
-	tidINT = 2,
-	tidREAL = 3,
-	tidTEXT = 4,
-} typeid_t;
-
-typedef struct
-{
-	typeid_t type;
-	int pointer;
-} type_t;
-
-typedef struct
-{
-	type_t type;
 	char *name;
-} VariableDeclaration;
+	trainscript::Variable variable;
+};
+
+struct LocalVariable
+{
+	char *name;
+	trainscript::Variable variable;
+	LocalVariable *next;
+};
+
+struct MethodHeader
+{
+	bool isPublic;
+	char *name;
+	LocalVariable *returnValue;
+	LocalVariable *locals;
+	LocalVariable *arguments;
+};
+
+struct MethodBody
+{
+	int indentation;
+	trainscript::Instruction *instruction;
+	MethodBody *next;
+};
+
+struct MethodDeclaration
+{
+	MethodHeader header;
+	MethodBody *body;
+};
+
+// Variable declaration
+

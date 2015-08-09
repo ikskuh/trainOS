@@ -46,16 +46,13 @@ int main(int argc, char** argv)
 		return 3;
 	}
 
-	// This should be replaced by parsing.... :P
-	{
-		Block *block = new Block(module);
-
-		block->instructions.push_back(new DebugInstruction(module, "hello world!"));
-		block->instructions.push_back(new DebugVariableInstruction(module, "x"));
-
-		Method *m = new Method(module, block);
-		m->arguments.push_back({"x", Variable(TypeID::Int)});
-		module->methods.insert({"main", m});
+	// Debug some stuff out:
+	for(auto &var : module->variables) {
+		printf("Variable: %s : %s = ",
+			var.first.c_str(),
+			typeName(var.second->type.id));
+		var.second->printval();
+		printf("\n");
 	}
 
 	Method *scriptMain = module->method("main");
@@ -64,7 +61,22 @@ int main(int argc, char** argv)
 		return 4;
 	}
 
-	scriptMain->invoke({ Variable(15) });
+	printf("run...\n");
+	scriptMain->invoke({ mkvar(10) });
+	printf("done.\n");
+
+	// Debug some stuff out:
+	for(auto &var : module->variables) {
+		printf("Variable: %s : %s = ",
+			var.first.c_str(),
+			typeName(var.second->type.id));
+		switch(var.second->type.id) {
+			case TypeID::Int: printf("%d", var.second->integer); break;
+			case TypeID::Real: printf("%f", var.second->real); break;
+			default: printf("???"); break;
+		}
+		printf("\n");
+	}
 
 	return 0;
 }

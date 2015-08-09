@@ -3,8 +3,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <string.h>
 
-#include "common.h"
+#include "typeid.hpp"
 
 namespace trainscript
 {
@@ -18,23 +19,10 @@ namespace trainscript
 		char *data;
 	};
 
-	enum class TypeID
-	{
-		Unknown = tidUNKNOWN,
-		Void = tidVOID,
-		Int = tidINT,
-		Real = tidREAL,
-		Text = tidTEXT
-	};
-
 	struct Type
 	{
 		TypeID id;
 		int pointer;
-
-		Type() : id(TypeID::Unknown), pointer(0) { }
-		Type(TypeID id) : id(id), pointer(0) { }
-		Type(TypeID id, int pointer) : id(id), pointer(pointer) { }
 
 		Type reference() const {
 			return { id, pointer + 1 };
@@ -70,23 +58,40 @@ namespace trainscript
 			Text text;
 		};
 
-		Variable() : type(TypeID::Unknown), integer(0) { }
-
-		explicit Variable(Type type) : type(type), integer(0) { }
-
-		explicit Variable(TypeID type) : type(type), integer(0) { }
-
-		explicit Variable(Int integer) : type(TypeID::Int), integer(integer) { }
-
-		explicit Variable(Real real) : type(TypeID::Real), real(real) { }
+		void printval() const
+		{
+			switch(this->type.id) {
+				case TypeID::Int: printf("%d", this->integer); break;
+				case TypeID::Real: printf("%f", this->real); break;
+				default: printf("???"); break;
+			}
+		}
 	};
+
+	static inline Variable mkvar(Type type) { return { type, 0 }; }
+
+	static inline Variable mkvar(TypeID type) { return { { type, 0 }, 0 }; }
+
+	static inline Variable mkvar(Int value) { return { { TypeID::Int, 0 }, value }; }
 
 	class Module;
 
-	using LocalContext = std::map<std::string, Variable&>;
+	class LocalContext :
+			public std::map<std::string, Variable*>
+	{
+	public:
+		int depth;
+
+		LocalContext() : depth(0) { }
+
+		void indent() {
+			for(int i = 0; i < depth; i++) printf("  ");
+		}
+	};
 
 	class Instruction
 	{
+	protected:
 		Module *module;
 	public:
 		Instruction (Module *module) : module(module)
@@ -96,7 +101,7 @@ namespace trainscript
 
 		virtual ~Instruction() { }
 
-		virtual void execute(LocalContext &context) const = 0;
+		virtual Variable execute(LocalContext &context) const = 0;
 	};
 
 	class Block :
@@ -111,51 +116,11 @@ namespace trainscript
 			for(auto *instr : instructions) delete instr;
 		}
 
-		void execute(LocalContext &context) const override {
+		Variable execute(LocalContext &context) const override {
 			for(auto *instr : instructions) {
 				instr->execute(context);
 			}
-		}
-	};
-
-	class DebugInstruction :
-			public Instruction
-	{
-	public:
-		std::string message;
-
-		DebugInstruction(Module *module, std::string msg) : Instruction(module), message(msg) { }
-
-		void execute(LocalContext &context) const override {
-			printf("debug: %s\n", message.c_str());
-		}
-	};
-
-	class DebugVariableInstruction :
-			public Instruction
-	{
-	public:
-		std::string variable;
-
-		DebugVariableInstruction(Module *module, std::string variable) : Instruction(module), variable(variable) { }
-
-		void execute(LocalContext &context) const override {
-			if(context.count(variable) > 0) {
-				auto &var = context.at(variable);
-				switch(var.type.id) {
-				case TypeID::Int:
-					printf("%s := %d\n", variable.c_str(), var.integer);
-					break;
-				case TypeID::Real:
-					printf("%s := %f\n", variable.c_str(), var.real);
-					break;
-				default:
-					printf("%s has unknown type.\n", variable.c_str());
-					break;
-				}
-			} else {
-				printf("variable %s not found.\n", variable.c_str());
-			}
+			return mkvar(TypeID::Void);
 		}
 	};
 
@@ -164,6 +129,7 @@ namespace trainscript
 	public:
 		Module *module;
 		Block *block;
+		bool isPublic;
 		std::vector<std::pair<std::string, Variable>> arguments;
 		std::map<std::string, Variable> locals;
 		std::pair<std::string, Variable> returnValue;
@@ -173,32 +139,7 @@ namespace trainscript
 
 		}
 
-		Variable invoke(std::vector<Variable> arguments)
-		{
-			LocalContext context;
-			if(this->returnValue.second.type.usable()) {
-				context.insert({ this->returnValue.first, this->returnValue.second });
-			}
-			if(arguments.size() != this->arguments.size()) {
-				printf("MECKER anzahl!\n");
-				return Variable();
-			}
-			for(size_t i = 0; i < this->arguments.size(); i++) {
-				if(this->arguments[i].second.type != arguments[i].type) {
-					printf("MECKER argtyp!\n");
-					return Variable();
-				}
-				context.insert({this->arguments[i].first, arguments[i] });
-			}
-			for(auto local : this->locals) {
-				context.insert({ local.first, local.second });
-			}
-
-
-			this->block->execute(context);
-
-			return this->returnValue.second;
-		}
+		Variable invoke(std::vector<Variable> arguments);
 	};
 
 	class Module
@@ -227,5 +168,159 @@ namespace trainscript
 		static Module *load(const void *buffer, size_t length);
 
 		static Module *load(const char *text);
+	};
+
+
+
+
+
+	// Instructions
+
+	class ConstantExpression :
+			public Instruction
+	{
+	public:
+		Variable value;
+		ConstantExpression(Module *mod, Variable value) : Instruction(mod), value(value) { }
+
+		Variable execute(LocalContext &context) const override {
+			context.indent(); printf("constant: "); this->value.printval(); printf("\n");
+			return this->value;
+		}
+	};
+
+	class VariableExpression :
+			public Instruction
+	{
+	public:
+		std::string variableName;
+		VariableExpression(Module *mod, std::string variableName) : Instruction(mod), variableName(variableName) { }
+
+		Variable execute(LocalContext &context) const override {
+			context.indent(); printf("variable: %s\n", this->variableName.c_str());
+			if(context.count(this->variableName) > 0) {
+				return *context.at(this->variableName);
+			} else {
+				auto *var = this->module->variable(this->variableName.c_str());
+				if(var != nullptr) {
+					return *var;
+				} else {
+					printf("Variable not found: %s\n", this->variableName.c_str());
+					return mkvar(TypeID::Void);
+				}
+			}
+		}
+	};
+
+
+	class VariableAssignmentExpression :
+			public Instruction
+	{
+	public:
+		std::string variableName;
+		Instruction *expression;
+		VariableAssignmentExpression(Module *mod, std::string variableName, Instruction *expression) :
+			Instruction(mod),
+			variableName(variableName),
+			expression(expression)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override {
+			if(this->expression == nullptr) {
+				printf("Invalid instruction in assignment.\n");
+				return mkvar(TypeID::Void);
+			}
+			context.depth++;
+			Variable result = this->expression->execute(context);
+			context.depth--;
+
+			context.indent(); printf("assign "); result.printval(); printf(" to %s\n", this->variableName.c_str());
+
+			Variable *target = nullptr;
+			if(context.count(this->variableName) > 0) {
+				target = context.at(this->variableName);
+			} else {
+				target = this->module->variable(this->variableName.c_str());
+			}
+
+			if(target == nullptr) {
+				printf("Variable not found: %s\n", this->variableName.c_str());
+				return mkvar(TypeID::Void);
+			}
+
+			if(target->type != result.type) {
+				printf(
+					"Assignment does not match: %s → %s\n",
+					typeName(result.type.id),
+					this->variableName.c_str());
+				return mkvar(TypeID::Void);
+			}
+
+			switch(target->type.id) {
+				case TypeID::Int: target->integer = result.integer; break;
+				case TypeID::Real: target->real = result.real; break;
+				default: printf("assignment not supported.\n"); break;
+			}
+
+
+			context.indent();
+			context.at("a")->printval();
+			printf(" ");
+			context.at("b")->printval();
+			printf("\n");
+
+			return result;
+		}
+	};
+
+	template<Variable (*OP)(Variable, Variable)>
+	class ArithmeticExpression :
+			public Instruction
+	{
+	public:
+		Instruction *rhs, *lhs;
+
+		ArithmeticExpression(Module *mod, Instruction *lhs, Instruction *rhs) :
+			Instruction(mod),
+			lhs(lhs),
+			rhs(rhs)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override {
+			if(this->lhs == nullptr) {
+				printf("lhs: Invalid instruction in addition.\n");
+				return mkvar(TypeID::Void);
+			}
+			if(this->rhs == nullptr) {
+				printf("rhs: Invalid instruction in addition.\n");
+				return mkvar(TypeID::Void);
+			}
+
+			context.depth++;
+			Variable left = this->lhs->execute(context);
+			Variable right = this->rhs->execute(context);
+			context.depth--;
+
+			if(left.type != right.type) {
+				printf(
+					"Arithmetic types do not match: %s != %s\n",
+					typeName(left.type.id),
+					typeName(right.type.id));
+				return mkvar(TypeID::Void);
+			}
+
+			context.indent();
+			printf("Arithmetic on ");
+			left.printval();
+			printf(" and ");
+			right.printval();
+			printf("\n");
+
+			return OP(left, right);
+		}
 	};
 }

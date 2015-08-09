@@ -27,7 +27,8 @@ HEADERS += \
     src/varargs.h \
     src/vmm.h \
 	trainscript/common.h \
-    trainscript/tsvm.hpp
+    trainscript/tsvm.hpp \
+    trainscript/typeid.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \

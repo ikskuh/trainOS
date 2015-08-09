@@ -57,4 +57,79 @@ namespace trainscript
 			delete val.second;
 		}
 	}
+
+	Variable Method::invoke(std::vector<Variable> arguments)
+	{
+		LocalContext context;
+		if(this->returnValue.second.type.usable()) {
+			context.insert({ this->returnValue.first, &this->returnValue.second });
+		}
+		if(arguments.size() != this->arguments.size()) {
+			printf("MECKER anzahl!\n");
+			return Variable();
+		}
+		for(size_t i = 0; i < this->arguments.size(); i++) {
+			if(this->arguments[i].second.type != arguments[i].type) {
+				printf("MECKER argtyp!\n");
+				return Variable();
+			}
+			context.insert({this->arguments[i].first, new Variable(arguments[i]) });
+		}
+		for(auto local : this->locals) {
+			context.insert({ local.first, new Variable(local.second) });
+		}
+
+
+		this->block->execute(context);
+
+		return this->returnValue.second;
+	}
+
+	namespace ops
+	{
+		Variable add(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int:return  mkvar(lhs.integer + rhs.integer);
+				case TypeID::Real: return mkvar(lhs.real + rhs.real);
+				default: printf("addition not supported for %s.\n", typeName(lhs.type.id)); break;
+			}
+		}
+
+		Variable subtract(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkvar(lhs.integer - rhs.integer);
+				case TypeID::Real:return  mkvar(lhs.real - rhs.real);
+				default: printf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+			}
+		}
+
+		Variable multiply(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkvar(lhs.integer * rhs.integer);
+				case TypeID::Real: return mkvar(lhs.real * rhs.real);
+				default: printf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+			}
+		}
+
+		Variable divide(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkvar(lhs.integer / rhs.integer);
+				case TypeID::Real: return mkvar(lhs.real / rhs.real);
+				default: printf("division not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+			}
+		}
+
+		Variable modulo(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkvar(lhs.integer % rhs.integer);
+				// case TypeID::Real: mkvar(lhs.real % rhs.real);
+				default: printf("modulo not supported for %s.\n", typeName(lhs.type.id));  return mkvar(TypeID::Void);
+			}
+		}
+	}
 }
