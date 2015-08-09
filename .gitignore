@@ -35,3 +35,9 @@ kernel
 
 # Debug files
 *.dSYM/
+trainOS.pro.user
+trainscript/tsvm
+*.tab.cpp
+*.tab.h
+*.l.h
+lex.yy.cpp
