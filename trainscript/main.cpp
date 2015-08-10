@@ -46,15 +46,6 @@ int main(int argc, char** argv)
 		return 3;
 	}
 
-	// Debug some stuff out:
-	for(auto &var : module->variables) {
-		printf("Variable: %s : %s = ",
-			var.first.c_str(),
-			typeName(var.second->type.id));
-		var.second->printval();
-		printf("\n");
-	}
-
 	Method *scriptMain = module->method("main");
 	if(scriptMain== nullptr) {
 		printf("'main' method not found.\n");
@@ -62,8 +53,14 @@ int main(int argc, char** argv)
 	}
 
 	printf("run...\n");
-	scriptMain->invoke({ mkvar(10) });
-	printf("done.\n");
+	Variable result = scriptMain->invoke({ mkvar(10) });
+	if(result.type.usable()) {
+		printf("done: ");
+		result.printval();
+		printf("\n");
+	} else {
+		printf("done.\n");
+	}
 
 	// Debug some stuff out:
 	for(auto &var : module->variables) {
@@ -78,7 +75,11 @@ int main(int argc, char** argv)
 		printf("\n");
 	}
 
-	return 0;
+	if(result.type == Type::Int) {
+		return result.integer;
+	} else {
+		return 0;
+	}
 }
 
 

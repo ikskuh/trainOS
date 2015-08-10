@@ -108,7 +108,7 @@ input:
 |   input method {
 		using namespace trainscript;
 		auto *mod = context->module;
-		Block *body = new Block(mod);
+		Block *body = new Block();
 
 		// Translate body here
 		MethodBody *mb = $2.body;
@@ -244,18 +244,18 @@ instruction:
 ;
 
 expression:
-	INT                                         { $$ = new ConstantExpression(context->module, mkvar($1)); }
-|   REAL                                        { $$ = new ConstantExpression(context->module, mkvar($1)); }
-// |   TEXT                                     { $$ = new ConstantExpression(context->module, mkvar($1)); }
-|   IDENTIFIER                                  { $$ = new VariableExpression(context->module, $1); }
+	INT                                         { $$ = new ConstantExpression(mkvar($1)); }
+|	REAL                                        { $$ = new ConstantExpression(mkvar($1)); }
+// |   TEXT                                     { $$ = new ConstantExpression(mkvar($1)); }
+|   IDENTIFIER                                  { $$ = new VariableExpression($1); }
 |   IDENTIFIER LBRACKET expressionList RBRACKET { $$ = nullptr; yyerror(nullptr, "missing instruction."); }
 |   LBRACKET expression RBRACKET                { $$ = $2; }
-|   expression PLUS expression                  { $$ = new ArithmeticExpression<trainscript::ops::add>(context->module, $1, $3); }
-|   expression MINUS expression                 { $$ = nullptr; yyerror(nullptr, "missing instruction.");}
-|   expression MULTIPLY expression              { $$ = nullptr; yyerror(nullptr, "missing instruction.");}
-|   expression DIVIDE expression                { $$ = nullptr; yyerror(nullptr, "missing instruction.");}
-|   expression MODULO expression                { $$ = nullptr; yyerror(nullptr, "missing instruction.");}
-|   expression RARROW IDENTIFIER                { $$ = new VariableAssignmentExpression(context->module, $3, $1); }
+|   expression PLUS expression                  { $$ = new ArithmeticExpression<trainscript::ops::add>($1, $3); }
+|   expression MINUS expression                 { $$ = new ArithmeticExpression<trainscript::ops::subtract>($1, $3); }
+|   expression MULTIPLY expression              { $$ = new ArithmeticExpression<trainscript::ops::multiply>($1, $3); }
+|   expression DIVIDE expression                { $$ = new ArithmeticExpression<trainscript::ops::divide>($1, $3); }
+|   expression MODULO expression                { $$ = new ArithmeticExpression<trainscript::ops::modulo>($1, $3); }
+|   expression RARROW IDENTIFIER                { $$ = new VariableAssignmentExpression($3, $1); }
 ;
 
 expressionList:

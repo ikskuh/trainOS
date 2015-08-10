@@ -34,15 +34,8 @@ VOID            { return KW_VOID; }
 INT             { return KW_INT; }
 REAL            { return KW_REAL; }
 TEXT            { return KW_TEXT; }
-[0-9]+\.[0-9]+  { yylval->fval = atof(yytext); return REAL; }
+[0-9]+\.[0-9]*  { yylval->fval = atof(yytext); return REAL; }
 [0-9]+          { yylval->ival = atoi(yytext); return INT; }
-[a-zA-Z0-9]+    { yylval->text = strdup(yytext); return IDENTIFIER; }
+[a-zA-Z0-9']+   { yylval->text = strdup(yytext); return IDENTIFIER; }
 .               { yyerror(NULL, "illegal token"); }
 %%
-
-/*
-[0-9]+          { yylval.ival = atoi(yytext); return INT; }
-[a-zA-Z0-9]+    { yylval.sval = strdup(yytext); return STRING; }
-
-
-*/

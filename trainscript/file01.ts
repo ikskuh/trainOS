@@ -1,19 +1,19 @@
 
 # Trainscript Test File
 VAR global : INT;
-VAR other : REAL;
+VAR v1' : REAL;
+VAR v2' : REAL;
 
-PUB main(x : INT) → c : INT | a : INT, b : INT
-	10 → a;
-	20 → b;
-	a + b → global;
-#   helper() → b;
+PUB main(x : INT) → c : INT | m1:REAL, v1:REAL, m2:REAL, v2:REAL
+	# Wagen 1
+	4.0 → m1;
+	1.2 → v1;
 
-PRI helper() → result : INT
-	20 → result;
+	# Wagen 2
+	5.0 → m2;
+	0.6 → v2;
 
-PRI arghelper(a0 : INT, a1 : INT, a2 : INT, a3 : INT)
-	x → global;
+	(((m1 - m2) * v1) + (2. * m2 * v2)) / (m1 + m2) → v1';
+	(((m2 - m1) * v2) + (2. * m1 * v1)) / (m1 + m2) → v2';
 
-PRI lochelper() | l0 : INT, l1 : INT, l2 : INT, l3 : INT
-	x → global;
+	42 → c;

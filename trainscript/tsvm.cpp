@@ -10,6 +10,20 @@
 
 namespace trainscript
 {
+	bool verbose = false;
+
+	const Type Type::Invalid = { TypeID::Invalid, 0 };
+	const Type Type::Void = { TypeID::Void, 0 };
+	const Type Type::Int = { TypeID::Int, 0 };
+	const Type Type::Real = { TypeID::Real, 0 };
+	const Type Type::Text = { TypeID::Text, 0 };
+
+	const Variable Variable::Invalid = { Type::Invalid };
+	const Variable Variable::Void = { Type::Void };
+	const Variable Variable::Int = { Type::Int };
+	const Variable Variable::Real = { Type::Real };
+	const Variable Variable::Text = { Type::Text };
+
 	Module *VM::load(const void *buffer, size_t length)
 	{
 		void *internalStorage = malloc(length);
@@ -61,6 +75,12 @@ namespace trainscript
 	Variable Method::invoke(std::vector<Variable> arguments)
 	{
 		LocalContext context;
+
+		for(auto var : this->module->variables)
+		{
+			context.insert({ var.first, var.second });
+		}
+
 		if(this->returnValue.second.type.usable()) {
 			context.insert({ this->returnValue.first, &this->returnValue.second });
 		}
@@ -79,11 +99,20 @@ namespace trainscript
 			context.insert({ local.first, new Variable(local.second) });
 		}
 
+		if(verbose) {
+			printf("executing with local context:\n");
+			for(auto &ref : context)
+			{
+				printf("  %s : %s\n", ref.first.c_str(), typeName(ref.second->type.id));
+			}
+		}
 
 		this->block->execute(context);
 
 		return this->returnValue.second;
 	}
+
+
 
 	namespace ops
 	{
@@ -101,7 +130,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer - rhs.integer);
 				case TypeID::Real:return  mkvar(lhs.real - rhs.real);
-				default: printf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+				default: printf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -110,7 +139,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer * rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real * rhs.real);
-				default: printf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+				default: printf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -119,7 +148,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer / rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real / rhs.real);
-				default: printf("division not supported for %s.\n", typeName(lhs.type.id)); return mkvar(TypeID::Void);
+				default: printf("division not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -128,7 +157,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer % rhs.integer);
 				// case TypeID::Real: mkvar(lhs.real % rhs.real);
-				default: printf("modulo not supported for %s.\n", typeName(lhs.type.id));  return mkvar(TypeID::Void);
+				default: printf("modulo not supported for %s.\n", typeName(lhs.type.id));  return Variable::Invalid;
 			}
 		}
 	}

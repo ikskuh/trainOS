@@ -4,7 +4,7 @@ namespace trainscript
 {
 	enum class TypeID
 	{
-		Unknown = 0,
+		Invalid = 0,
 		Void = 1,
 		Int = 2,
 		Real = 3,
@@ -13,6 +13,7 @@ namespace trainscript
 
 	static const char *typeName(TypeID id) {
 		switch(id) {
+			case TypeID::Invalid: return "INVALID";
 			case TypeID::Void: return "VOID";
 			case TypeID::Int: return "INT";
 			case TypeID::Real: return "REAL";
