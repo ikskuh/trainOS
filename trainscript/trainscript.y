@@ -46,6 +46,7 @@ void yyerror(void *scanner, const char *s);
 	MethodHeader methodHeader;
 	trainscript::Instruction *instruction;
 	LocalVariable *local;
+	ExpressionList *expressions;
 }
 
 %token TAB
@@ -94,6 +95,8 @@ void yyerror(void *scanner, const char *s);
 
 %type <instruction> instruction
 %type <instruction> expression
+
+%type <expressions> expressionList
 
 %start input
 
@@ -248,7 +251,15 @@ expression:
 |	REAL                                        { $$ = new ConstantExpression(mkvar($1)); }
 // |   TEXT                                     { $$ = new ConstantExpression(mkvar($1)); }
 |   IDENTIFIER                                  { $$ = new VariableExpression($1); }
-|   IDENTIFIER LBRACKET expressionList RBRACKET { $$ = nullptr; yyerror(nullptr, "missing instruction."); }
+|   IDENTIFIER LBRACKET expressionList RBRACKET {
+		auto *call = new MethodInvokeExpression($1);
+		auto *list = $3;
+		while(list) {
+			call->parameters.push_back(list->instruction);
+			list = list->next;
+		}
+		$$ = call;
+	}
 |   LBRACKET expression RBRACKET                { $$ = $2; }
 |   expression PLUS expression                  { $$ = new ArithmeticExpression<trainscript::ops::add>($1, $3); }
 |   expression MINUS expression                 { $$ = new ArithmeticExpression<trainscript::ops::subtract>($1, $3); }
@@ -259,9 +270,23 @@ expression:
 ;
 
 expressionList:
-	%empty
-|   expression
-|   expressionList COMMA expression
+	%empty { $$ = nullptr; }
+|   expression {
+		$$ = new ExpressionList();
+		$$->instruction = $1;
+		$$->next = nullptr;
+	}
+|   expressionList COMMA expression {
+		auto *list = new ExpressionList();
+		list->instruction = $3;
+		list->next = nullptr;
+
+		auto *it = $1;
+		while(it->next) { it = it->next; }
+		it->next = list;
+		$$ = $1;
+
+	}
 ;
 
 variableDeclaration:

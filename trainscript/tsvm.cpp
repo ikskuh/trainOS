@@ -74,7 +74,7 @@ namespace trainscript
 
 	Variable Method::invoke(std::vector<Variable> arguments)
 	{
-		LocalContext context;
+		LocalContext context(this->module);
 
 		for(auto var : this->module->variables)
 		{

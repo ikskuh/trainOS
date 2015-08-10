@@ -100,6 +100,15 @@ namespace trainscript
 			public std::map<std::string, Variable*>
 	{
 	public:
+		Module * const module = nullptr;
+
+		LocalContext(Module *mod) :
+			std::map<std::string, Variable*>(),
+			module(mod)
+		{
+
+		}
+
 		int depth;
 
 		LocalContext() : depth(0) { }
@@ -286,6 +295,38 @@ namespace trainscript
 			}
 
 			return result;
+		}
+	};
+
+	class MethodInvokeExpression :
+			public Instruction
+	{
+	public:
+		std::string methodName;
+		std::vector<Instruction*> parameters;
+
+		MethodInvokeExpression(std::string methodName) :
+			methodName(methodName)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override
+		{
+			Method *method = context.module->method(this->methodName.c_str());
+			if(method == nullptr) {
+				if(verbose) printf("method %s not found!\n", this->methodName.c_str());
+				return Variable::Invalid;
+			}
+
+			if(verbose) context.depth++;
+			std::vector<Variable> vars(this->parameters.size());
+			for(int i =  0; i < vars.size(); i++) {
+				vars[i] = this->parameters.at(i)->execute(context);
+			}
+			if(verbose) context.depth--;
+
+			return method->invoke(vars);
 		}
 	};
 

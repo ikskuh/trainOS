@@ -65,5 +65,11 @@ struct MethodDeclaration
 	MethodBody *body;
 };
 
+struct ExpressionList
+{
+	trainscript::Instruction *instruction;
+	ExpressionList *next;
+};
+
 // Variable declaration
 
