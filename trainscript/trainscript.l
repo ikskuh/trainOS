@@ -47,6 +47,7 @@ BOOL            { return KW_BOOL; }
 BEGIN           { return KW_BEGIN; }
 END             { return KW_END; }
 IF              { return KW_IF; }
+THEN            { return KW_THEN; }
 ELSE            { return KW_ELSE; }
 REPEAT          { return KW_REPEAT; }
 FROM            { return KW_FROM; }

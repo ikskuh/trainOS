@@ -39,7 +39,8 @@ DISTFILES += \
 	trainscript/trainscript.l \
     trainscript/file01.ts \
 	trainscript/Makefile \
-	trainscript/trainscript.y
+	trainscript/trainscript.y \
+    trainscript/file02.ts
 
 QMAKE_INCDIR =
 

@@ -169,13 +169,13 @@ namespace trainscript
 	{
 	public:
 		Module *module;
-		Block *block;
+		Instruction *block;
 		bool isPublic;
 		std::vector<std::pair<std::string, Variable>> arguments;
 		std::map<std::string, Variable> locals;
 		std::pair<std::string, Variable> returnValue;
 
-		Method(Module *module, Block *block) : module(module), block(block)
+		Method(Module *module, Instruction *block) : module(module), block(block)
 		{
 
 		}
@@ -389,6 +389,42 @@ namespace trainscript
 			}
 
 			return OP(left, right);
+		}
+	};
+
+	class ConditionExpression :
+			public Instruction
+	{
+	public:
+		Instruction *condition;
+		Instruction *block;
+
+		ConditionExpression(Instruction *condition, Instruction *block) :
+			condition(condition),
+			block(block)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override {
+			if(this->condition == nullptr) {
+				if(verbose) printf("IF: missing condition.\n");
+				return Variable::Invalid;
+			}
+
+			if(this->block == nullptr) {
+				return Variable::Void;
+			}
+
+			Variable result = this->condition->execute(context);
+			if(result.type != Type::Boolean) {
+				if(verbose) printf("IF: Invalid condition type.\n");
+				return Variable::Invalid;
+			}
+			if(result.boolean && (this->block != nullptr)) {
+				this->block->execute(context);
+			}
+			return Variable::Void;
 		}
 	};
 }

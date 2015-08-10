@@ -98,6 +98,7 @@ void yyerror(void *scanner, const char *s);
 %token KW_END
 
 %token KW_IF
+%token KW_THEN
 %token KW_ELSE
 %token KW_REPEAT
 %token KW_FROM
@@ -112,7 +113,7 @@ void yyerror(void *scanner, const char *s);
 
 %type <method> method
 %type <methodHeader> methodDeclaration
-%type <body> block
+%type <instruction> block
 %type <body> body
 
 %type <local> argument
@@ -141,20 +142,8 @@ input:
 |   input method {
 		using namespace trainscript;
 		auto *mod = context->module;
-		Block *body = new Block();
 
-		// Translate body here
-		MethodBody *mb = $2.body;
-		while(mb) {
-			if(mb->instruction != nullptr) {
-				body->instructions.push_back(mb->instruction);
-			} else {
-				printf("invalid instruction in %s\n", $2.header.name);
-			}
-			mb = mb->next;
-		}
-
-		Method *method = new Method(mod, body);
+		Method *method = new Method(mod, $2.body);
 		method->isPublic = $2.header.isPublic;
 		if($2.header.returnValue) {
 			method->returnValue = std::pair<std::string, Variable>(
@@ -184,12 +173,22 @@ method:
 ;
 
 block:
-	KW_BEGIN body KW_END { $$ = $2; }
+	KW_BEGIN body KW_END {
+		auto *block = new Block();
+		MethodBody *mb = $2;
+		while(mb) {
+			if(mb->instruction != nullptr) {
+				block->instructions.push_back(mb->instruction);
+			}
+			mb = mb->next;
+		}
+		$$ = block;
+	}
 ;
 
 body:
 	%empty { $$ = nullptr; }
-|   body instruction SEMICOLON {
+|   body instruction {
 		auto *body = new MethodBody();
 		body->indentation = 0;
 		body->instruction = $2;
@@ -277,7 +276,8 @@ argument:
 ;
 
 instruction:
-	expression { $$ = $1; }
+	expression SEMICOLON { $$ = $1; }
+|	KW_IF expression KW_THEN instruction { $$ = new ConditionExpression($2, $4); }
 ;
 
 expression:

@@ -1,8 +1,14 @@
 
-VAR temp : BOOL;
+VAR res : INT;
 
 PUB main(x : INT) → c : INT
 BEGIN
-	(x =/= c) → temp;
-	x → c;
+	factorial(10) → res;
+END
+
+PUB factorial(number : INT) → result : INT
+BEGIN
+	1 → result;
+	IF number > 1 THEN
+		number * factorial(number - 1) → result;
 END

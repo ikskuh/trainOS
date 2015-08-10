@@ -62,7 +62,7 @@ struct MethodBody
 struct MethodDeclaration
 {
 	MethodHeader header;
-	MethodBody *body;
+	trainscript::Instruction *body;
 };
 
 struct ExpressionList
