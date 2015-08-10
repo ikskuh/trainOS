@@ -17,12 +17,14 @@ namespace trainscript
 	const Type Type::Int = { TypeID::Int, 0 };
 	const Type Type::Real = { TypeID::Real, 0 };
 	const Type Type::Text = { TypeID::Text, 0 };
+	const Type Type::Boolean = { TypeID::Bool, 0 };
 
 	const Variable Variable::Invalid = { Type::Invalid };
 	const Variable Variable::Void = { Type::Void };
 	const Variable Variable::Int = { Type::Int };
 	const Variable Variable::Real = { Type::Real };
 	const Variable Variable::Text = { Type::Text };
+	const Variable Variable::Boolean = { Type::Boolean };
 
 	Module *VM::load(const void *buffer, size_t length)
 	{
@@ -158,6 +160,75 @@ namespace trainscript
 				case TypeID::Int: return mkvar(lhs.integer % rhs.integer);
 				// case TypeID::Real: mkvar(lhs.real % rhs.real);
 				default: printf("modulo not supported for %s.\n", typeName(lhs.type.id));  return Variable::Invalid;
+			}
+		}
+
+		Variable equals(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer == rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real == rhs.real);
+				case TypeID::Bool: return mkbool(lhs.boolean == rhs.boolean);
+				default:
+					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
+			}
+		}
+
+		Variable inequals(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer != rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real != rhs.real);
+				case TypeID::Bool: return mkbool(lhs.boolean != rhs.boolean);
+				default:
+					printf("inequals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
+			}
+		}
+
+
+		Variable less(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer < rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real < rhs.real);
+				default:
+					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
+			}
+		}
+
+		Variable lessEqual(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer <= rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real <= rhs.real);
+				default:
+					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
+			}
+		}
+
+		Variable greater(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer > rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real > rhs.real);
+				default:
+					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
+			}
+		}
+
+		Variable greaterEqual(Variable lhs, Variable rhs)
+		{
+			switch(lhs.type.id) {
+				case TypeID::Int: return mkbool(lhs.integer >= rhs.integer);
+				case TypeID::Real: return mkbool(lhs.real >= rhs.real);
+				default:
+					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					return Variable::Invalid;
 			}
 		}
 	}

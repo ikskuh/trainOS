@@ -12,6 +12,7 @@ namespace trainscript
 	using Int = int32_t;
 	using Real = double;
 	using Void = void;
+	using Bool = bool;
 
 	extern bool verbose;
 
@@ -55,6 +56,7 @@ namespace trainscript
 		static const Type Int;
 		static const Type Real;
 		static const Type Text;
+		static const Type Boolean;
 	};
 
 	struct Variable
@@ -64,6 +66,7 @@ namespace trainscript
 			Int integer;
 			Real real;
 			Text text;
+			Bool boolean;
 		};
 
 		void printval() const
@@ -71,6 +74,7 @@ namespace trainscript
 			switch(this->type.id) {
 				case TypeID::Int: printf("%d", this->integer); break;
 				case TypeID::Real: printf("%f", this->real); break;
+				case TypeID::Bool: printf("%s", this->boolean ? "TRUE" : "FALSE"); break;
 				default: printf("???"); break;
 			}
 		}
@@ -80,6 +84,7 @@ namespace trainscript
 		static const Variable Int;
 		static const Variable Real;
 		static const Variable Text;
+		static const Variable Boolean;
 	};
 
 	static inline Variable mkvar(Int value) {
@@ -91,6 +96,12 @@ namespace trainscript
 	static inline Variable mkvar(Real value) {
 		Variable v = Variable::Real;
 		v.real = value;
+		return v;
+	}
+
+	static inline Variable mkbool(Bool value) {
+		Variable v = Variable::Boolean;
+		v.boolean = value;
 		return v;
 	}
 
@@ -291,6 +302,7 @@ namespace trainscript
 			switch(target->type.id) {
 				case TypeID::Int: target->integer = result.integer; break;
 				case TypeID::Real: target->real = result.real; break;
+				case TypeID::Bool: target->boolean = result.boolean; break;
 				default: if(verbose) printf("assignment not supported.\n"); break;
 			}
 

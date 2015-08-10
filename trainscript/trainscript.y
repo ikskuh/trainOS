@@ -15,6 +15,13 @@ namespace trainscript {
 		Variable multiply(Variable lhs, Variable rhs);
 		Variable divide(Variable lhs, Variable rhs);
 		Variable modulo(Variable lhs, Variable rhs);
+
+		Variable equals(Variable lhs, Variable rhs);
+		Variable inequals(Variable lhs, Variable rhs);
+		Variable less(Variable lhs, Variable rhs);
+		Variable lessEqual(Variable lhs, Variable rhs);
+		Variable greater(Variable lhs, Variable rhs);
+		Variable greaterEqual(Variable lhs, Variable rhs);
 	}
 }
 
@@ -65,6 +72,13 @@ void yyerror(void *scanner, const char *s);
 %token RARROW
 %token LARROW
 
+%token OP_LT
+%token OP_LE
+%token OP_GT
+%token OP_GE
+%token OP_EQ
+%token OP_NEQ
+
 %token <fval> REAL
 %token <ival> INT
 %token <text> IDENTIFIER
@@ -73,17 +87,32 @@ void yyerror(void *scanner, const char *s);
 %token KW_PRI
 %token KW_VAR
 %token KW_PTR
+
 %token KW_VOID
 %token KW_INT
 %token KW_REAL
 %token KW_TEXT
+%token KW_BOOL
+
+%token KW_BEGIN
+%token KW_END
+
+%token KW_IF
+%token KW_ELSE
+%token KW_REPEAT
+%token KW_FROM
+%token KW_TO
+%token KW_UNTIL
+%token KW_WHILE
 
 %type <type> typeName
 %type <varDecl> variableDeclaration
-%type <indentation> indentation
+
+// %type <indentation> indentation
 
 %type <method> method
 %type <methodHeader> methodDeclaration
+%type <body> block
 %type <body> body
 
 %type <local> argument
@@ -101,6 +130,7 @@ void yyerror(void *scanner, const char *s);
 %start input
 
 %left PLUS MINUS MULTIPLY DIVIDE MODULO RARROW
+%left OP_LT OP_LE OP_GT OP_GE OP_EQ OP_NEQ
 
 %%
 input:
@@ -147,18 +177,22 @@ input:
 ;
 
 method:
-	methodDeclaration body {
+	methodDeclaration block {
 		$$.header = $1;
 		$$.body = $2;
 	}
 ;
 
+block:
+	KW_BEGIN body KW_END { $$ = $2; }
+;
+
 body:
 	%empty { $$ = nullptr; }
-|   body indentation instruction SEMICOLON {
+|   body instruction SEMICOLON {
 		auto *body = new MethodBody();
-		body->indentation = $2;
-		body->instruction = $3;
+		body->indentation = 0;
+		body->instruction = $2;
 		if($1 == nullptr) {
 			$$ = body;
 		} else {
@@ -266,6 +300,12 @@ expression:
 |   expression MULTIPLY expression              { $$ = new ArithmeticExpression<trainscript::ops::multiply>($1, $3); }
 |   expression DIVIDE expression                { $$ = new ArithmeticExpression<trainscript::ops::divide>($1, $3); }
 |   expression MODULO expression                { $$ = new ArithmeticExpression<trainscript::ops::modulo>($1, $3); }
+|   expression OP_LT expression                 { $$ = new ArithmeticExpression<trainscript::ops::less>($1, $3); }
+|   expression OP_LE expression                 { $$ = new ArithmeticExpression<trainscript::ops::lessEqual>($1, $3); }
+|   expression OP_GT expression                 { $$ = new ArithmeticExpression<trainscript::ops::greater>($1, $3); }
+|   expression OP_GE expression                 { $$ = new ArithmeticExpression<trainscript::ops::greaterEqual>($1, $3); }
+|   expression OP_EQ expression                 { $$ = new ArithmeticExpression<trainscript::ops::equals>($1, $3); }
+|   expression OP_NEQ expression                { $$ = new ArithmeticExpression<trainscript::ops::inequals>($1, $3); }
 |   expression RARROW IDENTIFIER                { $$ = new VariableAssignmentExpression($3, $1); }
 ;
 
@@ -302,13 +342,15 @@ typeName:
 |   KW_INT                            { $$.id = TypeID::Int; $$.pointer = 0; }
 |   KW_REAL                           { $$.id = TypeID::Real; $$.pointer = 0; }
 |   KW_TEXT                           { $$.id = TypeID::Text; $$.pointer = 0; }
+|   KW_BOOL                           { $$.id = TypeID::Bool; $$.pointer = 0; }
 |   KW_PTR LBRACKET typeName RBRACKET { $$ = $3; $$.pointer++; }
 ;
-
+/*
 indentation:
 	TAB { $$ = 1; }
 |   indentation TAB { $$ = $1 + 1; }
 ;
+*/
 
 %%
 
@@ -317,5 +359,16 @@ indentation:
 #include "trainscript.l.h"
 
 void yyerror(void *scanner, const char *s) {
-	printf("Error: %s\n", s);
+	if(scanner == nullptr) {
+		printf("Error: %s\n", s);
+		return;
+	}
+	int line = 0; // yyget_lineno(scanner);
+	int col = 0; //yyget_column(scanner);
+	char *text = yyget_text(scanner);
+	printf(
+		"[%d:%d] Error: %s at '%s'\n",
+		line, col,
+		s,
+		text);
 }

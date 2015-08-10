@@ -9,6 +9,7 @@ namespace trainscript
 		Int = 2,
 		Real = 3,
 		Text = 4,
+		Bool = 5,
 	};
 
 	static const char *typeName(TypeID id) {
@@ -18,6 +19,7 @@ namespace trainscript
 			case TypeID::Int: return "INT";
 			case TypeID::Real: return "REAL";
 			case TypeID::Text: return "TEXT";
+			case TypeID::Bool: return "BOOL";
 			default: return "unknown";
 		}
 	}

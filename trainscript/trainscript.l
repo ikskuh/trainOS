@@ -11,8 +11,7 @@
 %option yylineno
 %%
 \#[^\n]*        ; // Eat all the comments!
-[ ]+            ; // Eat all the whitespace!
-\t              { return TAB; }
+[ \t]+          ; // Eat all the whitespace!
 \;              { return SEMICOLON; }
 \:              { return COLON; }
 \,              { return COMMA; }
@@ -26,16 +25,39 @@
 \%              { return MODULO; }
 \-\>|→          { return RARROW; }
 \<\-|←          { return LARROW; }
+
+\<              { return OP_LT; }
+\<\=            { return OP_LE; }
+\>              { return OP_GT; }
+\>\=            { return OP_GE; }
+\=              { return OP_EQ; }
+\≠|\=\/\=       { return OP_NEQ; }
+
 VAR             { return KW_VAR; }
 PUB             { return KW_PUB; }
 PRI             { return KW_PRI; }
 PTR             { return KW_PTR; }
+
 VOID            { return KW_VOID; }
 INT             { return KW_INT; }
 REAL            { return KW_REAL; }
 TEXT            { return KW_TEXT; }
+BOOL            { return KW_BOOL; }
+
+BEGIN           { return KW_BEGIN; }
+END             { return KW_END; }
+IF              { return KW_IF; }
+ELSE            { return KW_ELSE; }
+REPEAT          { return KW_REPEAT; }
+FROM            { return KW_FROM; }
+TO              { return KW_TO; }
+UNTIL           { return KW_UNTIL; }
+WHILE           { return KW_WHILE; }
 [0-9]+\.[0-9]*  { yylval->fval = atof(yytext); return REAL; }
 [0-9]+          { yylval->ival = atoi(yytext); return INT; }
 [a-zA-Z0-9']+   { yylval->text = strdup(yytext); return IDENTIFIER; }
 .               { yyerror(NULL, "illegal token"); }
 %%
+/*
+\t              { return TAB; }
+*/

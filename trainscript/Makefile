@@ -1,5 +1,5 @@
 # -fsanitize=address
-CFLAGS=
+CFLAGS=-g
 CCFLAGS=$(CFLAGS) -std=c++11 -c
 LFLAGS=$(CFLAGS) -o tsvm
 

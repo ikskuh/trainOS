@@ -67,11 +67,7 @@ int main(int argc, char** argv)
 		printf("Variable: %s : %s = ",
 			var.first.c_str(),
 			typeName(var.second->type.id));
-		switch(var.second->type.id) {
-			case TypeID::Int: printf("%d", var.second->integer); break;
-			case TypeID::Real: printf("%f", var.second->real); break;
-			default: printf("???"); break;
-		}
+		var.second->printval();
 		printf("\n");
 	}
 
