@@ -106,6 +106,7 @@ void yyerror(void *scanner, const char *s);
 %token KW_TO
 %token KW_UNTIL
 %token KW_WHILE
+%token KW_DO
 
 %type <type> typeName
 %type <varDecl> variableDeclaration
@@ -128,6 +129,7 @@ void yyerror(void *scanner, const char *s);
 %type <instruction> expression
 %type <instruction> condition
 %type <instruction> elseIfLoop
+%type <instruction> loop
 
 %type <expressions> expressionList
 
@@ -284,11 +286,16 @@ instruction:
 	block { $$ = $1; }
 |	expression SEMICOLON { $$ = $1; }
 |	condition { $$ = $1; }
+|	loop { $$ = $1; }
+;
+
+loop:
+	KW_REPEAT instruction { $$ = new RepeatEndlessExpression($2); }
+|	KW_WHILE expression KW_DO instruction { $$ = new RepeatWhileExpression($2, $4); }
 ;
 
 condition:
 	KW_IF expression KW_THEN instruction elseIfLoop { $$ = new IfExpression($2, $4, $5); }
-//|	KW_IF expression KW_THEN instruction KW_ELSE instruction { $$ = new IfExpression($2, $4, $6); }
 ;
 
 elseIfLoop:

@@ -428,4 +428,75 @@ namespace trainscript
 			return Variable::Void;
 		}
 	};
+
+	class RepeatEndlessExpression :
+			public Instruction
+	{
+	public:
+		Instruction *block;
+
+		RepeatEndlessExpression(Instruction *block) :
+			block(block)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override {
+			if(this->block == nullptr) {
+				if(verbose) printf("REPEAT: missing block.\n");
+				return Variable::Invalid;
+			}
+
+			while(true)
+			{
+				Variable result = this->block->execute(context);
+				(void)result;
+			}
+			return Variable::Void;
+		}
+	};
+
+
+	class RepeatWhileExpression :
+			public Instruction
+	{
+	public:
+		Instruction *condition;
+		Instruction *block;
+
+		RepeatWhileExpression(Instruction *condition, Instruction *block) :
+			condition(condition),
+			block(block)
+		{
+
+		}
+
+		Variable execute(LocalContext &context) const override {
+			if(this->condition == nullptr) {
+				if(verbose) printf("REPEAT: missing condition.\n");
+				return Variable::Invalid;
+			}
+			if(this->block == nullptr) {
+				if(verbose) printf("REPEAT: missing block.\n");
+				return Variable::Invalid;
+			}
+
+			while(true)
+			{
+				Variable cond = this->condition->execute(context);
+
+				if(cond.type != Type::Boolean) {
+					printf("REPEAT: Invalid expression type.\n");
+					return Variable::Invalid;
+				}
+
+				if(cond.boolean == false) {
+					break;
+				}
+
+				this->block->execute(context);
+			}
+			return Variable::Void;
+		}
+	};
 }
