@@ -49,6 +49,7 @@ END             { return KW_END; }
 IF              { return KW_IF; }
 THEN            { return KW_THEN; }
 ELSE            { return KW_ELSE; }
+ELSEIF          { return KW_ELSEIF; }
 REPEAT          { return KW_REPEAT; }
 FROM            { return KW_FROM; }
 TO              { return KW_TO; }

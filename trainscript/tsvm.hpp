@@ -392,16 +392,18 @@ namespace trainscript
 		}
 	};
 
-	class ConditionExpression :
+	class IfExpression :
 			public Instruction
 	{
 	public:
 		Instruction *condition;
-		Instruction *block;
+		Instruction *blockTrue;
+		Instruction *blockFalse;
 
-		ConditionExpression(Instruction *condition, Instruction *block) :
+		IfExpression(Instruction *condition, Instruction *blockTrue, Instruction *blockFalse) :
 			condition(condition),
-			block(block)
+			blockTrue(blockTrue),
+			blockFalse(blockFalse)
 		{
 
 		}
@@ -412,17 +414,16 @@ namespace trainscript
 				return Variable::Invalid;
 			}
 
-			if(this->block == nullptr) {
-				return Variable::Void;
-			}
-
 			Variable result = this->condition->execute(context);
 			if(result.type != Type::Boolean) {
 				if(verbose) printf("IF: Invalid condition type.\n");
 				return Variable::Invalid;
 			}
-			if(result.boolean && (this->block != nullptr)) {
-				this->block->execute(context);
+			if((result.boolean == true) && (this->blockTrue != nullptr)) {
+				this->blockTrue->execute(context);
+			}
+			if((result.boolean == false) && (this->blockFalse != nullptr)) {
+				this->blockFalse->execute(context);
 			}
 			return Variable::Void;
 		}

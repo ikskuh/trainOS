@@ -100,6 +100,7 @@ void yyerror(void *scanner, const char *s);
 %token KW_IF
 %token KW_THEN
 %token KW_ELSE
+%token KW_ELSEIF
 %token KW_REPEAT
 %token KW_FROM
 %token KW_TO
@@ -125,6 +126,8 @@ void yyerror(void *scanner, const char *s);
 
 %type <instruction> instruction
 %type <instruction> expression
+%type <instruction> condition
+%type <instruction> elseIfLoop
 
 %type <expressions> expressionList
 
@@ -132,6 +135,8 @@ void yyerror(void *scanner, const char *s);
 
 %left PLUS MINUS MULTIPLY DIVIDE MODULO RARROW
 %left OP_LT OP_LE OP_GT OP_GE OP_EQ OP_NEQ
+
+%right KW_IF KW_THEN KW_ELSEIF KW_ELSE
 
 %%
 input:
@@ -276,8 +281,42 @@ argument:
 ;
 
 instruction:
-	expression SEMICOLON { $$ = $1; }
-|	KW_IF expression KW_THEN instruction { $$ = new ConditionExpression($2, $4); }
+	block { $$ = $1; }
+|	expression SEMICOLON { $$ = $1; }
+|	condition { $$ = $1; }
+;
+
+condition:
+	KW_IF expression KW_THEN instruction elseIfLoop { $$ = new IfExpression($2, $4, $5); }
+//|	KW_IF expression KW_THEN instruction KW_ELSE instruction { $$ = new IfExpression($2, $4, $6); }
+;
+
+elseIfLoop:
+	%empty { $$ = nullptr; }
+|	elseIfLoop KW_ELSEIF expression KW_THEN instruction {
+		if($$ == nullptr) {
+			$$ = new IfExpression($3, $5, nullptr);
+		} else {
+			IfExpression *exp = (IfExpression*)$1;
+			while(exp->blockFalse != nullptr) {
+				exp = (IfExpression*)exp->blockFalse;
+			}
+			exp->blockFalse = new IfExpression($3, $5, nullptr);
+			$$ = $1;
+		}
+	}
+|	elseIfLoop KW_ELSE instruction {
+		if($$ == nullptr) {
+			$$ = $3;
+		} else {
+			IfExpression *exp = (IfExpression*)$1;
+			while(exp->blockFalse != nullptr) {
+				exp = (IfExpression*)exp->blockFalse;
+			}
+			exp->blockFalse = $3;
+			$$ = $1;
+		}
+	}
 ;
 
 expression:
@@ -345,12 +384,6 @@ typeName:
 |   KW_BOOL                           { $$.id = TypeID::Bool; $$.pointer = 0; }
 |   KW_PTR LBRACKET typeName RBRACKET { $$ = $3; $$.pointer++; }
 ;
-/*
-indentation:
-	TAB { $$ = 1; }
-|   indentation TAB { $$ = $1 + 1; }
-;
-*/
 
 %%
 
