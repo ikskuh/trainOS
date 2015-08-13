@@ -75,7 +75,7 @@ void kputs(const char *str);
  * @param format The format string that will be printed in formatted version.
  * @param ... The format parameters that will be used to print the string.
  */
-void kprintf(const char *format, ...);
+void kprintf(const char *format, ...) __attribute__((format(printf,1,2)));
 
 #if defined(__cplusplus)
 }

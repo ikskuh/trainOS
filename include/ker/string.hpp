@@ -34,29 +34,22 @@ namespace ker
 
         String & operator = (const String &other)
         {
-            free(this->mText);
-            this->mLength = other.mLength;
-
-            this->mText = (uint8_t*)malloc(this->mLength + 1);
-            memcpy(this->mText, other.mText, this->mLength + 1);
+            this->copyFrom(other.mText, other.mLength);
+            return *this;
         }
 
 		String(const char *text) :
 			mText(nullptr),
 			mLength(0)
         {
-            this->mLength = strlen(text);
-            this->mText = (uint8_t*)malloc(this->mLength + 1);
-            memcpy(this->mText, text, this->mLength);
-            this->mText[this->mLength] = 0;
+            this->copyFrom(reinterpret_cast<const uint8_t*>(text), strlen(text));
 		}
 
 		String(const uint8_t *bytes, size_t length) :
-            mText((uint8_t*)malloc(length + 1)),
+            mText(nullptr),
 			mLength(length)
 		{
-            memcpy(this->mText, bytes, length);
-            this->mText[this->mLength] = 0; // last byte is always 0
+            this->copyFrom(bytes, length);
 		}
 
 		~String()
@@ -76,7 +69,7 @@ namespace ker
 			if(this->mLength != other.mLength) {
 				return false;
 			}
-			return memcmp(this->mText, other.mText, this->mLength) != 0;
+            return memcmp(this->mText, other.mText, this->mLength) == 0;
 		}
 
 		const uint8_t *text() const
@@ -123,5 +116,16 @@ namespace ker
 		{
 			return !this->equals(other);
 		}
+    private:
+        void copyFrom(const uint8_t *bytes, size_t length)
+        {
+            if(this->mText != nullptr) {
+                free(this->mText);
+            }
+            this->mText = (uint8_t*)malloc(length + 1);
+            memcpy(this->mText, bytes, length);
+            this->mLength = length;
+            this->mText[this->mLength] = 0; // last byte is always 0
+        }
 	};
 };

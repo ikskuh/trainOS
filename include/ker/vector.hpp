@@ -23,11 +23,52 @@ namespace ker
 			this->reserve(Vector<T>::initialCap);
 		}
 
+        Vector(const Vector &other) :
+            mData(nullptr),
+            mLength(0),
+            mReserved(0)
+        {
+            this->mLength = other.mLength;
+            if(this->mLength > 0) {
+                this->reserve(this->mLength);
+                for(size_t i = 0; i < this->mLength; i++) {
+                    new (&this->mData[i]) T(other.mData[i]);
+                }
+            }
+        }
+
+        Vector(Vector &&other) :
+            mData(other.mData),
+            mLength(other.mLength),
+            mReserved(other.mReserved)
+        {
+            other.mData = nullptr;
+            other.mLength = 0;
+            other.mReserved = 0;
+        }
+
+        Vector & operator = (const Vector &other)
+        {
+            this->resize(other.mLength);
+            for(size_t i = 0; i < this->mLength; i++)
+            {
+                this->mData[i] = other.mData[i];
+            }
+            return *this;
+        }
+
 		explicit Vector(size_t initialReserve) :
 			Vector()
 		{
 			this->reserve(initialReserve);
 		}
+
+        ~Vector()
+        {
+            if(this->mData != nullptr) {
+                free(this->mData);
+            }
+        }
 
 		size_t length() const
 		{
@@ -47,7 +88,7 @@ namespace ker
 		void append(const T &value)
 		{
 			this->reserve(this->mLength + 1);
-			new (&this->mData[this->mLength - 1]) T(value);
+            new (&this->mData[this->mLength]) T(value);
 			this->mLength += 1;
 		}
 
@@ -67,6 +108,7 @@ namespace ker
 					new (&this->mData[i]) T ();
 				}
 			}
+            this->mLength = size;
 		}
 
 		void reserve(size_t space)
@@ -82,6 +124,7 @@ namespace ker
 				free(this->mData);
 			}
 			this->mData = newData;
+            this->mReserved = space;
 		}
 
 		T& operator [](size_t idx)

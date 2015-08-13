@@ -164,7 +164,15 @@ namespace trainscript
 		}
 	};
 
-	class Method
+    class Method
+    {
+    public:
+        virtual ~Method() { }
+        virtual Variable invoke(ker::Vector<Variable> arguments) = 0;
+    };
+
+    class ScriptMethod :
+            public Method
 	{
 	public:
 		Module *module;
@@ -174,12 +182,12 @@ namespace trainscript
 		ker::Dictionary<ker::String, Variable> locals;
 		ker::Pair<ker::String, Variable> returnValue;
 
-		Method(Module *module, Instruction *block) : module(module), block(block)
+        ScriptMethod(Module *module, Instruction *block) : module(module), block(block)
 		{
 
 		}
 
-		Variable invoke(ker::Vector<Variable> arguments);
+        Variable invoke(ker::Vector<Variable> arguments) override;
 	};
 
 	class Module
@@ -193,12 +201,12 @@ namespace trainscript
 
 		Method *method(const char *name)
 		{
-			return this->methods[name];
+            return this->methods.get(name);
 		}
 
 		Variable *variable(const char *name)
 		{
-			return this->variables[name];
+            return this->variables.get(name);
 		}
 	};
 

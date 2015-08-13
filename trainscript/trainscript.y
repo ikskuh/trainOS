@@ -151,7 +151,7 @@ input:
 		using namespace trainscript;
 		auto *mod = context->module;
 
-		Method *method = new Method(mod, $2.body);
+        ScriptMethod *method = new ScriptMethod(mod, $2.body);
 		method->isPublic = $2.header.isPublic;
 		if($2.header.returnValue) {
             method->returnValue = ker::Pair<ker::String, Variable>(

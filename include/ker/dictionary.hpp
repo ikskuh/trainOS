@@ -10,7 +10,7 @@ namespace ker
 	{
 	public:
 		typedef Pair<Key, Value> Entry;
-	private:
+    public:
 		Vector<Entry> contents;
 	public:
 		Dictionary() :
@@ -18,6 +18,24 @@ namespace ker
 		{
 
 		}
+
+        Dictionary(const Dictionary &other) :
+            contents(other.contents)
+        {
+
+        }
+
+        Dictionary(Dictionary &&other) :
+            contents(other.contents)
+        {
+            other.contents = Vector<Entry>();
+        }
+
+        Dictionary & operator = (const Dictionary &other)
+        {
+            this->contents = other.contents;
+            return *this;
+        }
 
 		Value &at(const Key &key)
 		{
@@ -38,6 +56,15 @@ namespace ker
 				}
 			}
 		}
+
+        Value get(const Key &key) const
+        {
+            if(this->contains(key)) {
+                return this->at(key);
+            } else {
+                return Value();
+            }
+        }
 
 		bool contains(const Key &key) const
         {

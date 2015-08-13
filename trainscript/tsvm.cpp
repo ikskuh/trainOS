@@ -42,9 +42,7 @@ namespace trainscript
 		data.module = module;
 		yylex_init_extra(&data, &data.scanner);
 
-        int error = yyparse(&data);
-        kprintf("[E:%d]", error);
-        bool valid = error == 0;
+        bool valid = yyparse(&data) == 0;
 
 		yylex_destroy(data.scanner);
 		free(internalStorage);
@@ -78,7 +76,7 @@ namespace trainscript
 		}
 	}
 
-	Variable Method::invoke(ker::Vector<Variable> arguments)
+    Variable ScriptMethod::invoke(ker::Vector<Variable> arguments)
 	{
 		LocalContext context(this->module);
 
