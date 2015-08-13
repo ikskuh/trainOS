@@ -144,7 +144,8 @@ void yyerror(void *scanner, const char *s);
 input:
 	%empty
 |   input variableDeclaration SEMICOLON {
-		context->module->variables.insert( { $2.name, new Variable($2.variable) } );
+        auto *var = new Variable($2.variable);
+        context->module->variables.add( ker::String($2.name), var );
 	}
 |   input method {
 		using namespace trainscript;
@@ -153,22 +154,22 @@ input:
 		Method *method = new Method(mod, $2.body);
 		method->isPublic = $2.header.isPublic;
 		if($2.header.returnValue) {
-			method->returnValue = std::pair<std::string, Variable>(
+            method->returnValue = ker::Pair<ker::String, Variable>(
 				$2.header.returnValue->name,
 				$2.header.returnValue->variable);
 		}
 		LocalVariable *local = $2.header.locals;
 		while(local) {
-			method->locals.insert( { local->name, local->variable } );
+            method->locals.add( local->name, local->variable );
 			local = local->next;
 		}
 		LocalVariable *arg = $2.header.arguments;
 		while(arg) {
-			method->arguments.push_back( { arg->name, arg->variable } );
+            method->arguments.append( { arg->name, arg->variable } );
 			arg = arg->next;
 		}
 
-		context->module->methods.insert( { $2.header.name, method } );
+        context->module->methods.add( $2.header.name, method );
 	}
 ;
 
@@ -185,7 +186,7 @@ block:
 		MethodBody *mb = $2;
 		while(mb) {
 			if(mb->instruction != nullptr) {
-				block->instructions.push_back(mb->instruction);
+                block->instructions.append(mb->instruction);
 			}
 			mb = mb->next;
 		}
@@ -335,7 +336,7 @@ expression:
 		auto *call = new MethodInvokeExpression($1);
 		auto *list = $3;
 		while(list) {
-			call->parameters.push_back(list->instruction);
+            call->parameters.append(list->instruction);
 			list = list->next;
 		}
 		$$ = call;

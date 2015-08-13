@@ -14,7 +14,8 @@ SOURCES += \
     trainscript/tsvm.cpp \
     trainscript/main.cpp \
     src/timer.c \
-    src/cplusplus.cpp
+    src/cplusplus.cpp \
+    src/vm.cpp
 
 HEADERS += \
 	include/console.h \
@@ -49,7 +50,8 @@ DISTFILES += \
     trainscript/file01.ts \
 	trainscript/Makefile \
 	trainscript/trainscript.y \
-    trainscript/file02.ts
+    trainscript/file02.ts \
+    kernel.ld
 
 QMAKE_INCDIR =
 

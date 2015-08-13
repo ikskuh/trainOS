@@ -21,12 +21,12 @@ namespace trainscript
 	const Type Type::Text = { TypeID::Text, 0 };
 	const Type Type::Boolean = { TypeID::Bool, 0 };
 
-	const Variable Variable::Invalid = { Type::Invalid };
-	const Variable Variable::Void = { Type::Void };
-	const Variable Variable::Int = { Type::Int };
-	const Variable Variable::Real = { Type::Real };
-	const Variable Variable::Text = { Type::Text };
-	const Variable Variable::Boolean = { Type::Boolean };
+    const Variable Variable::Invalid = { Type::Invalid, 0 };
+    const Variable Variable::Void = { Type::Void, 0 };
+    const Variable Variable::Int = { Type::Int, 0 };
+    const Variable Variable::Real = { Type::Real, 0 };
+    const Variable Variable::Text = { Type::Text, 0 };
+    const Variable Variable::Boolean = { Type::Boolean, 0 };
 
 	Module *VM::load(const void *buffer, size_t length)
 	{
@@ -42,7 +42,9 @@ namespace trainscript
 		data.module = module;
 		yylex_init_extra(&data, &data.scanner);
 
-		bool valid = yyparse(&data) == 0;
+        int error = yyparse(&data);
+        kprintf("[E:%d]", error);
+        bool valid = error == 0;
 
 		yylex_destroy(data.scanner);
 		free(internalStorage);

@@ -3,7 +3,7 @@ OBJS = $(addsuffix .o,$(basename $(SRCS)))
 
 CC = gcc
 CXX = g++
-LD = ld
+LD = g++
 LEX=flex
 YACC=bison
 
@@ -11,10 +11,12 @@ YACC=bison
 CFLAGS = -m32 -Dnullptr=0
 ASFLAGS =
 CCFLAGS = -g -std=c11 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
-CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-exceptions -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS = -g -melf_i386 -Tkernel.ld
+CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
+LDFLAGS = -g -m32 -Tkernel.ld
 
-kernel: $(OBJS) obj/tsvm.o obj/lex.yy.o obj/trainscript.tab.o
+all: clean kernel
+
+kernel: $(OBJS) obj/tsvm.o obj/lex.yy.o obj/trainscript.tab.o obj/vm.o
 	$(LD) $(LDFLAGS) -o $@ $(addprefix obj/, $(notdir $^))
 
 %.o: %.c
@@ -26,13 +28,16 @@ kernel: $(OBJS) obj/tsvm.o obj/lex.yy.o obj/trainscript.tab.o
 %.o: %.cpp
 	$(CXX) $(CFLAGS) $(CXXFLAGS) -c -o $(addprefix obj/, $(notdir $@)) $^
 
-obj/tsvm.o: trainscript/tsvm.cpp trainscript/tsvm.hpp trainscript/common.h
+obj/vm.o: src/vm.cpp trainscript/tsvm.hpp
+	g++ $(CFLAGS) $(CXXFLAGS) -c src/vm.cpp -o obj/vm.o
+
+obj/tsvm.o: trainscript/tsvm.cpp trainscript/tsvm.hpp
 	g++ $(CFLAGS) $(CXXFLAGS) -c trainscript/tsvm.cpp -o obj/tsvm.o
 
-obj/lex.yy.o: trainscript/lex.yy.cpp trainscript/tsvm.hpp trainscript/common.h trainscript/trainscript.tab.cpp
+obj/lex.yy.o: trainscript/lex.yy.cpp trainscript/tsvm.hpp
 	g++ $(CFLAGS) $(CXXFLAGS) -c trainscript/lex.yy.cpp -o obj/lex.yy.o
 
-trainscript.tab.o: trainscript/lex.yy.cpp trainscript/trainscript.tab.cpp trainscript/tsvm.hpp trainscript/common.h
+obj/trainscript.tab.o: trainscript/trainscript.tab.cpp trainscript/tsvm.hpp
 	g++ $(CFLAGS) $(CXXFLAGS) -c trainscript/trainscript.tab.cpp -o obj/trainscript.tab.o
 
 trainscript/lex.yy.cpp: trainscript/trainscript.l
@@ -41,8 +46,11 @@ trainscript/lex.yy.cpp: trainscript/trainscript.l
 trainscript/trainscript.tab.cpp: trainscript/trainscript.y
 	$(YACC) -o trainscript/trainscript.tab.cpp -d trainscript/trainscript.y
 
+obj/file01.o:
+	objcopy -I binary -O elf32-i386 --redefine-sym _binary_trainscript_file01_ts_start=file01_start --redefine-sym _binary_trainscript_file01_ts_end=file01_end --redefine-sym _binary_trainscript_file01_ts_size=file01_size trainscript/file01.ts obj/file01.o
+
 clean:
-	rm $(addprefix obj/, $(notdir $(OBJS)))
+	rm obj/*.o
 
 run:
 	qemu-system-i386 -kernel kernel

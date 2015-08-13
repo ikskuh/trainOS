@@ -1,5 +1,7 @@
 /*  Bei _start soll die Ausfuehrung losgehen */
-ENTRY(_start)
+ENTRY(_trainOS_start)
+OUTPUT_FORMAT(elf32-i386)
+OUTPUT_ARCH(i386:i386)
 
 /*
  * Hier wird festgelegt, in welcher Reihenfolge welche Sektionen in die Binary
@@ -24,6 +26,11 @@ SECTIONS
         *(.text)
     }
     .data ALIGN(4096) : {
+        start_ctors = .;
+        KEEP(*( .init_array ));
+        KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));
+        end_ctors = .;
+
         *(.data)
     }
     .rodata ALIGN(4096) : {

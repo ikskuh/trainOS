@@ -40,7 +40,7 @@ namespace ker
 		}
 
 		bool contains(const Key &key) const
-		{
+        {
 			for(const auto &pair : this->contents)
 			{
 				if(pair.first == key) {
@@ -51,7 +51,7 @@ namespace ker
 		}
 
 		void add(const Key &key, const Value &value)
-		{
+        {
 			if(this->contains(key)) {
 				for(auto &&pair : this->contents)
 				{

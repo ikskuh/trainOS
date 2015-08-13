@@ -4,8 +4,8 @@
 .extern init
 
 // .global für Sichtbarkeit im Linker (invers zu static aus C)
-.global _start
-_start:
+.global _trainOS_start
+_trainOS_start:
 	// Init stack
 	mov $kernel_stack, %esp
 

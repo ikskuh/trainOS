@@ -18,25 +18,52 @@ namespace ker
 
 		}
 
+        String(const String &other) :
+            String(other.mText, other.mLength)
+        {
+
+        }
+
+        String(String &&other) :
+            mText(other.mText),
+            mLength(other.mLength)
+        {
+            other.mText = nullptr;
+            other.mLength = 0;
+        }
+
+        String & operator = (const String &other)
+        {
+            free(this->mText);
+            this->mLength = other.mLength;
+
+            this->mText = (uint8_t*)malloc(this->mLength + 1);
+            memcpy(this->mText, other.mText, this->mLength + 1);
+        }
+
 		String(const char *text) :
 			mText(nullptr),
 			mLength(0)
-		{
-			this->mLength = strlen(text);
-			this->mText = (uint8_t*)malloc(this->mLength + 1);
-			memcpy(this->mText, text, this->mLength);
+        {
+            this->mLength = strlen(text);
+            this->mText = (uint8_t*)malloc(this->mLength + 1);
+            memcpy(this->mText, text, this->mLength);
+            this->mText[this->mLength] = 0;
 		}
 
 		String(const uint8_t *bytes, size_t length) :
-			mText((uint8_t*)malloc(length)),
+            mText((uint8_t*)malloc(length + 1)),
 			mLength(length)
 		{
-			memcpy(this->mText, bytes, length);
+            memcpy(this->mText, bytes, length);
+            this->mText[this->mLength] = 0; // last byte is always 0
 		}
 
 		~String()
 		{
-			free(this->mText);
+            if(this->mText != nullptr) {
+                free(this->mText);
+            }
 		}
 
 		size_t length() const

@@ -94,10 +94,7 @@ static void dumpMB(const MultibootStructure *mbHeader)
     // TODO: MB_APS_TABLE
 }
 
-void cpp_init()
-{
-
-}
+void cpp_init();
 
 void putsuccess()
 {
@@ -105,6 +102,8 @@ void putsuccess()
 	ksetpos(CONSOLE_WIDTH - 9, y);
 	kputs("[success]");
 }
+
+extern void vm_start();
 
 void init(const MultibootStructure *mbHeader)
 {
@@ -151,9 +150,22 @@ void init(const MultibootStructure *mbHeader)
 	cpp_init();
 	putsuccess();
 
+    vm_start();
+
 	while(1)
 	{
 		kputs("x");
 		sleep(1);
 	}
 }
+
+int main(int argc, char **argv)
+{
+    while(1) {
+        kputs("x");
+    }
+    return 0;
+}
+
+void __init_array_start() { }
+void __init_array_end() { }

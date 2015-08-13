@@ -85,6 +85,19 @@ int atoi(const char *str)
 	return res;
 }
 
+float atof(const char *str)
+{
+    // HACK: Implement
+    return 42.0f;
+}
+
+double atod(const char *str)
+{
+    // HACK: Implement
+    return 42.0;
+}
+
+
 void *memmove( void *destination, const void *source, size_t num)
 {
 	// TODO: Implement memmove
