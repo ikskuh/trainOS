@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 #define CONSOLE_WIDTH 80
 #define CONSOLE_HEIGHT 25
 
@@ -72,3 +76,7 @@ void kputs(const char *str);
  * @param ... The format parameters that will be used to print the string.
  */
 void kprintf(const char *format, ...);
+
+#if defined(__cplusplus)
+}
+#endif

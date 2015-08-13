@@ -2,6 +2,10 @@
 
 #include <inttypes.h>
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 #define VM_PRESENT  0x01
 #define VM_WRITABLE 0x02
 #define VM_USER     0x04
@@ -19,3 +23,7 @@ void vmm_init(void);
  * @remarks If flags is 0, the mapping will be undone.
  */
 void vmm_map(uintptr_t virtual, uintptr_t physical, uint32_t flags);
+
+#if defined(__cplusplus)
+}
+#endif

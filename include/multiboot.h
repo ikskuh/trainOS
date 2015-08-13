@@ -2,6 +2,10 @@
 
 #include <inttypes.h>
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 #define MB_MEMSIZE (1<<0)
 #define MB_BOOTDEVICE (1<<1)
 #define MB_COMMANDLINE (1<<2)
@@ -89,3 +93,7 @@ typedef struct {
     uint16_t vbeInterfaceOffset;
     uint16_t vbeInterfaceLength;
 } __attribute__((packed)) MultibootStructure;
+
+#if defined(__cplusplus)
+}
+#endif

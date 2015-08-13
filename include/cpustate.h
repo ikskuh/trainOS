@@ -1,6 +1,10 @@
 #pragma once
 #include "inttypes.h"
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 typedef struct
 {
 	// Saved by interrupt routine
@@ -22,3 +26,7 @@ typedef struct
     uint32_t   esp;
     uint32_t   ss;
 } CpuState;
+
+#if defined(__cplusplus)
+}
+#endif

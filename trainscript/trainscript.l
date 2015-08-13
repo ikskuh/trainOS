@@ -1,7 +1,7 @@
 %{
 #include <stdlib.h>
 #include "common.h"
-#include "trainscript.tab.h"
+#include "trainscript.tab.hpp"
 
 %}
 %option noyywrap

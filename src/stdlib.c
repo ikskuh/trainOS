@@ -1,4 +1,23 @@
-#include "stdlib.h"
+#include <stdlib.h>
+#include <kernel.h>
+
+void* realloc (void* ptr, size_t size)
+{
+	void *n = malloc(size);
+	memcpy(n, ptr, size);
+	free(ptr);
+	return n;
+}
+
+void exit(int errorCode)
+{
+	static char buffer[128];
+	static char tmp[10];
+	strcpy(buffer, "Program exited with error code ");
+	strcat(buffer, itoa(errorCode, tmp, 10));
+	strcat(buffer, ".\n");
+	die(buffer);
+}
 
 static void reverse(char *str, int length)
 {

@@ -1,9 +1,18 @@
 #pragma once
 
-#include <map>
-#include <string>
-#include <vector>
-#include <string.h>
+extern "C" {
+#include <stdlib.h>
+#include <console.h>
+}
+
+// #include <map>
+
+#include <ker/string.hpp>
+#include <ker/vector.hpp>
+#include <ker/dictionary.hpp>
+
+// #include <vector>
+// #include <string.h>
 
 #include "typeid.hpp"
 
@@ -32,7 +41,6 @@ namespace trainscript
 		}
 
 		Type dereference() const {
-			if(pointer == 0) throw std::exception();
 			return { id, pointer - 1 };
 		}
 
@@ -72,10 +80,10 @@ namespace trainscript
 		void printval() const
 		{
 			switch(this->type.id) {
-				case TypeID::Int: printf("%d", this->integer); break;
-				case TypeID::Real: printf("%f", this->real); break;
-				case TypeID::Bool: printf("%s", this->boolean ? "TRUE" : "FALSE"); break;
-				default: printf("???"); break;
+				case TypeID::Int: kprintf("%d", this->integer); break;
+				case TypeID::Real: kprintf("%f", this->real); break;
+				case TypeID::Bool: kprintf("%s", this->boolean ? "TRUE" : "FALSE"); break;
+				default: kprintf("???"); break;
 			}
 		}
 
@@ -107,33 +115,24 @@ namespace trainscript
 
 	class Module;
 
-	class LocalContext :
-			public std::map<std::string, Variable*>
+	class LocalContext  :
+			public ker::Dictionary<ker::String, Variable*>
 	{
 	public:
 		Module * const module = nullptr;
 
 		LocalContext(Module *mod) :
-			std::map<std::string, Variable*>(),
+			ker::Dictionary<ker::String, Variable*>(),
 			module(mod)
 		{
 
 		}
 
-		int depth;
-
-		LocalContext() : depth(0) { }
-
-		void indent() {
-			for(int i = 0; i < depth; i++) printf("  ");
-		}
-
-		Variable *get(const std::string &name)
+		Variable *get(const ker::String &name)
 		{
-			if(this->count(name) > 0) {
+			if(this->contains(name)) {
 				return this->at(name);
 			} else {
-				printf("Variable %s not found!\n", name.c_str());
 				return nullptr;
 			}
 		}
@@ -151,7 +150,7 @@ namespace trainscript
 			public Instruction
 	{
 	public:
-		std::vector<Instruction*> instructions;
+		ker::Vector<Instruction*> instructions;
 
 		~Block() {
 			for(auto *instr : instructions) delete instr;
@@ -171,23 +170,23 @@ namespace trainscript
 		Module *module;
 		Instruction *block;
 		bool isPublic;
-		std::vector<std::pair<std::string, Variable>> arguments;
-		std::map<std::string, Variable> locals;
-		std::pair<std::string, Variable> returnValue;
+		ker::Vector<ker::Pair<ker::String, Variable>> arguments;
+		ker::Dictionary<ker::String, Variable> locals;
+		ker::Pair<ker::String, Variable> returnValue;
 
 		Method(Module *module, Instruction *block) : module(module), block(block)
 		{
 
 		}
 
-		Variable invoke(std::vector<Variable> arguments);
+		Variable invoke(ker::Vector<Variable> arguments);
 	};
 
 	class Module
 	{
 	public:
-		std::map<std::string, Variable*> variables;
-		std::map<std::string, Method*> methods;
+		ker::Dictionary<ker::String, Variable*> variables;
+		ker::Dictionary<ker::String, Method*> methods;
 	public:
 		Module();
 		~Module();
@@ -225,12 +224,6 @@ namespace trainscript
 		ConstantExpression(Variable value) : value(value) { }
 
 		Variable execute(LocalContext &context) const override {
-			if(verbose) {
-				context.indent();
-				printf("constant: ");
-				this->value.printval();
-				printf("\n");
-			}
 			return this->value;
 		}
 	};
@@ -239,15 +232,10 @@ namespace trainscript
 			public Instruction
 	{
 	public:
-		std::string variableName;
-		VariableExpression(std::string variableName) : variableName(variableName) { }
+		ker::String variableName;
+		VariableExpression(ker::String variableName) : variableName(variableName) { }
 
 		Variable execute(LocalContext &context) const override {
-			if(verbose) {
-				context.indent();
-				printf("variable: %s\n", this->variableName.c_str());
-			}
-
 			auto *var = context.get(this->variableName);
 			if(var == nullptr) {
 				return Variable::Invalid;
@@ -261,9 +249,9 @@ namespace trainscript
 			public Instruction
 	{
 	public:
-		std::string variableName;
+		ker::String variableName;
 		Instruction *expression;
-		VariableAssignmentExpression(std::string variableName, Instruction *expression) :
+		VariableAssignmentExpression(ker::String variableName, Instruction *expression) :
 			variableName(variableName),
 			expression(expression)
 		{
@@ -272,19 +260,9 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->expression == nullptr) {
-				if(verbose) printf("Invalid instruction in assignment.\n");
 				return Variable::Invalid;
 			}
-			if(verbose) context.depth++;
 			Variable result = this->expression->execute(context);
-			if(verbose) context.depth--;
-
-			if(verbose) {
-				context.indent();
-				printf("assign ");
-				result.printval();
-				printf(" to %s\n", this->variableName.c_str());
-			}
 
 			Variable *target = context.get(this->variableName);
 			if(target == nullptr) {
@@ -292,10 +270,6 @@ namespace trainscript
 			}
 
 			if(target->type != result.type) {
-				if(verbose) printf(
-					"Assignment does not match: %s → %s\n",
-					typeName(result.type.id),
-					this->variableName.c_str());
 				return Variable::Invalid;
 			}
 
@@ -303,7 +277,7 @@ namespace trainscript
 				case TypeID::Int: target->integer = result.integer; break;
 				case TypeID::Real: target->real = result.real; break;
 				case TypeID::Bool: target->boolean = result.boolean; break;
-				default: if(verbose) printf("assignment not supported.\n"); break;
+				default: break;
 			}
 
 			return result;
@@ -314,10 +288,10 @@ namespace trainscript
 			public Instruction
 	{
 	public:
-		std::string methodName;
-		std::vector<Instruction*> parameters;
+		ker::String methodName;
+		ker::Vector<Instruction*> parameters;
 
-		MethodInvokeExpression(std::string methodName) :
+		MethodInvokeExpression(ker::String methodName) :
 			methodName(methodName)
 		{
 
@@ -325,18 +299,16 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override
 		{
-			Method *method = context.module->method(this->methodName.c_str());
+			Method *method = context.module->method(this->methodName.str());
 			if(method == nullptr) {
-				if(verbose) printf("method %s not found!\n", this->methodName.c_str());
 				return Variable::Invalid;
 			}
 
-			if(verbose) context.depth++;
-			std::vector<Variable> vars(this->parameters.size());
-			for(int i =  0; i < vars.size(); i++) {
+			ker::Vector<Variable> vars(this->parameters.length());
+			vars.resize(this->parameters.length());
+			for(size_t i =  0; i < vars.length(); i++) {
 				vars[i] = this->parameters.at(i)->execute(context);
 			}
-			if(verbose) context.depth--;
 
 			return method->invoke(vars);
 		}
@@ -347,7 +319,7 @@ namespace trainscript
 			public Instruction
 	{
 	public:
-		Instruction *rhs, *lhs;
+		Instruction *lhs, *rhs;
 
 		ArithmeticExpression(Instruction *lhs, Instruction *rhs) :
 			lhs(lhs),
@@ -358,34 +330,17 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->lhs == nullptr) {
-				if(verbose) printf("lhs: Invalid instruction in addition.\n");
 				return Variable::Invalid;
 			}
 			if(this->rhs == nullptr) {
-				if(verbose) printf("rhs: Invalid instruction in addition.\n");
 				return Variable::Invalid;
 			}
 
-			if(verbose) context.depth++;
 			Variable left = this->lhs->execute(context);
 			Variable right = this->rhs->execute(context);
-			if(verbose) context.depth--;
 
 			if(left.type != right.type) {
-				if(verbose) printf(
-					"Arithmetic types do not match: %s != %s\n",
-					typeName(left.type.id),
-					typeName(right.type.id));
 				return Variable::Invalid;
-			}
-
-			if(verbose) {
-				context.indent();
-				printf("Arithmetic on ");
-				left.printval();
-				printf(" and ");
-				right.printval();
-				printf("\n");
 			}
 
 			return OP(left, right);
@@ -410,13 +365,11 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->condition == nullptr) {
-				if(verbose) printf("IF: missing condition.\n");
 				return Variable::Invalid;
 			}
 
 			Variable result = this->condition->execute(context);
 			if(result.type != Type::Boolean) {
-				if(verbose) printf("IF: Invalid condition type.\n");
 				return Variable::Invalid;
 			}
 			if((result.boolean == true) && (this->blockTrue != nullptr)) {
@@ -443,7 +396,6 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->block == nullptr) {
-				if(verbose) printf("REPEAT: missing block.\n");
 				return Variable::Invalid;
 			}
 
@@ -473,23 +425,18 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->condition == nullptr) {
-				if(verbose) printf("REPEAT: missing condition.\n");
 				return Variable::Invalid;
 			}
 			if(this->block == nullptr) {
-				if(verbose) printf("REPEAT: missing block.\n");
 				return Variable::Invalid;
 			}
 
 			while(true)
 			{
 				Variable cond = this->condition->execute(context);
-
 				if(cond.type != Type::Boolean) {
-					printf("REPEAT: Invalid expression type.\n");
 					return Variable::Invalid;
 				}
-
 				if(cond.boolean == false) {
 					break;
 				}

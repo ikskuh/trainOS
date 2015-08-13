@@ -15,10 +15,10 @@ main.o: main.cpp tsvm.hpp common.h
 tsvm.o: tsvm.cpp tsvm.hpp common.h
 	g++ $(CCFLAGS) -c tsvm.cpp -o tsvm.o
 
-lex.yy.o: lex.yy.cpp tsvm.hpp common.h
+lex.yy.o: lexyy.cpp tsvm.hpp common.h
 	g++ $(CCFLAGS) -c lex.yy.cpp -o lex.yy.o
 
-trainscript.tab.o: lex.yy.cpp trainscript.tab.cpp tsvm.hpp common.h
+trainscript.tab.o: lex.yy.cpp trainscript_tab.cpp tsvm.hpp common.h
 	g++ $(CCFLAGS) -c trainscript.tab.cpp -o trainscript.tab.o
 
 lex.yy.cpp: trainscript.l

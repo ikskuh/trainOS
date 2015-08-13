@@ -1,4 +1,9 @@
 #pragma once
+#include "cpustate.h"
+
+#if defined(__cplusplus)
+extern "C"  {
+#endif
 
 #define GDTF_DATASEG 0x02
 #define GDTF_CODESEG 0x0a
@@ -16,10 +21,19 @@
 #define INTR_TRAP_GATE 7
 #define INTR_TASK_GATE 5
 
+typedef void (*InterruptHandler)(CpuState *);
+
 /**
  * Initializes interrupt handling and the global descriptor table.
  */
 void intr_init();
+
+/**
+ * @brief Sets the handler for the given interrupt.
+ * @param interrupt The number of the interrupt.
+ * @param handler The function that should handle this interrupt
+ */
+void intr_set_handler(uint32_t interrupt, InterruptHandler handler);
 
 /**
  * @brief Enables physical interrupts.
@@ -37,3 +51,6 @@ static inline void irq_disable(void)
 	__asm__ volatile("cli");
 }
 
+#if defined(__cplusplus)
+}
+#endif

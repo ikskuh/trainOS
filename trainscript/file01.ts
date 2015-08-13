@@ -36,6 +36,7 @@ BEGIN
 	1 → iter;
 	0 → r;
 	WHILE iter < max DO
+#	FOR iter FROM 1 TO max DO
 	BEGIN
 		IF (iter % 5) = 0 THEN
 			r + iter → r;

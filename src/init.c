@@ -1,9 +1,11 @@
-#include "kernel.h"
-#include "stdlib.h"
-#include "console.h"
-#include "interrupts.h"
-#include "pmm.h"
-#include "vmm.h"
+#include <kernel.h>
+#include <stdlib.h>
+#include <console.h>
+#include <interrupts.h>
+#include <pmm.h>
+#include <vmm.h>
+
+#include <timer.h>
 
 void die(const char *msg)
 {
@@ -13,15 +15,6 @@ void die(const char *msg)
     while(1)
     {
         __asm__ volatile ("cli; hlt;");
-    }
-}
-
-void ksleep(uint32_t time)
-{
-    for(uint32_t i = 0; i < time; i++)
-    {
-        // BURN, CPU, BURN!
-        for(volatile size_t i = 0; i < 40000000; i++);
     }
 }
 
@@ -101,6 +94,18 @@ static void dumpMB(const MultibootStructure *mbHeader)
     // TODO: MB_APS_TABLE
 }
 
+void cpp_init()
+{
+
+}
+
+void putsuccess()
+{
+	int y; kgetpos(nullptr, &y);
+	ksetpos(CONSOLE_WIDTH - 9, y);
+	kputs("[success]");
+}
+
 void init(const MultibootStructure *mbHeader)
 {
     (void)debug_test;
@@ -113,37 +118,42 @@ void init(const MultibootStructure *mbHeader)
     //dumpMB(mbHeader);
 
     kputs("Initialize physical memory management: ");
-    pmm_init(mbHeader);
-    kputs("success.\n");
+	pmm_init(mbHeader);
+	putsuccess();
+
     // uint32_t freeMem = pmm_calc_free();
     //kprintf("Free memory: %d B, %d kB, %d MB\n", freeMem, freeMem >> 10, freeMem >> 20);
 
-    ksleep(1);
-
     kputs("Initialize virtual memory management: ");
-    vmm_init();
-    kputs("success.\n");
+	vmm_init();
+	putsuccess();
 
-	kputs("Initialize interrupts: ");
+	kputs("Initialize interrupts:");
 	intr_init();
-	kputs("success.\n");
+	putsuccess();
 
-	kputs("Enable hw interrupts:  ");
+	kputs("Enable hw interrupts:");
 	irq_enable();
-	kputs("success.\n");
+	putsuccess();
 
-	//__asm__ volatile("sti");
+	kputs("Prepare heap memory:");
+	for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
+	{
+		vmm_map(ptr, (uintptr_t)pmm_alloc(), VM_PROGRAM);
+	}
+	putsuccess();
 
-    kputs("Prepare heap memory:   ");
-    for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
-    {
-        vmm_map(ptr, (uintptr_t)pmm_alloc(), VM_PROGRAM);
-    }
-    kputs("success.\n");
+	kputs("Initialize timer:");
+	timer_init();
+	putsuccess();
+
+	kputs("Initialize C++ objects: ");
+	cpp_init();
+	putsuccess();
 
 	while(1)
 	{
 		kputs("x");
-		ksleep(1);
+		sleep(1);
 	}
 }

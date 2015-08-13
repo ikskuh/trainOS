@@ -1,11 +1,13 @@
+extern "C"  {
 #include <stdlib.h>
-#include <string.h>
+#include <console.h>
+}
 
 #include "common.h"
 
 #include "tsvm.hpp"
 
-#include "trainscript.tab.h"
+#include "trainscript.tab.hpp"
 #include "trainscript.l.h"
 
 namespace trainscript
@@ -74,39 +76,29 @@ namespace trainscript
 		}
 	}
 
-	Variable Method::invoke(std::vector<Variable> arguments)
+	Variable Method::invoke(ker::Vector<Variable> arguments)
 	{
 		LocalContext context(this->module);
 
 		for(auto var : this->module->variables)
 		{
-			context.insert({ var.first, var.second });
+			context.add(var.first, var.second);
 		}
 
 		if(this->returnValue.second.type.usable()) {
-			context.insert({ this->returnValue.first, &this->returnValue.second });
+			context.add(this->returnValue.first, &this->returnValue.second);
 		}
-		if(arguments.size() != this->arguments.size()) {
-			printf("MECKER anzahl!\n");
-			return Variable();
+		if(arguments.length() != this->arguments.length()) {
+			return Variable::Invalid;
 		}
-		for(size_t i = 0; i < this->arguments.size(); i++) {
+		for(size_t i = 0; i < this->arguments.length(); i++) {
 			if(this->arguments[i].second.type != arguments[i].type) {
-				printf("MECKER argtyp!\n");
-				return Variable();
+				return Variable::Invalid;
 			}
-			context.insert({this->arguments[i].first, new Variable(arguments[i]) });
+			context.add(this->arguments[i].first, new Variable(arguments[i]));
 		}
 		for(auto local : this->locals) {
-			context.insert({ local.first, new Variable(local.second) });
-		}
-
-		if(verbose) {
-			printf("executing with local context:\n");
-			for(auto &ref : context)
-			{
-				printf("  %s : %s\n", ref.first.c_str(), typeName(ref.second->type.id));
-			}
+			context.add(local.first, new Variable(local.second));
 		}
 
 		this->block->execute(context);
@@ -123,7 +115,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int:return  mkvar(lhs.integer + rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real + rhs.real);
-				default: printf("addition not supported for %s.\n", typeName(lhs.type.id)); break;
+				default: kprintf("addition not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -132,7 +124,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer - rhs.integer);
 				case TypeID::Real:return  mkvar(lhs.real - rhs.real);
-				default: printf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -141,7 +133,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer * rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real * rhs.real);
-				default: printf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -150,7 +142,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer / rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real / rhs.real);
-				default: printf("division not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("division not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
 			}
 		}
 
@@ -159,7 +151,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer % rhs.integer);
 				// case TypeID::Real: mkvar(lhs.real % rhs.real);
-				default: printf("modulo not supported for %s.\n", typeName(lhs.type.id));  return Variable::Invalid;
+				default: kprintf("modulo not supported for %s.\n", typeName(lhs.type.id));  return Variable::Invalid;
 			}
 		}
 
@@ -170,7 +162,7 @@ namespace trainscript
 				case TypeID::Real: return mkbool(lhs.real == rhs.real);
 				case TypeID::Bool: return mkbool(lhs.boolean == rhs.boolean);
 				default:
-					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}
@@ -182,7 +174,7 @@ namespace trainscript
 				case TypeID::Real: return mkbool(lhs.real != rhs.real);
 				case TypeID::Bool: return mkbool(lhs.boolean != rhs.boolean);
 				default:
-					printf("inequals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("inequals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}
@@ -194,7 +186,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer < rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real < rhs.real);
 				default:
-					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}
@@ -205,7 +197,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer <= rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real <= rhs.real);
 				default:
-					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}
@@ -216,7 +208,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer > rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real > rhs.real);
 				default:
-					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}
@@ -227,7 +219,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer >= rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real >= rhs.real);
 				default:
-					printf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
 					return Variable::Invalid;
 			}
 		}

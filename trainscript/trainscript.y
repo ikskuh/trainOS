@@ -400,13 +400,13 @@ typeName:
 
 void yyerror(void *scanner, const char *s) {
 	if(scanner == nullptr) {
-		printf("Error: %s\n", s);
+		kprintf("Error: %s\n", s);
 		return;
 	}
 	int line = 0; // yyget_lineno(scanner);
 	int col = 0; //yyget_column(scanner);
 	char *text = yyget_text(scanner);
-	printf(
+	kprintf(
 		"[%d:%d] Error: %s at '%s'\n",
 		line, col,
 		s,

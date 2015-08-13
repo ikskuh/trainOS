@@ -4,6 +4,10 @@
 #include <inttypes.h>
 #include "varargs.h"
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 char *itoa(int value, char *str, int base);
 int atoi(const char *str);
 float atof(const char *str);
@@ -20,6 +24,10 @@ void *malloc(size_t size);
  * @param mem The block of memory.
  */
 void free(void *mem);
+
+void* realloc (void* ptr, size_t size);
+
+void exit(int errorCode);
 
 static inline void *memset(void *ptr, int value, size_t num)
 {
@@ -43,6 +51,20 @@ static inline void *memcpy(void *destination, const void *source, size_t num)
 }
 
 void *memmove(void *destination, const void *source, size_t num);
+
+static inline int memcmp(const void *s1, const void *s2, size_t n)
+{
+	const uint8_t * p1 = (const uint8_t *)s1;
+	const uint8_t * p2 = (const uint8_t *)s2;
+	for ( ; n-- ; p1++, p2++) {
+		uint8_t u1 = *p1;
+		uint8_t u2 = *p2;
+		if ( u1 != u2) {
+			return (u1-u2);
+		}
+	}
+	return 0;
+}
 
 static inline char *strcpy(char *destination, const char *source)
 {
@@ -79,3 +101,15 @@ static inline void *calloc(size_t size)
     memset(mem, 0, size);
     return mem;
 }
+
+static inline char * strdup(const char *str)
+{
+	size_t len = strlen(str) + 1;
+	char * n = (char*)malloc(len);
+	memcpy(n, str, len);
+	return n;
+}
+
+#if defined(__cplusplus)
+}
+#endif

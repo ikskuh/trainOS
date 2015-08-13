@@ -10,6 +10,8 @@
 static uint64_t gdt[GDT_ENTRIES];
 static uint64_t idt[IDT_ENTRIES];
 
+static InterruptHandler handlers[IDT_ENTRIES];
+
 static const char *interruptNames[] = {
 	"Divide-by-zero Error",//	0 (0x0)	Fault	#DE	No
 	"Debug",//	1 (0x1)	Fault/Trap	#DB	No
@@ -65,21 +67,39 @@ static const size_t interruptNameCount = sizeof(interruptNames) / sizeof(interru
 
 #include "intr_stubs.h"
 
+void intr_set_handler(uint32_t interrupt, InterruptHandler handler)
+{
+	if(interrupt < IDT_ENTRIES) {
+		handlers[interrupt] = handler;
+	}
+}
+
 void intr_routine(CpuState *state)
 {
 	const char *name = "Unknown";
 	if(state->intr < interruptNameCount)
 		name = interruptNames[state->intr];
+	InterruptHandler handler = handlers[state->intr];
 	if(state->intr < 0x20)
 	{
-		kprintf("\n\x12\x04Exception [%d] %s!\x12\0x7\n", state->intr, name);
-		while(1)
-		{
-			__asm__ volatile("cli; hlt");
+		if(handler != nullptr) {
+			handler(state);
+		} else {
+			kprintf("\n\x12\x04Exception [%d] %s!\x12\0x7\n", state->intr, name);
+			while(1)
+			{
+				__asm__ volatile("cli; hlt");
+			}
 		}
 	}
 	if (state->intr >= 0x20 && state->intr <= 0x2f)
 	{
+		if(handler != nullptr) {
+			handler(state);
+		} else {
+			kprintf("[Unhandled IRQ: %d]", state->intr);
+		}
+
 		if (state->intr >= 0x28)
 		{
 			// EOI an Slave-PIC
@@ -90,11 +110,15 @@ void intr_routine(CpuState *state)
 	}
 	else
 	{
-		kprintf("\n\x12\x04Interrupt [%d] %s occurred!\x12\0x7\n", state->intr, name);
-		while(1)
-		{
-			// Prozessor anhalten
-			__asm__ volatile("cli; hlt");
+		if(handler != nullptr) {
+			handler(state);
+		} else {
+			kprintf("\n\x12\x04Interrupt [%d] %s occurred!\x12\0x7\n", state->intr, name);
+			while(1)
+			{
+				// Prozessor anhalten
+				__asm__ volatile("cli; hlt");
+			}
 		}
 	}
 }
@@ -240,8 +264,16 @@ static void init_idt(void)
 	__asm__ volatile("lidt %0" : : "m" (idtp));
 }
 
+void init_handlers(void)
+{
+	memset(handlers, 0, sizeof(handlers));
+}
+
 void intr_init(void)
 {
+	// Initialize handler table
+	init_handlers();
+
 	// Initialize global descriptor table
 	init_gdt();
 

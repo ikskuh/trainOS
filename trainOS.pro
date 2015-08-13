@@ -12,23 +12,32 @@ SOURCES += \
     src/stdlib.c \
     src/vmm.c \
     trainscript/tsvm.cpp \
-    trainscript/main.cpp
+    trainscript/main.cpp \
+    src/timer.c \
+    src/cplusplus.cpp
 
 HEADERS += \
-    src/console.h \
-    src/cpustate.h \
-    src/interrupts.h \
-    src/intr_stubs.h \
-    src/io.h \
-    src/kernel.h \
-    src/multiboot.h \
-    src/pmm.h \
-    src/stdlib.h \
-    src/varargs.h \
-    src/vmm.h \
+	include/console.h \
+	include/cpustate.h \
+	include/interrupts.h \
+	include/intr_stubs.h \
+	include/io.h \
+	include/kernel.h \
+	include/multiboot.h \
+	include/pmm.h \
+	include/stdlib.h \
+	include/varargs.h \
+	include/vmm.h \
 	trainscript/common.h \
     trainscript/tsvm.hpp \
-    trainscript/typeid.hpp
+    trainscript/typeid.hpp \
+	include/timer.h \
+    include/ker/string.hpp \
+    include/ker/pair.hpp \
+    include/ker/vector.hpp \
+    include/ker/dictionary.hpp \
+    include/string.h \
+    include/ker/new.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \

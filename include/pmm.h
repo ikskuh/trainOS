@@ -2,6 +2,10 @@
 
 #include "multiboot.h"
 
+#if defined(__cplusplus)
+extern "C"  {
+#endif
+
 /**
  * Initializes physical memory management.
  * @param mb The multi boot structure used for gathering information about free memory.
@@ -22,3 +26,7 @@ void *pmm_alloc(void);
  * Calculates the free memory in bytes.
  */
 uint32_t pmm_calc_free(void);
+
+#if defined(__cplusplus)
+}
+#endif
