@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kernel.h>
+
 #include "pair.hpp"
 #include "vector.hpp"
 
@@ -10,7 +12,8 @@ namespace ker
 	{
 	public:
 		typedef Pair<Key, Value> Entry;
-    public:
+		static Value _default;
+	public:
 		Vector<Entry> contents;
 	public:
 		Dictionary() :
@@ -45,16 +48,21 @@ namespace ker
 					return pair.second;
 				}
 			}
+			die("Key not found in dictionary.");
+			return _default;
 		}
 
 		const Value &at(const Key &key) const
 		{
+			static Value _default;
 			for(auto &&pair : this->contents)
 			{
 				if(pair.first == key) {
 					return pair.second;
 				}
 			}
+			die("Key not found in dictionary.");
+			return _default;
 		}
 
         Value get(const Key &key) const
@@ -122,4 +130,7 @@ namespace ker
 			return this->contents.end();
 		}
 	};
+
+	template<typename Key, typename Value>
+	Value Dictionary<Key, Value>::_default = Value();
 }

@@ -154,18 +154,18 @@ input:
         ScriptMethod *method = new ScriptMethod(mod, $2.body);
 		method->isPublic = $2.header.isPublic;
 		if($2.header.returnValue) {
-            method->returnValue = ker::Pair<ker::String, Variable>(
+			method->mReturnValue = ker::Pair<ker::String, Type>(
 				$2.header.returnValue->name,
-				$2.header.returnValue->variable);
+				$2.header.returnValue->type);
 		}
 		LocalVariable *local = $2.header.locals;
 		while(local) {
-            method->locals.add( local->name, local->variable );
+			method->mLocals.add( local->name, local->type );
 			local = local->next;
 		}
 		LocalVariable *arg = $2.header.arguments;
 		while(arg) {
-            method->arguments.append( { arg->name, arg->variable } );
+			method->mArguments.append( { arg->name, arg->type} );
 			arg = arg->next;
 		}
 
@@ -277,8 +277,7 @@ argument:
 	IDENTIFIER COLON typeName {
 		$$ = new LocalVariable();
 		$$->name = $1;
-		$$->variable.type = $3;
-		$$->variable.integer = 0; // zero value
+		$$->type = $3;
 		$$->next = nullptr;
 	}
 ;

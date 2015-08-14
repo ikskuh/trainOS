@@ -30,13 +30,7 @@ namespace ker
         {
             other.mText = nullptr;
             other.mLength = 0;
-        }
-
-        String & operator = (const String &other)
-        {
-            this->copyFrom(other.mText, other.mLength);
-            return *this;
-        }
+		}
 
 		String(const char *text) :
 			mText(nullptr),
@@ -50,6 +44,12 @@ namespace ker
 			mLength(length)
 		{
             this->copyFrom(bytes, length);
+		}
+
+		String & operator = (const String &other)
+		{
+			this->copyFrom(other.mText, other.mLength);
+			return *this;
 		}
 
 		~String()
@@ -70,6 +70,21 @@ namespace ker
 				return false;
 			}
             return memcmp(this->mText, other.mText, this->mLength) == 0;
+		}
+
+		String append(const String &other) const
+		{
+			uint8_t *data = (uint8_t*)malloc(this->mLength + other.mLength);
+			memcpy(&data[0], this->mText, this->mLength);
+			memcpy(&data[this->mLength], other.mText, other.mLength);
+			String cat(data, this->mLength + other.mLength);
+			free(data);
+			return cat;
+		}
+
+		static String concat(const String &lhs, const String &rhs)
+		{
+			return lhs.append(rhs);
 		}
 
 		const uint8_t *text() const
@@ -128,4 +143,15 @@ namespace ker
             this->mText[this->mLength] = 0; // last byte is always 0
         }
 	};
+
+
+	static String operator + (const char *lhs, const String &rhs)
+	{
+		return String::concat(lhs, rhs);
+	}
+
+	static String operator + (const String &lhs, const char *rhs)
+	{
+		return String::concat(lhs, rhs);
+	}
 };

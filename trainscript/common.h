@@ -39,7 +39,7 @@ struct VariableDeclaration
 struct LocalVariable
 {
 	char *name;
-	trainscript::Variable variable;
+	trainscript::Type type;
 	LocalVariable *next;
 };
 

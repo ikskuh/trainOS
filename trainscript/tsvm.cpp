@@ -28,6 +28,17 @@ namespace trainscript
     const Variable Variable::Text = { Type::Text, 0 };
     const Variable Variable::Boolean = { Type::Boolean, 0 };
 
+	bool Module::validate(ker::String &errorCode) const
+	{
+		errorCode = "";
+		for(auto method : this->methods) {
+			if(method.second->validate(errorCode) == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	Module *VM::load(const void *buffer, size_t length)
 	{
 		void *internalStorage = malloc(length);
@@ -85,28 +96,78 @@ namespace trainscript
 			context.add(var.first, var.second);
 		}
 
-		if(this->returnValue.second.type.usable()) {
-			context.add(this->returnValue.first, &this->returnValue.second);
+		Variable returnVariable = {
+			this->mReturnValue.second, 0
+		};
+
+		if(this->mReturnValue.second.usable()) {
+			context.add(this->mReturnValue.first, &returnVariable);
 		}
-		if(arguments.length() != this->arguments.length()) {
+		if(arguments.length() != this->mArguments.length()) {
 			return Variable::Invalid;
 		}
-		for(size_t i = 0; i < this->arguments.length(); i++) {
-			if(this->arguments[i].second.type != arguments[i].type) {
+		for(size_t i = 0; i < this->mArguments.length(); i++) {
+			if(this->mArguments[i].second != arguments[i].type) {
 				return Variable::Invalid;
 			}
-			context.add(this->arguments[i].first, new Variable(arguments[i]));
+			context.add(this->mArguments[i].first, new Variable(arguments[i]));
 		}
-		for(auto local : this->locals) {
-			context.add(local.first, new Variable(local.second));
+		for(auto local : this->mLocals) {
+			context.add(local.first, new Variable { local.second, 0 });
 		}
 
 		this->block->execute(context);
 
-		return this->returnValue.second;
+		return returnVariable;
 	}
 
+	bool ScriptMethod::validate(ker::String &errorCode) const
+	{
+		if(this->block == nullptr) {
+			errorCode = "Method block is not set.";
+			return false;
+		}
 
+		LocalContext context(this->module);
+
+		for(auto var : this->module->variables)
+		{
+			context.add(var.first, var.second);
+		}
+
+		Variable returnVariable = {
+			this->mReturnValue.second, 0
+		};
+
+		if(this->mReturnValue.second.usable()) {
+			if(context.get(this->mReturnValue.first) != nullptr) {
+				errorCode = "Return variable overlaps a variable.";
+				return false;
+			}
+			context.add(this->mReturnValue.first, &returnVariable);
+		}
+
+		for(size_t i = 0; i < this->mArguments.length(); i++) {
+			if(context.get(this->mArguments[i].first) != nullptr) {
+				errorCode = "Parameter overlaps a variable.";
+				return false;
+			}
+			context.add(this->mArguments[i].first, new Variable { this->mArguments[i].second, 0 });
+		}
+		for(auto local : this->mLocals) {
+			if(context.get(local.first) != nullptr) {
+				errorCode = "Local variable overlaps a variable.";
+				return false;
+			}
+			context.add(local.first, new Variable { local.second, 0 });
+		}
+
+		if(this->block->validate(context, errorCode) == false) {
+			return false;
+		}
+
+		return true;
+	}
 
 	namespace ops
 	{

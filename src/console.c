@@ -183,7 +183,6 @@ void kprintf(const char *format, ...)
 		{
 			c = *(format++);
 			int i;
-			float f;
 			char *str;
 			switch(c)
 			{

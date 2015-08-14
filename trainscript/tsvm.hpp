@@ -5,14 +5,9 @@ extern "C" {
 #include <console.h>
 }
 
-// #include <map>
-
 #include <ker/string.hpp>
 #include <ker/vector.hpp>
 #include <ker/dictionary.hpp>
-
-// #include <vector>
-// #include <string.h>
 
 #include "typeid.hpp"
 
@@ -144,6 +139,15 @@ namespace trainscript
 		virtual ~Instruction() { }
 
 		virtual Variable execute(LocalContext &context) const = 0;
+
+		virtual Type expectedResult(LocalContext &) const {
+			return Type::Void;
+		}
+
+		virtual bool validate(LocalContext &, ker::String &errorCode) const {
+			errorCode = "";
+			return true;
+		}
 	};
 
 	class Block :
@@ -154,6 +158,15 @@ namespace trainscript
 
 		~Block() {
 			for(auto *instr : instructions) delete instr;
+		}
+
+		bool validate(LocalContext &context, ker::String &errorCode) const {
+			errorCode = "";
+			for(auto *instr : instructions) {
+				if(instr->validate(context, errorCode) == false)
+					return false;
+			}
+			return true;
 		}
 
 		Variable execute(LocalContext &context) const override {
@@ -167,8 +180,15 @@ namespace trainscript
     class Method
     {
     public:
-        virtual ~Method() { }
-        virtual Variable invoke(ker::Vector<Variable> arguments) = 0;
+		virtual ~Method() { }
+
+		virtual Variable invoke(ker::Vector<Variable> arguments) = 0;
+
+		virtual bool validate(ker::String &errorCode) const = 0;
+
+		virtual ker::Vector<Type> arguments() const = 0;
+
+		virtual Type returnType() const = 0;
     };
 
     class ScriptMethod :
@@ -178,9 +198,9 @@ namespace trainscript
 		Module *module;
 		Instruction *block;
 		bool isPublic;
-		ker::Vector<ker::Pair<ker::String, Variable>> arguments;
-		ker::Dictionary<ker::String, Variable> locals;
-		ker::Pair<ker::String, Variable> returnValue;
+		ker::Vector<ker::Pair<ker::String, Type>> mArguments;
+		ker::Dictionary<ker::String, Type> mLocals;
+		ker::Pair<ker::String, Type> mReturnValue;
 
         ScriptMethod(Module *module, Instruction *block) : module(module), block(block)
 		{
@@ -188,6 +208,22 @@ namespace trainscript
 		}
 
         Variable invoke(ker::Vector<Variable> arguments) override;
+
+		bool validate(ker::String &errorCode) const override;
+
+		ker::Vector<Type> arguments() const override
+		{
+			ker::Vector<Type> args(this->mArguments.length());
+			for(size_t i = 0; i < args.length(); i++) {
+				args[i] = this->mArguments[i].second;
+			}
+			return args;
+		}
+
+		Type returnType() const override
+		{
+			return this->mReturnValue.second;
+		}
 	};
 
 	class Module
@@ -208,6 +244,8 @@ namespace trainscript
 		{
             return this->variables.get(name);
 		}
+
+		bool validate(ker::String &errorCode) const;
 	};
 
 	class VM
@@ -231,8 +269,12 @@ namespace trainscript
 		Variable value;
 		ConstantExpression(Variable value) : value(value) { }
 
-		Variable execute(LocalContext &context) const override {
+		Variable execute(LocalContext &) const override {
 			return this->value;
+		}
+
+		Type expectedResult(LocalContext &) const override {
+			return this->value.type;
 		}
 	};
 
@@ -249,6 +291,24 @@ namespace trainscript
 				return Variable::Invalid;
 			}
 			return *var;
+		}
+
+		bool validate(LocalContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			if(context.get(this->variableName) == nullptr) {
+				errorCode = "Variable " + this->variableName + " not found.";
+				return false;
+			}
+			return true;
+		}
+
+		Type expectedResult(LocalContext &context) const override {
+			Variable *var = context.get(this->variableName);
+			if(var == nullptr) {
+				return Type::Invalid;
+			} else {
+				return var->type;
+			}
 		}
 	};
 
@@ -290,6 +350,43 @@ namespace trainscript
 
 			return result;
 		}
+
+		bool validate(LocalContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			if(this->expression == nullptr) {
+				errorCode = "Missing expression.";
+				return false;
+			}
+			Type result = this->expression->expectedResult(context);
+			if(result == Type::Invalid) {
+				errorCode = "Expression returns invalid type.";
+				return false;
+			}
+			if(result == Type::Void) {
+				errorCode = "Void cannot be assigned to a variable";
+				return false;
+			}
+			Variable *var = context.get(this->variableName);
+			if(var == nullptr) {
+				errorCode = "Variable " + this->variableName + " not found.";
+				return false;
+			}
+			if(var->type != result) {
+				errorCode = "Variable assignment has invalid type.";
+				return false;
+			}
+			if(this->expression->validate(context, errorCode) == false)
+				return false;
+			return true;
+		}
+
+		Type expectedResult(LocalContext &context) const override {
+			if(this->expression == nullptr) {
+				return Type::Invalid;
+			} else {
+				return this->expression->expectedResult(context);
+			}
+		}
 	};
 
 	class MethodInvokeExpression :
@@ -319,6 +416,38 @@ namespace trainscript
 			}
 
 			return method->invoke(vars);
+		}
+
+		bool validate(LocalContext &context, ker::String &errorCode) const override {
+			Method *method = context.module->method(this->methodName.str());
+			if(method == nullptr) {
+				errorCode = "The method " + this->methodName + " does not exist.";
+				return false;
+			}
+
+			ker::Vector<Type> arguments = method->arguments();
+			if(arguments.length() != this->parameters.length()) {
+				errorCode = "Argument count mismatch.";
+				return false;
+			}
+			for(size_t i = 0; i < arguments.length(); i++) {
+				if(this->parameters[i]->expectedResult(context) != arguments[i]) {
+					errorCode = "Argument type mismatch.";
+					return false;
+				}
+				if(this->parameters[i]->validate(context, errorCode) == false)
+					return false;
+			}
+
+			return true;
+		}
+
+		Type expectedResult(LocalContext &context) const override {
+			Method *method = context.module->method(this->methodName.str());
+			if(method == nullptr) {
+				return Type::Invalid;
+			}
+			return method->returnType();
 		}
 	};
 
@@ -352,6 +481,47 @@ namespace trainscript
 			}
 
 			return OP(left, right);
+		}
+
+		bool validate(LocalContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			if(this->lhs == nullptr) {
+				errorCode = "Left part of operand is missing.";
+				return false;
+			}
+			if(this->rhs == nullptr) {
+				errorCode = "Right part of operand is missing.";
+				return false;
+			}
+			Type lhsType = this->lhs->expectedResult(context);
+			Type rhsType = this->rhs->expectedResult(context);
+			if(lhsType != rhsType) {
+				errorCode = "Types of operands do not match.";
+				return false;
+			}
+			if(lhsType == Type::Invalid) {
+				errorCode = "Invalid type can't be used for operand.";
+				return false;
+			}
+			if(rhsType == Type::Void) {
+				errorCode = "VOID type can't be used for operand.";
+				return false;
+			}
+
+			if(this->lhs->validate(context, errorCode) == false)
+				return false;
+			if(this->rhs->validate(context, errorCode) == false)
+				return false;
+
+			return true;
+		}
+
+		Type expectedResult(LocalContext &context) const override {
+			if(this->lhs == nullptr) {
+				return Type::Invalid;
+			} else {
+				return this->lhs->expectedResult(context);
+			}
 		}
 	};
 

@@ -77,9 +77,9 @@ obj/vmm.o: src/vmm.c include/vmm.h include/pmm.h include/multiboot.h \
 obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
  include/console.h trainscript/common.h trainscript/tsvm.hpp \
  include/ker/string.hpp include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/ker/pair.hpp trainscript/typeid.hpp \
- trainscript/trainscript.tab.hpp trainscript/trainscript.l.h \
- include/string.h
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
+ trainscript/typeid.hpp trainscript/trainscript.tab.hpp \
+ trainscript/trainscript.l.h include/string.h
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/tsvm.cpp
 
 # src/cplusplus.cpp
@@ -91,7 +91,7 @@ obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
 obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/timer.h \
  src/../trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/ker/pair.hpp src/../trainscript/typeid.hpp
+ include/kernel.h include/ker/pair.hpp src/../trainscript/typeid.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # obj/trainscript.yy.cpp
@@ -99,15 +99,17 @@ obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
  include/stdlib.h include/varargs.h trainscript/common.h \
  trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/ker/pair.hpp trainscript/typeid.hpp obj/trainscript.tab.hpp
+ include/kernel.h include/ker/pair.hpp trainscript/typeid.hpp \
+ obj/trainscript.tab.hpp
 	$(CXX) -iquotetrainscript $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.yy.cpp
 
 # obj/trainscript.tab.cpp
 obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
  include/varargs.h trainscript/common.h trainscript/tsvm.hpp \
  include/console.h include/ker/string.hpp include/ker/vector.hpp \
- include/ker/new.hpp include/ker/dictionary.hpp include/ker/pair.hpp \
- trainscript/typeid.hpp trainscript/trainscript.l.h include/string.h
+ include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
+ include/ker/pair.hpp trainscript/typeid.hpp trainscript/trainscript.l.h \
+ include/string.h
 	$(CXX) -iquotetrainscript $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.tab.cpp
 
 # asm/intr_common_handler.S

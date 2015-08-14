@@ -13,13 +13,6 @@ extern "C" {
 
 void cpp_test();
 
-class PrintMethod :
-        public Method
-{
-public:
-    Variable invoke(Vector<Variable> arguments) override;
-};
-
 class NativeMethod :
 		public Method
 {
@@ -33,18 +26,24 @@ public:
 	}
 
 	Variable invoke(Vector<Variable> arguments) override;
-};
 
-Variable PrintMethod::invoke(Vector<Variable> arguments)
-{
-    for(auto &var : arguments)
-    {
-        var.printval();
-        kprintf(" ");
-    }
-    kprintf("\n");
-    return Variable::Void;
-}
+	bool validate(ker::String &errorCode) const
+	{
+		if(this->function == nullptr) {
+			errorCode = "Native method with nullptr interface.";
+			return false;
+		}
+		return true;
+	}
+
+	Vector<Type> arguments() const {
+		return Vector<Type>();
+	}
+
+	Type returnType() const {
+		return Type::Int;
+	}
+};
 
 static void copyCode(uint8_t **ptr, const uint8_t *src, size_t length)
 {
@@ -169,9 +168,11 @@ extern "C" void vm_start()
 
     kprintf("Module successfully loaded :)\n");
 
-    module->methods.add("print", new PrintMethod());
-
-	module->methods.add("afraid", new NativeMethod(reinterpret_cast<void*>(&cCodeFunction)));
+	String errorCode;
+	if(module->validate(errorCode) == false) {
+		kprintf("Module validation failed: %s\n", errorCode.str());
+		return;
+	}
 
 	NativeModuleDef *mod = methods;
 	while(mod->name != nullptr) {
