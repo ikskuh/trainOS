@@ -22,3 +22,7 @@ CCFLAGS=-g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Ii
 CXXFLAGS=-g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
 LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
+--
+.PHONY: run
+run:
+	qemu-system-i386 -kernel kernel kernel
