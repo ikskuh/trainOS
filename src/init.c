@@ -150,6 +150,10 @@ void init(const MultibootStructure *mbHeader)
 	cpp_init();
 	putsuccess();
 
+	double f = 1.0;
+
+	int i = (int)f;
+
     vm_start();
 
 	kputs("\x12\x04trainOS stopped.\x12\x07!\n");

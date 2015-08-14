@@ -17,8 +17,8 @@ LEX=flex
 YACC=bison
 
 # Flags
-FLAGS=-m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))"
-ASFLAGS=
+FLAGS=-m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
+ASFLAGS=-masm=intel
 CCFLAGS=-g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS=-g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
 LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld

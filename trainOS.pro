@@ -38,7 +38,8 @@ HEADERS += \
     include/ker/vector.hpp \
     include/ker/dictionary.hpp \
     include/string.h \
-    include/ker/new.hpp
+    include/ker/new.hpp \
+    include/dynamic.h
 
 DISTFILES += \
     asm/intr_common_handler.S \
@@ -54,7 +55,8 @@ DISTFILES += \
     kernel.ld \
     Depfile \
     Makefile.new \
-    scripts/main.ts
+    scripts/main.ts \
+    asm/dynamic.S
 
 QMAKE_INCDIR =
 

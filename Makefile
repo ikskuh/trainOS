@@ -10,14 +10,14 @@ LEX  = flex
 YACC = bison
 
 # File Lists
-SRCS_AS  = asm/intr_common_handler.S asm/multiboot.S asm/start.S
+SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/stdlib.c src/timer.c src/vmm.c
 SRCS_CXX = trainscript/tsvm.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.cpp obj/trainscript.tab.cpp
-OBJS     = obj/tsvm.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+OBJS     = obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # Flags
-FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))"
-ASFLAGS  = 
+FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
+ASFLAGS  = -masm=intel
 CCFLAGS  = -g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
 LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld
@@ -27,10 +27,10 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
-kernel: obj/tsvm.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+kernel: obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
@@ -89,9 +89,10 @@ obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/timer.h \
- src/../trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
- include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp src/../trainscript/typeid.hpp
+ include/dynamic.h src/../trainscript/tsvm.hpp include/console.h \
+ include/ker/string.hpp include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
+ src/../trainscript/typeid.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # obj/trainscript.yy.cpp
@@ -111,6 +112,10 @@ obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
  include/ker/pair.hpp trainscript/typeid.hpp trainscript/trainscript.l.h \
  include/string.h
 	$(CXX) -iquotetrainscript $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.tab.cpp
+
+# asm/dynamic.S
+obj/dynamic.o: asm/dynamic.S
+	$(AS) $(FLAGS) $(ASFLAGS) -o $@ -c asm/dynamic.S
 
 # asm/intr_common_handler.S
 obj/intr_common_handler.o: asm/intr_common_handler.S
