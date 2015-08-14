@@ -202,7 +202,7 @@ void kprintf(const char *format, ...)
 					kputs(itoa(i, buffer, 16));
 					break;
 				case 'f':
-					f = va_arg(vl, float);
+					f = va_arg(vl, double);
 					kputs(ftoa(f, buffer, 3));
 					break;
 				case 'c':

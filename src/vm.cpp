@@ -15,7 +15,7 @@ VAR global : INT;
 PUB main() | i : INT
 BEGIN
     print(10, 20, 30);
-	afraid(15.0, 34) → i;
+	afraid(15, 34) → i;
 	print(40, i, 60);
     0 -> i;
 	WHILE i < 5 DO
@@ -147,7 +147,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	return mkvar((Int)result);
 }
 
-extern "C" uint32_t __attribute__((cdecl)) cCodeFunction(float a, int b)
+extern "C" uint32_t __attribute__((cdecl)) cCodeFunction(int a, int b)
 {
 	kprintf("a=%d, b=%d\n", a, b);
 	return 666;

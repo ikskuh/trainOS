@@ -4,6 +4,9 @@ TempDir=obj
 SourceDir=asm src
 Files=trainscript/trainscript.y trainscript/trainscript.l trainscript/tsvm.cpp
 
+LexUseCpp
+YaccUseCpp
+
 # Tools
 AS=gcc
 CC=gcc
