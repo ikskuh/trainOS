@@ -55,6 +55,8 @@ static void copyCode(uint8_t **ptr, const uint8_t *src, size_t length)
 	}
 }
 
+
+
 /**
  * @brief Invokes a cdecl function
  * @param arguments Arguments passed to the c function

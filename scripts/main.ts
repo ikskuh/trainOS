@@ -2,7 +2,7 @@ VAR global : INT;
 
 PUB main() | i : INT
 BEGIN
-	fun(1) -> i;
+	fun() -> i;
 END
 
 PUB fun() -> i : INT
