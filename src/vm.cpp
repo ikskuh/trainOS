@@ -170,7 +170,7 @@ extern "C" void vm_start()
 
 	String errorCode;
 	if(module->validate(errorCode) == false) {
-		kprintf("Module validation failed: %s\n", errorCode.str());
+		kprintf("Module validation failed: \x12\x06%s\x12\x07\n", errorCode.str());
 		return;
 	}
 

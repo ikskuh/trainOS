@@ -112,7 +112,7 @@ void init(const MultibootStructure *mbHeader)
 
 	ksetcolor(COLOR_BLACK, COLOR_LIGHTGRAY);
 	kclear();
-	kputs("Welcome to \x12\x05nucleo\x12\x07!\n");
+	kputs("Welcome to \x12\x05trainOS\x12\x07!\n");
 
     //dumpMB(mbHeader);
 
@@ -152,11 +152,9 @@ void init(const MultibootStructure *mbHeader)
 
     vm_start();
 
-	while(1)
-	{
-		kputs("x");
-		sleep(1);
-	}
+	kputs("\x12\x04trainOS stopped.\x12\x07!\n");
+
+	while(1);
 }
 
 int main(int argc, char **argv)
