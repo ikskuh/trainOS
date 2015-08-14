@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <timer.h>
 #include "../trainscript/tsvm.hpp"
 
 using namespace ker;
@@ -128,11 +129,24 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	return mkvar((Int)result);
 }
 
-extern "C" uint32_t __attribute__((cdecl)) cCodeFunction(int a, int b)
+extern "C" uint32_t __cdecl cCodeFunction(int a, int b)
 {
 	kprintf("a=%d, b=%d\n", a, b);
 	return 666;
 }
+
+struct NativeModuleDef
+{
+	const char *name;
+	void *function;
+};
+
+NativeModuleDef methods[] = {
+	{ "sleep", (void*)sleep },
+	{ "timer_get", (void*)timer_get },
+	{ "timer_set", (void*)timer_set },
+	{ nullptr, 0 }
+};
 
 extern "C" void vm_start()
 {
@@ -158,6 +172,12 @@ extern "C" void vm_start()
     module->methods.add("print", new PrintMethod());
 
 	module->methods.add("afraid", new NativeMethod(reinterpret_cast<void*>(&cCodeFunction)));
+
+	NativeModuleDef *mod = methods;
+	while(mod->name != nullptr) {
+		module->methods.add(mod->name, new NativeMethod(mod->function));
+		mod++;
+	}
 
     for(const auto &var : module->variables)
     {

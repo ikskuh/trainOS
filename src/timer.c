@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "interrupts.h"
 
-static volatile uint64_t ticks = 0;
+static volatile time_t ticks = 0;
 
 static void timer_irq()
 {
@@ -15,17 +15,17 @@ void timer_init()
 	intr_set_handler(0x20, timer_irq);
 }
 
-uint64_t timer_get()
+time_t timer_get()
 {
 	return ticks;
 }
 
-void timer_set(uint64_t time)
+void timer_set(time_t time)
 {
 	ticks = time;
 }
 
-void sleep(uint64_t t)
+void sleep(time_t t)
 {
 	uint64_t end = timer_get() + t;
 	while(timer_get() < end);

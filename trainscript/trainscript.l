@@ -58,7 +58,7 @@ WHILE           { return KW_WHILE; }
 DO              { return KW_DO; }
 [0-9]+\.[0-9]*  { yylval->fval = atof(yytext); return REAL; }
 [0-9]+          { yylval->ival = atoi(yytext); return INT; }
-[a-zA-Z0-9']+   { yylval->text = strdup(yytext); return IDENTIFIER; }
+[a-zA-Z0-9'_]+  { yylval->text = strdup(yytext); return IDENTIFIER; }
 .               { yyerror(NULL, "illegal token"); }
 %%
 /*

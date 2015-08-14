@@ -14,8 +14,17 @@ BEGIN
 
 	REPEAT
 	BEGIN
-
+		print(1);
+		sleep'(5);
 	END
+END
+
+# Sleep implementation
+PRI sleep'(time : INT) | init : INT
+BEGIN
+	timer_get() → init;
+	WHILE (timer_get() - init) < time DO
+		0; # do nothing
 END
 
 # Calculates factorial (number!)

@@ -16,7 +16,7 @@ SRCS_CXX = trainscript/tsvm.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.
 OBJS     = obj/tsvm.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # Flags
-FLAGS    = -m32 -Dnullptr=0
+FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))"
 ASFLAGS  = 
 CCFLAGS  = -g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
@@ -88,7 +88,7 @@ obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/vm.cpp
-obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h \
+obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/timer.h \
  src/../trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
  include/ker/pair.hpp src/../trainscript/typeid.hpp
