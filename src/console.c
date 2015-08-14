@@ -201,10 +201,6 @@ void kprintf(const char *format, ...)
 					i = va_arg(vl, int);
 					kputs(itoa(i, buffer, 16));
 					break;
-				case 'f':
-					f = va_arg(vl, double);
-					kputs(ftoa(f, buffer, 3));
-					break;
 				case 'c':
 					c = va_arg(vl, int);
 					kputc(c);

@@ -3,6 +3,7 @@ Artifact=kernel
 TempDir=obj
 SourceDir=asm src
 Files=trainscript/trainscript.y trainscript/trainscript.l trainscript/tsvm.cpp
+AdditionalObjects=obj/main.o
 
 LexUseCpp
 YaccUseCpp
@@ -23,6 +24,16 @@ CXXFLAGS=-g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdl
 LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 --
+obj/main.o: scripts/main.ts
+	objcopy -B i386 -I binary -O elf32-i386 \
+		scripts/main.ts obj/main.o
+	objcopy  \
+		--redefine-sym _binary_scripts_main_ts_start=mainscript_start \
+		--redefine-sym _binary_scripts_main_ts_end=mainscript_end \
+		--redefine-sym _binary_scripts_main_ts_size=mainscript_size \
+		obj/main.o
+
+
 .PHONY: run
 run:
 	qemu-system-i386 -kernel kernel kernel

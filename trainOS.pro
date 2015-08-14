@@ -53,7 +53,8 @@ DISTFILES += \
     trainscript/file02.ts \
     kernel.ld \
     Depfile \
-    Makefile.new
+    Makefile.new \
+    scripts/main.ts
 
 QMAKE_INCDIR =
 

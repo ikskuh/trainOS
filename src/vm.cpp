@@ -5,29 +5,10 @@ using namespace ker;
 using namespace trainscript;
 
 extern "C" {
-//    extern const char file01_start;
-//    extern const char file01_end;
-//    extern size_t file01_size;
+	extern const char mainscript_start;
+	extern const char mainscript_end;
+	extern const char mainscript_size;
 }
-
-char file01[] = R"code(
-VAR global : INT;
-PUB main() | i : INT
-BEGIN
-    print(10, 20, 30);
-	afraid(15, 34) → i;
-	print(40, i, 60);
-    0 -> i;
-	WHILE i < 5 DO
-    BEGIN
-        print(i);
-        i + 1 -> i;
-    END
-	REPEAT
-	BEGIN
-
-	END
-END)code";
 
 void cpp_test();
 
@@ -155,10 +136,18 @@ extern "C" uint32_t __attribute__((cdecl)) cCodeFunction(int a, int b)
 
 extern "C" void vm_start()
 {
+	struct {
+		const char *ptr;
+		uint32_t size;
+	} mainfile {
+		&mainscript_start,
+		(uint32_t)&mainscript_size
+	};
+
     // cpp_test();
 
     kprintf("Parse kernel module: ");
-    Module *module = VM::load(file01, sizeof(file01) - 1);
+	Module *module = VM::load(mainfile.ptr, mainfile.size);
     if(module == nullptr) {
         kprintf("Could not load module :(\n");
         return;
