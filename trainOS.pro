@@ -51,7 +51,8 @@ DISTFILES += \
 	trainscript/Makefile \
 	trainscript/trainscript.y \
     trainscript/file02.ts \
-    kernel.ld
+    kernel.ld \
+    Depfile
 
 QMAKE_INCDIR =
 

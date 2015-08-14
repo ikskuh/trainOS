@@ -41,3 +41,6 @@ trainscript/tsvm
 *.tab.h
 *.l.h
 lex.yy.cpp
+
+depmake.exe*
+docs/*

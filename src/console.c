@@ -183,6 +183,7 @@ void kprintf(const char *format, ...)
 		{
 			c = *(format++);
 			int i;
+			float f;
 			char *str;
 			switch(c)
 			{
@@ -199,6 +200,10 @@ void kprintf(const char *format, ...)
 				case 'X':
 					i = va_arg(vl, int);
 					kputs(itoa(i, buffer, 16));
+					break;
+				case 'f':
+					f = va_arg(vl, float);
+					kputs(ftoa(f, buffer, 3));
 					break;
 				case 'c':
 					c = va_arg(vl, int);

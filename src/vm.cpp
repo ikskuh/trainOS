@@ -15,12 +15,18 @@ VAR global : INT;
 PUB main() | i : INT
 BEGIN
     print(10, 20, 30);
+	afraid(15.0, 34) → i;
+	print(40, i, 60);
     0 -> i;
-    REPEAT
+	WHILE i < 5 DO
     BEGIN
         print(i);
         i + 1 -> i;
     END
+	REPEAT
+	BEGIN
+
+	END
 END)code";
 
 void cpp_test();
@@ -32,6 +38,21 @@ public:
     Variable invoke(Vector<Variable> arguments) override;
 };
 
+class NativeMethod :
+		public Method
+{
+private:
+	void *function;
+public:
+	NativeMethod(void *fn) :
+		function(fn)
+	{
+
+	}
+
+	Variable invoke(Vector<Variable> arguments) override;
+};
+
 Variable PrintMethod::invoke(Vector<Variable> arguments)
 {
     for(auto &var : arguments)
@@ -41,6 +62,95 @@ Variable PrintMethod::invoke(Vector<Variable> arguments)
     }
     kprintf("\n");
     return Variable::Void;
+}
+
+static void copyCode(uint8_t **ptr, const uint8_t *src, size_t length)
+{
+	for(size_t i = 0; i < length; i++) {
+		// Copy byte
+		**ptr = src[i];
+		// Iterate
+		(*ptr)++;
+	}
+}
+
+/**
+ * @brief Invokes a cdecl function
+ * @param arguments Arguments passed to the c function
+ * @return uint32_t return value of the c function
+ */
+Variable NativeMethod::invoke(Vector<Variable> arguments)
+{
+	if(this->function == nullptr) {
+		return Variable::Invalid;
+	}
+
+	// ASM code:
+	// push ebp
+	// mov ebp, esp
+	// (push imm32) * num
+	// call [function]
+	// add esp, 4 * num
+	// ret
+
+	uint8_t headerCode[] = {
+		0x55, // push ebp
+		0x89, 0xE5, // mov ebp, esp
+	};
+	uint8_t tailCode[] = {
+		0xB8, 0x42, 0x00, 0x00, 0x00, // mov eax,0x42
+		0xFF, 0xD0, // call eax
+		0x83, 0xC4, 0x08, // add esp, 0x00
+		0xC9, // leave
+		// 0x5D, // pop ebp
+		0xC3, // ret
+	};
+
+	// Store some memory for a function
+	uint8_t pushCode[] = {
+		0x68, 0x00, 0x00, 0x00, 0x00 // push 0x00
+	};
+
+	size_t stackSize = 4 * arguments.length();
+
+	// Copy target address to mov eax, 0x42
+	*reinterpret_cast<uintptr_t*>(&tailCode[1]) = reinterpret_cast<uintptr_t>(this->function);
+	// Copy stack size to add esp, 0x00
+	*reinterpret_cast<uint8_t*>(&tailCode[9]) = static_cast<uint8_t>(stackSize);
+
+	uint8_t code[128];
+	// Built the function
+	{
+		uint8_t *codePtr = &code[0];
+		// Copy function header
+		copyCode(&codePtr, headerCode, sizeof(headerCode));
+
+		// Copy arguments
+		for(int i = arguments.length() - 1; i >= 0; i--) {
+
+			// Copy argument value to push 0x00
+			*reinterpret_cast<int32_t*>(&pushCode[1]) = reinterpret_cast<int32_t>(arguments[i].integer);
+
+			// Copy push code
+			copyCode(&codePtr, pushCode, sizeof(pushCode));
+		}
+
+		// Copy function end
+		copyCode(&codePtr, tailCode, sizeof(tailCode));
+	}
+
+	// Call some crazy
+	uint32_t (*func)() = (uint32_t(*)())code;
+
+	uint32_t result = func();
+
+	return mkvar((Int)result);
+}
+
+extern "C" uint32_t __attribute__((cdecl)) cCodeFunction(float a, int b)
+{
+	kprintf("a=%d, b=%d\n", a, b);
+	return 666;
 }
 
 extern "C" void vm_start()
@@ -57,6 +167,8 @@ extern "C" void vm_start()
     kprintf("Module successfully loaded :)\n");
 
     module->methods.add("print", new PrintMethod());
+
+	module->methods.add("afraid", new NativeMethod(reinterpret_cast<void*>(&cCodeFunction)));
 
     for(const auto &var : module->variables)
     {

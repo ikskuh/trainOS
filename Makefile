@@ -8,11 +8,11 @@ LEX=flex
 YACC=bison
 
 # define nullptr, but not NULL.
-CFLAGS = -m32 -Dnullptr=0
+CFLAGS = -m32
 ASFLAGS =
-CCFLAGS = -g -std=c11 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
+CCFLAGS = -g -std=c11 -Wall -Dnullptr=0 -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS = -g -m32 -Tkernel.ld
+LDFLAGS = -g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 all: clean kernel
 

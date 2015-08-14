@@ -19,7 +19,7 @@ extern "C" {
 namespace trainscript
 {
 	using Int = int32_t;
-	using Real = double;
+	using Real = float;
 	using Void = void;
 	using Bool = bool;
 
