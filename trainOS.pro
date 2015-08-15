@@ -56,7 +56,8 @@ DISTFILES += \
     Depfile \
     Makefile.new \
     scripts/main.ts \
-    asm/dynamic.S
+    asm/dynamic.S \
+    README.md
 
 QMAKE_INCDIR =
 
