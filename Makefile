@@ -64,8 +64,8 @@ obj/stdlib.o: src/stdlib.c include/stdlib.h include/varargs.h \
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
-obj/timer.o: src/timer.c include/timer.h include/interrupts.h \
- include/cpustate.h
+obj/timer.o: src/timer.c include/timer.h include/kernel.h \
+ include/interrupts.h include/cpustate.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
 
 # src/vmm.c

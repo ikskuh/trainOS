@@ -85,7 +85,11 @@ void intr_routine(CpuState *state)
 		if(handler != nullptr) {
 			handler(state);
 		} else {
-			kprintf("\n\x12\x04Exception [%d] %s!\x12\0x7\n", state->intr, name);
+            kprintf("\n\x12\x04 Exception [%d] %s!\x12\0x07  \n", state->intr, name);
+            kprintf(
+                "EIP: %x"
+                "",
+                state->eip);
 			while(1)
 			{
 				__asm__ volatile("cli; hlt");

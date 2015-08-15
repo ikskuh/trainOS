@@ -18,6 +18,41 @@ void die(const char *msg)
     }
 }
 
+extern size_t mallocCount;
+extern size_t freeCount;
+extern size_t allocatedMemory;
+
+void update_statusbar(time_t t)
+{
+    size_t a, b;
+    static char tmp[64];
+    static char buffer[CONSOLE_WIDTH];
+    memset(buffer, ' ', sizeof(char) * CONSOLE_WIDTH);
+
+    memcpy(&buffer[0], "Malloc: ", 8);
+
+    b = 8;
+    a = strlen(itoa(freeCount, tmp, 10));
+    memcpy(&buffer[8], tmp, a);
+    b += a;
+
+    buffer[b] = '/'; b++;
+
+    a = strlen(itoa(mallocCount, tmp, 10));
+    memcpy(&buffer[b], tmp, a);
+    b += a;
+
+    b += 2;
+
+    a = strlen(itoa(allocatedMemory, tmp, 10));
+    memcpy(&buffer[b], tmp, a);
+    b += a;
+
+    memcpy(&buffer[b], " Byte", 5);
+
+    console_setstate(buffer);
+}
+
 static void debug_test()
 {
 	char buffer[64];
@@ -31,12 +66,13 @@ static void debug_test()
 	kprintf("This %s %c test line.\n", "is", 'a');
 	kprintf("Numbers: %d %i %x %b\n", 15, 15, 15, 15);
 
-	/*
+    ///*
 	kputs("scroll-test:\n");
-	for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 10; i++)
 	{
 		kprintf("They see me scrolling, they hating! %i\n", i);
-	}
+    }
+    /*
 	for(int i = 0; i < 272; i++)
 	{
 		kprintf("x");
@@ -136,7 +172,7 @@ void init(const MultibootStructure *mbHeader)
 	putsuccess();
 
 	kputs("Prepare heap memory:");
-	for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
+    for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
 	{
 		vmm_map(ptr, (uintptr_t)pmm_alloc(), VM_PROGRAM);
 	}
@@ -148,11 +184,11 @@ void init(const MultibootStructure *mbHeader)
 
 	kputs("Initialize C++ objects: ");
 	cpp_init();
-	putsuccess();
+    putsuccess();
 
-	double f = 1.0;
+    timer_add_callback(1, update_statusbar);
 
-	int i = (int)f;
+    debug_test();
 
     vm_start();
 
@@ -171,3 +207,8 @@ int main(int argc, char **argv)
 
 void __init_array_start() { }
 void __init_array_end() { }
+
+
+
+
+

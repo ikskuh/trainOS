@@ -26,6 +26,13 @@ time_t __cdecl timer_get();
 void __cdecl timer_set(time_t time);
 
 /**
+ * @brief Adds a callback to the timer.
+ * @param interval The period time when the callback is called.
+ * @param callback The callback that is called.
+ */
+void __cdecl timer_add_callback(time_t interval, void (*callback)(time_t));
+
+/**
  * @brief Waits until a certain time elapsed.
  * @param ticks The number of ticks to wait
  */

@@ -28,6 +28,21 @@ static ConsoleState state = csDefault;
 
 static ConsoleChar *screen = (ConsoleChar*)0xB8000;
 
+static ConsoleChar *statusbar = (ConsoleChar*)(0xB8000 + 0x02 * CONSOLE_WIDTH * CONSOLE_HEIGHT);
+
+void console_setstate(const char *text)
+{
+    for(size_t i = 0; i < CONSOLE_WIDTH; i++) {
+        statusbar[i].c = ' ';
+        statusbar[i].color = 0x70;
+    }
+    ConsoleChar *ptr = statusbar;
+    while(*text) {
+        (ptr++)->c = *text++;
+    }
+
+}
+
 void ksetpos(int x, int y)
 {
 	if((x >= 0) && (x < CONSOLE_WIDTH))

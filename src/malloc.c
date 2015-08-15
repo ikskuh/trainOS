@@ -41,6 +41,9 @@ struct __freelist {
 	struct __freelist *nx;
 };
 
+size_t mallocCount = 0, freeCount = 0;
+size_t allocatedMemory = 0;
+
 size_t __malloc_margin = 32;
 char * const __malloc_heap_start = (char *)0x400000;
 char * const __malloc_heap_end = (char *)0x800000;
@@ -50,6 +53,8 @@ struct __freelist *__flp;
 
 void *malloc(size_t len)
 {
+    allocatedMemory += len;
+    mallocCount++;
 	struct __freelist *fp1, *fp2, *sfp1, *sfp2;
 	char *cp;
 	size_t s, avail;
@@ -168,6 +173,7 @@ void *malloc(size_t len)
 
 void free(void *p)
 {
+    freeCount++;
 	struct __freelist *fp1, *fp2, *fpnew;
 	char *cp1, *cp2, *cpnew;
 

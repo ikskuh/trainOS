@@ -5,7 +5,7 @@ extern "C"  {
 #endif
 
 #define CONSOLE_WIDTH 80
-#define CONSOLE_HEIGHT 25
+#define CONSOLE_HEIGHT 24
 
 #define COLOR_BLACK 0x0
 #define COLOR_BLUE 0x1
@@ -22,6 +22,12 @@ extern "C"  {
 #define COLOR_LIGHTMAGENTA 0xD
 #define COLOR_YELLOW 0xE
 #define COLOR_WHITE 0xF
+
+/**
+ * @brief Sets the console status bar
+ * @param text
+ */
+void console_setstate(const char *text);
 
 /**
  * @brief Sets the cursor position.
