@@ -173,7 +173,10 @@ void *malloc(size_t len)
 
 void free(void *p)
 {
-    freeCount++;
+	freeCount++;
+
+	return;
+
 	struct __freelist *fp1, *fp2, *fpnew;
 	char *cp1, *cp2, *cpnew;
 

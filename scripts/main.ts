@@ -3,11 +3,10 @@ VAR global : INT;
 PUB main() | i : INT
 BEGIN
 	0 -> i;
-	# Print numbers from 1 to 5
-	WHILE ((i + 1) -> i) <= 5 DO
+	WHILE ((i + 1) -> i) <= 50 DO
 	BEGIN
 		printInt(i);
-		sleep(20);
+		sleep(2);
 	END
 END
 

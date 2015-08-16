@@ -21,14 +21,29 @@ void yyerror(void *scanner, const char *s);
 	} \
 }
 
-typedef struct 
+struct ParserData
 {
 	char *buffer;
 	size_t index;
 	size_t length;
 	trainscript::Module *module;
 	void *scanner;
-} ParserData;
+	char* strings[256];
+
+	char *strdup(const char *str)
+	{
+		for(size_t i = 0; i < 256; i++) {
+			if(this->strings[i] == nullptr) {
+				return this->strings[i] = ::strdup(str);
+			}
+			else if(strcmp(this->strings[i], str) == 0) {
+				return this->strings[i];
+			}
+		}
+		die_extra("ParserData::strdup", "out of strings");
+	}
+
+};
 
 struct VariableDeclaration
 {

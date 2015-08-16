@@ -39,7 +39,8 @@ HEADERS += \
     include/ker/dictionary.hpp \
     include/string.h \
     include/ker/new.hpp \
-    include/dynamic.h
+    include/dynamic.h \
+    include/config.h
 
 DISTFILES += \
     asm/intr_common_handler.S \

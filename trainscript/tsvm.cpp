@@ -58,6 +58,12 @@ namespace trainscript
 		yylex_destroy(data.scanner);
 		free(internalStorage);
 
+		for(size_t i = 0; i < 256; i++) {
+			if(data.strings[i] != nullptr) {
+				free(data.strings[i]);
+			}
+		}
+
 		if(valid) {
 			return module;
 		} else {
@@ -104,11 +110,11 @@ namespace trainscript
 			context.add(this->mReturnValue.first, &returnVariable);
 		}
 		if(arguments.length() != this->mArguments.length()) {
-			return Variable::Invalid;
+			die_extra("ScriptMethod::invoke", "Invalid argument count.");
 		}
 		for(size_t i = 0; i < this->mArguments.length(); i++) {
 			if(this->mArguments[i].second != arguments[i].type) {
-				return Variable::Invalid;
+				die_extra("ScriptMethod::invoke", "Invalid argument type.");
 			}
 			context.add(this->mArguments[i].first, new Variable(arguments[i]));
 		}
@@ -176,7 +182,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int:return  mkvar(lhs.integer + rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real + rhs.real);
-				default: kprintf("addition not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("addition not supported for %s.\n", lhs.type.name()); return Variable::Invalid;
 			}
 		}
 
@@ -185,7 +191,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer - rhs.integer);
 				case TypeID::Real:return  mkvar(lhs.real - rhs.real);
-				default: kprintf("subtraction not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("subtraction not supported for %s.\n", lhs.type.name()); return Variable::Invalid;
 			}
 		}
 
@@ -194,7 +200,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer * rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real * rhs.real);
-				default: kprintf("multiplication not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("multiplication not supported for %s.\n", lhs.type.name()); return Variable::Invalid;
 			}
 		}
 
@@ -203,7 +209,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer / rhs.integer);
 				case TypeID::Real: return mkvar(lhs.real / rhs.real);
-				default: kprintf("division not supported for %s.\n", typeName(lhs.type.id)); return Variable::Invalid;
+				default: kprintf("division not supported for %s.\n", lhs.type.name()); return Variable::Invalid;
 			}
 		}
 
@@ -212,7 +218,7 @@ namespace trainscript
 			switch(lhs.type.id) {
 				case TypeID::Int: return mkvar(lhs.integer % rhs.integer);
 				// case TypeID::Real: mkvar(lhs.real % rhs.real);
-				default: kprintf("modulo not supported for %s.\n", typeName(lhs.type.id));  return Variable::Invalid;
+				default: kprintf("modulo not supported for %s.\n", lhs.type.name());  return Variable::Invalid;
 			}
 		}
 
@@ -223,7 +229,7 @@ namespace trainscript
 				case TypeID::Real: return mkbool(lhs.real == rhs.real);
 				case TypeID::Bool: return mkbool(lhs.boolean == rhs.boolean);
 				default:
-					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}
@@ -235,7 +241,7 @@ namespace trainscript
 				case TypeID::Real: return mkbool(lhs.real != rhs.real);
 				case TypeID::Bool: return mkbool(lhs.boolean != rhs.boolean);
 				default:
-					kprintf("inequals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("inequals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}
@@ -247,7 +253,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer < rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real < rhs.real);
 				default:
-					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}
@@ -258,7 +264,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer <= rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real <= rhs.real);
 				default:
-					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}
@@ -269,7 +275,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer > rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real > rhs.real);
 				default:
-					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}
@@ -280,7 +286,7 @@ namespace trainscript
 				case TypeID::Int: return mkbool(lhs.integer >= rhs.integer);
 				case TypeID::Real: return mkbool(lhs.real >= rhs.real);
 				default:
-					kprintf("equals not supported for %s.\n", typeName(lhs.type.id));
+					kprintf("equals not supported for %s.\n", lhs.type.name());
 					return Variable::Invalid;
 			}
 		}

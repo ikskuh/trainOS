@@ -54,6 +54,18 @@ namespace trainscript
 				   (this->pointer != other.pointer);
 		}
 
+		const char *name() const {
+			switch(id) {
+				case TypeID::Invalid: return "INVALID";
+				case TypeID::Void: return "VOID";
+				case TypeID::Int: return "INT";
+				case TypeID::Real: return "REAL";
+				case TypeID::Text: return "TEXT";
+				case TypeID::Bool: return "BOOL";
+				default: return "unknown";
+			}
+		}
+
 		static const Type Invalid;
 		static const Type Void;
 		static const Type Int;
@@ -288,7 +300,7 @@ namespace trainscript
 		Variable execute(LocalContext &context) const override {
 			auto *var = context.get(this->variableName);
 			if(var == nullptr) {
-				return Variable::Invalid;
+				die_extra("VariableExpression.VariableNotFound", this->variableName.str());
 			}
 			return *var;
 		}
@@ -328,17 +340,17 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->expression == nullptr) {
-				return Variable::Invalid;
+				die("VariableAssignmentExpression.ExpressionMissing");
 			}
 			Variable result = this->expression->execute(context);
 
 			Variable *target = context.get(this->variableName);
 			if(target == nullptr) {
-				return Variable::Invalid;
+				die_extra("VariableAssignmentExpression.VariableNotFound", this->variableName.str());
 			}
 
 			if(target->type != result.type) {
-				return Variable::Invalid;
+				die_extra("VariableAssignmentExpression.ExpectedType", result.type.name());
 			}
 
 			switch(target->type.id) {
@@ -406,7 +418,7 @@ namespace trainscript
 		{
 			Method *method = context.module->method(this->methodName.str());
 			if(method == nullptr) {
-				return Variable::Invalid;
+				die_extra("MethodInvokeExpression.MethodNotFound", this->methodName.str());
 			}
 
 			ker::Vector<Variable> vars(this->parameters.length());
@@ -467,20 +479,25 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->lhs == nullptr) {
-				return Variable::Invalid;
+				die_extra("ArithmeticExpression.ExpressionMissing", "Left-hand side");
 			}
 			if(this->rhs == nullptr) {
-				return Variable::Invalid;
+				die_extra("ArithmeticExpression.ExpressionMissing", "Right-hand side");
 			}
 
 			Variable left = this->lhs->execute(context);
 			Variable right = this->rhs->execute(context);
 
 			if(left.type != right.type) {
-				return Variable::Invalid;
+				die("ArithmeticExpression.TypeMismatch");
 			}
 
-			return OP(left, right);
+			Variable result = OP(left, right);
+
+			if(result.type.usable() == false) {
+				die_extra("ArithmeticExpression.InvalidResult", result.type.name());
+			}
+			return result;
 		}
 
 		bool validate(LocalContext &context, ker::String &errorCode) const override {
@@ -543,12 +560,12 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->condition == nullptr) {
-				return Variable::Invalid;
+				die("IfExpression.ConditionMissing");
 			}
 
 			Variable result = this->condition->execute(context);
 			if(result.type != Type::Boolean) {
-				return Variable::Invalid;
+				die_extra("IfExpression.TypeMismatch", result.type.name());
 			}
 			if((result.boolean == true) && (this->blockTrue != nullptr)) {
 				this->blockTrue->execute(context);
@@ -574,7 +591,7 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->block == nullptr) {
-				return Variable::Invalid;
+				die("RepeatEndlessExpression.BlockMissing");
 			}
 
 			while(true)
@@ -603,10 +620,10 @@ namespace trainscript
 
 		Variable execute(LocalContext &context) const override {
 			if(this->condition == nullptr) {
-				return Variable::Invalid;
+				die("RepeatWhileExpression.ConditionMissing");
 			}
 			if(this->block == nullptr) {
-				return Variable::Invalid;
+				die("RepeatWhileExpression.BlockMissing");
 			}
 
 			while(true)

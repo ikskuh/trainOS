@@ -1,10 +1,13 @@
 #pragma once
 
 #include <inttypes.h>
+#include <config.h>
 
 #if defined(__cplusplus)
 extern "C"  {
 #endif
+
+#if defined(USE_VIRTUAL_MEMORY_MANAGEMENT)
 
 #define VM_PRESENT  0x01
 #define VM_WRITABLE 0x02
@@ -23,6 +26,8 @@ void vmm_init(void);
  * @remarks If flags is 0, the mapping will be undone.
  */
 void vmm_map(uintptr_t virtual, uintptr_t physical, uint32_t flags);
+
+#endif
 
 #if defined(__cplusplus)
 }

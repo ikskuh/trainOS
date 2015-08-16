@@ -11,16 +11,4 @@ namespace trainscript
 		Text = 4,
 		Bool = 5,
 	};
-
-	static const char *typeName(TypeID id) {
-		switch(id) {
-			case TypeID::Invalid: return "INVALID";
-			case TypeID::Void: return "VOID";
-			case TypeID::Int: return "INT";
-			case TypeID::Real: return "REAL";
-			case TypeID::Text: return "TEXT";
-			case TypeID::Bool: return "BOOL";
-			default: return "unknown";
-		}
-	}
 }

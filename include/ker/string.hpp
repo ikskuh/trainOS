@@ -46,12 +46,6 @@ namespace ker
             this->copyFrom(bytes, length);
 		}
 
-		String & operator = (const String &other)
-		{
-			this->copyFrom(other.mText, other.mLength);
-			return *this;
-		}
-
 		~String()
 		{
             if(this->mText != nullptr) {
@@ -80,11 +74,6 @@ namespace ker
 			String cat(data, this->mLength + other.mLength);
 			free(data);
 			return cat;
-		}
-
-		static String concat(const String &lhs, const String &rhs)
-		{
-			return lhs.append(rhs);
 		}
 
 		const uint8_t *text() const
@@ -122,6 +111,12 @@ namespace ker
 			return this->mText[index];
 		}
 
+		String & operator = (const String &other)
+		{
+			this->copyFrom(other.mText, other.mLength);
+			return *this;
+		}
+
 		bool operator ==(const String &other) const
 		{
 			return this->equals(other);
@@ -131,6 +126,12 @@ namespace ker
 		{
 			return !this->equals(other);
 		}
+
+		String operator +(const String &other) const
+		{
+			return this->append(other);
+		}
+
     private:
         void copyFrom(const uint8_t *bytes, size_t length)
         {
@@ -142,6 +143,18 @@ namespace ker
             this->mLength = length;
             this->mText[this->mLength] = 0; // last byte is always 0
         }
+	public:
+		static String concat(const String &lhs, const String &rhs)
+		{
+			return lhs.append(rhs);
+		}
+
+		static String fromNumber(int32_t number, int radix = 10)
+		{
+			static char buffer[64];
+			itoa(number, buffer, radix);
+			return String(buffer);
+		}
 	};
 
 

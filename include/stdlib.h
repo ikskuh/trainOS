@@ -95,6 +95,28 @@ static inline size_t strlen(const char *str)
 	return size;
 }
 
+static inline int strcmp(const char *p1, const char *p2)
+{
+	while(*p1) {
+		if(*p2 == 0) {
+			return 1;
+		}
+
+		if(*p2 > *p1) {
+			return -1;
+		}
+		if(*p1 > *p2) {
+			return 1;
+		}
+		p1++;
+		p2++;
+	}
+	if (*p2) {
+		return -1;
+	}
+	return 0;
+}
+
 static inline void *calloc(size_t size)
 {
     void *mem = malloc(size);

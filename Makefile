@@ -40,7 +40,7 @@ obj/console.o: src/console.c include/console.h include/stdlib.h \
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
  include/console.h include/interrupts.h include/cpustate.h include/pmm.h \
- include/multiboot.h include/vmm.h include/timer.h
+ include/multiboot.h include/vmm.h include/config.h include/timer.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
 
 # src/interrupts.c
@@ -69,8 +69,9 @@ obj/timer.o: src/timer.c include/timer.h include/kernel.h \
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
 
 # src/vmm.c
-obj/vmm.o: src/vmm.c include/vmm.h include/pmm.h include/multiboot.h \
- include/stdlib.h include/varargs.h include/console.h include/kernel.h
+obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
+ include/multiboot.h include/stdlib.h include/varargs.h include/console.h \
+ include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # trainscript/tsvm.cpp

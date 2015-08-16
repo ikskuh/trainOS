@@ -1,8 +1,11 @@
-#include "vmm.h"
-#include "pmm.h"
-#include "stdlib.h"
-#include "console.h"
-#include "kernel.h"
+#include <config.h>
+#include <vmm.h>
+#include <pmm.h>
+#include <stdlib.h>
+#include <console.h>
+#include <kernel.h>
+
+#if defined(USE_VIRTUAL_MEMORY_MANAGEMENT)
 
 typedef struct
 {
@@ -79,3 +82,5 @@ void vmm_init(void)
     cr0 |= (1 << 31);
     __asm__ volatile("mov %0, %%cr0" : : "r" (cr0));
 }
+
+#endif

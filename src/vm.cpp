@@ -66,7 +66,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 			case TypeID::Bool: stackSize += sizeof(Int); break;
 			case TypeID::Int:  stackSize += sizeof(Int); break;
 			case TypeID::Real: stackSize += sizeof(Real); break;
-			default: die("invalid argument type."); break;
+			default: die_extra("NativeMethod.InvalidArgument", arguments[i].type.name()); break;
 		}
 	}
 
@@ -85,7 +85,6 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 				*reinterpret_cast<Real*>(stack) = arguments[i].real;
 				stack += sizeof(Real);
 				break;
-			default: die("invalid argument type."); break;
 		}
 	}
 

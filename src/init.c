@@ -4,18 +4,28 @@
 #include <interrupts.h>
 #include <pmm.h>
 #include <vmm.h>
-
 #include <timer.h>
+#include <config.h>
 
 void die(const char *msg)
 {
-    kputs("\n");
-    ksetcolor(COLOR_RED, COLOR_WHITE);
-    kputs(msg);
-    while(1)
-    {
-        __asm__ volatile ("cli; hlt;");
-    }
+	die_extra(msg, "");
+}
+
+void die_extra(const char *msg, const char *extra)
+{
+	kputs("\n");
+	ksetcolor(COLOR_RED, COLOR_WHITE);
+	kputs(msg);
+	if((extra != nullptr) && (strlen(extra) > 0)) {
+		kputs(": '");
+		kputs(extra);
+		kputc('\'');
+	}
+	while(1)
+	{
+		__asm__ volatile ("cli; hlt;");
+	}
 }
 
 extern size_t mallocCount;
@@ -156,12 +166,14 @@ void init(const MultibootStructure *mbHeader)
 	pmm_init(mbHeader);
 	putsuccess();
 
-    // uint32_t freeMem = pmm_calc_free();
-    //kprintf("Free memory: %d B, %d kB, %d MB\n", freeMem, freeMem >> 10, freeMem >> 20);
+	 uint32_t freeMem = pmm_calc_free();
+	kprintf("Free memory: %d B, %d kB, %d MB\n", freeMem, freeMem >> 10, freeMem >> 20);
 
-    kputs("Initialize virtual memory management: ");
+#if defined(USE_VIRTUAL_MEMORY_MANAGEMENT)
+	kputs("Initialize virtual memory management: ");
 	vmm_init();
 	putsuccess();
+#endif
 
 	kputs("Initialize interrupts:");
 	intr_init();
@@ -171,12 +183,14 @@ void init(const MultibootStructure *mbHeader)
 	irq_enable();
 	putsuccess();
 
+#if defined(USE_VIRTUAL_MEMORY_MANAGEMENT)
 	kputs("Prepare heap memory:");
-    for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
+	for(uintptr_t ptr = 0x400000; ptr < 0x800000; ptr += 4096)
 	{
 		vmm_map(ptr, (uintptr_t)pmm_alloc(), VM_PROGRAM);
 	}
 	putsuccess();
+#endif
 
 	kputs("Initialize timer:");
 	timer_init();
@@ -187,8 +201,6 @@ void init(const MultibootStructure *mbHeader)
     putsuccess();
 
     timer_add_callback(1, update_statusbar);
-
-    debug_test();
 
     vm_start();
 
