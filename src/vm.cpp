@@ -19,11 +19,32 @@ class NativeMethod :
 {
 private:
 	void *function;
+	ker::Vector<Type> parameters;
 public:
-	NativeMethod(void *fn) :
+	NativeMethod(const char *arguments, void *fn) :
 		function(fn)
 	{
-
+		Type *current = nullptr;
+		while(*arguments) {
+			switch(*arguments) {
+				case '*':
+					if(current == nullptr) die("NativeMethod.ctor.InvalidPointerSpec");
+					current->pointer++;
+					break;
+				case 'i':
+					current = &this->parameters.append(Type::Int);
+					break;
+				case 'r':
+					current = &this->parameters.append(Type::Real);
+					break;
+				case 't':
+					current = &this->parameters.append(Type::Text);
+					break;
+				default:
+					die("NativeMethod.ctor.InvalidArgumentList");
+			}
+			arguments++;
+		}
 	}
 
 	Variable invoke(Vector<Variable> arguments) override;
@@ -38,9 +59,7 @@ public:
 	}
 
 	Vector<Type> arguments() const {
-		Vector<Type> list;
-		list.append(Type::Int);
-		return list;
+		return this->parameters;
 	}
 
 	Type returnType() const {
@@ -62,6 +81,9 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	// Copy arguments
 	size_t stackSize = 0;
 	for(int i = 0; i < arguments.length(); i++) {
+		if(arguments[i].type != this->parameters[i]) {
+			// die_extra("NativeMethod.InvalidArgumentType", arguments[i].type.name());
+		}
 		switch(arguments[i].type.id) {
 			case TypeID::Bool: stackSize += sizeof(Int); break;
 			case TypeID::Int:  stackSize += sizeof(Int); break;
@@ -102,15 +124,16 @@ extern "C" void __cdecl printInt(int i) {
 struct NativeModuleDef
 {
 	const char *name;
+	const char *signature;
 	void *function;
 };
 
 NativeModuleDef methods[] = {
-	{ "sleep", (void*)sleep },
-	{ "timer_get", (void*)timer_get },
-	{ "timer_set", (void*)timer_set },
-	{ "printInt", (void*)printInt },
-	{ nullptr, 0 }
+	{ "sleep", "i", (void*)sleep },
+	{ "timer_get", "", (void*)timer_get },
+	{ "timer_set", "i", (void*)timer_set },
+	{ "printInt", "i", (void*)printInt },
+	{ nullptr, nullptr, 0 }
 };
 
 extern "C" void vm_start()
@@ -134,10 +157,12 @@ extern "C" void vm_start()
 
 	kprintf("Module successfully loaded :)\n");
 
+
+
 	// Load native modules
 	NativeModuleDef *mod = methods;
 	while(mod->name != nullptr) {
-		module->methods.add(mod->name, new NativeMethod(mod->function));
+		module->methods.add(mod->name, new NativeMethod(mod->signature, mod->function));
 		mod++;
 	}
 

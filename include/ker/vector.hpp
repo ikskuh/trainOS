@@ -85,11 +85,12 @@ namespace ker
 			return this->mData[index];
 		}
 
-		void append(const T &value)
+		T& append(const T &value)
 		{
 			this->reserve(this->mLength + 1);
             new (&this->mData[this->mLength]) T(value);
 			this->mLength += 1;
+			return this->mData[this->mLength - 1];
 		}
 
 		void resize(size_t size)
