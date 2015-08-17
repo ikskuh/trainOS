@@ -15,3 +15,7 @@
 //*
 #define USE_MAGIC_SECURED_MALLOC
 //*/
+
+//*
+#define ENABLE_MALLOC_MONITORING
+//*/

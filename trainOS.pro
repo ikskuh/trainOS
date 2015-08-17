@@ -42,7 +42,8 @@ HEADERS += \
     include/ker/new.hpp \
     include/dynamic.h \
     include/config.h \
-    include/serial.h
+    include/serial.h \
+    include/malloc.h
 
 DISTFILES += \
     asm/intr_common_handler.S \

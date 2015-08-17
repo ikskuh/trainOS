@@ -5,6 +5,8 @@
 #include "varargs.h"
 #include "config.h"
 
+#include "malloc.h"
+
 #if defined(__cplusplus)
 extern "C"  {
 #endif
@@ -12,29 +14,6 @@ extern "C"  {
 char *itoa(int value, char *str, int base);
 int atoi(const char *str);
 float atof(const char *str);
-
-#if defined(USE_VERBOSE_MALLOC)
-void *malloc_d(size_t,const char *,int);
-#endif
-
-#if defined(USE_VERBOSE_FREE)
-void free_d(void *,const char*, int);
-#endif
-
-/**
- * Allocates a block of memory
- * @param size Minimum size of the memory block
- * @return Pointer to the allocated memory area
- */
-void *malloc(size_t size);
-
-/**
- * Frees a previously allocated block of memory.
- * @param mem The block of memory.
- */
-void free(void *mem);
-
-void* realloc (void* ptr, size_t size);
 
 void exit(int errorCode);
 
@@ -126,19 +105,19 @@ static inline int strcmp(const char *p1, const char *p2)
 	return 0;
 }
 
-static inline void *calloc(size_t size)
-{
-    void *mem = malloc(size);
-    memset(mem, 0, size);
-    return mem;
-}
-
 static inline char * strdup(const char *str)
 {
 	size_t len = strlen(str) + 1;
 	char * n = (char*)malloc(len);
 	memcpy(n, str, len);
 	return n;
+}
+
+static inline void *calloc(size_t size)
+{
+	void *mem = malloc(size);
+	memset(mem, 0, size);
+	return mem;
 }
 
 int sprintf(char *target, const char *format, ...);
@@ -149,12 +128,3 @@ int vsprintf(char *target, const char *format, va_list vl);
 }
 #endif
 
-
-
-#if defined(USE_VERBOSE_MALLOC)
-#define malloc(size) malloc_d((size), __FILE__, __LINE__)
-#endif
-
-#if defined(USE_VERBOSE_FREE)
-#define free(ptr) free_d((ptr), __FILE__, __LINE__)
-#endif

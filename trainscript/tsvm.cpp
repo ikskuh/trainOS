@@ -96,6 +96,8 @@ namespace trainscript
 	{
 		LocalContext context(this->module);
 
+		ker::Vector<Variable*> temporaries;
+
 		for(auto var : this->module->variables)
 		{
 			context.add(var.first, var.second);
@@ -115,13 +117,21 @@ namespace trainscript
 			if(this->mArguments[i].second != arguments[i].type) {
 				die_extra("ScriptMethod::invoke", "Invalid argument type.");
 			}
-			context.add(this->mArguments[i].first, new Variable(arguments[i]));
+			auto *v = new Variable(arguments[i]);
+			temporaries.append(v);
+			context.add(this->mArguments[i].first, v);
 		}
 		for(auto local : this->mLocals) {
-			context.add(local.first, new Variable { local.second, 0 });
+			auto *v = new Variable { local.second, 0 };
+			temporaries.append(v);
+			context.add(local.first, v);
 		}
 
 		this->block->execute(context);
+
+		for(auto *var : temporaries) {
+			delete var;
+		}
 
 		return returnVariable;
 	}

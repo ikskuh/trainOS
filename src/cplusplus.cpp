@@ -6,12 +6,16 @@
 
 void *operator new( size_t size )
 {
-    return calloc( size );
+	void *ptr = malloc( size );
+	memset(ptr, 0, size);
+	return ptr;
 }
 
 void *operator new[]( size_t  size )
 {
-	return calloc( size );
+	void *ptr = malloc( size );
+	memset(ptr, 0, size);
+	return ptr;
 }
 
 void operator delete( void *obj )

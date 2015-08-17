@@ -66,6 +66,9 @@ namespace ker
         ~Vector()
         {
             if(this->mData != nullptr) {
+				for(size_t i = 0; i < this->mLength; i++) {
+					this->mData[i].~T();
+				}
 				free(this->mData);
             }
         }

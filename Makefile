@@ -34,12 +34,12 @@ kernel: obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/s
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
- include/varargs.h include/config.h
+ include/varargs.h include/config.h include/malloc.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
- include/config.h include/console.h include/interrupts.h \
+ include/config.h include/malloc.h include/console.h include/interrupts.h \
  include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
  include/timer.h include/serial.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
@@ -47,27 +47,29 @@ obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
  include/console.h include/stdlib.h include/varargs.h include/config.h \
- include/io.h src/intr_stubs.h
+ include/malloc.h include/io.h src/intr_stubs.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
 obj/malloc.o: src/malloc.c include/kernel.h include/stdlib.h \
- include/varargs.h include/config.h include/console.h include/serial.h
+ include/varargs.h include/config.h include/malloc.h include/console.h \
+ include/serial.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
- include/stdlib.h include/varargs.h include/config.h include/console.h
+ include/stdlib.h include/varargs.h include/config.h include/malloc.h \
+ include/console.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
 
 # src/serial.c
 obj/serial.o: src/serial.c include/io.h include/serial.h include/stdlib.h \
- include/varargs.h include/config.h
+ include/varargs.h include/config.h include/malloc.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
 obj/stdlib.o: src/stdlib.c include/stdlib.h include/varargs.h \
- include/config.h include/kernel.h
+ include/config.h include/malloc.h include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
@@ -77,13 +79,13 @@ obj/timer.o: src/timer.c include/timer.h include/kernel.h \
 
 # src/vmm.c
 obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
- include/multiboot.h include/stdlib.h include/varargs.h include/console.h \
- include/kernel.h
+ include/multiboot.h include/stdlib.h include/varargs.h include/malloc.h \
+ include/console.h include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # trainscript/tsvm.cpp
 obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
- include/config.h include/console.h trainscript/common.h \
+ include/config.h include/malloc.h include/console.h trainscript/common.h \
  trainscript/tsvm.hpp include/ker/string.hpp include/ker/vector.hpp \
  include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
  include/ker/pair.hpp trainscript/typeid.hpp \
@@ -93,29 +95,29 @@ obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
- include/config.h include/console.h include/ker/new.hpp
+ include/config.h include/malloc.h include/console.h include/ker/new.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/config.h \
- include/timer.h include/dynamic.h src/../trainscript/tsvm.hpp \
- include/console.h include/ker/string.hpp include/ker/vector.hpp \
- include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
- include/ker/pair.hpp src/../trainscript/typeid.hpp
+ include/malloc.h include/timer.h include/dynamic.h \
+ src/../trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
+ include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
+ include/kernel.h include/ker/pair.hpp src/../trainscript/typeid.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # obj/trainscript.yy.cpp
 obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
- include/stdlib.h include/varargs.h include/config.h trainscript/common.h \
- trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
- include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp trainscript/typeid.hpp \
- obj/trainscript.tab.hpp
+ include/stdlib.h include/varargs.h include/config.h include/malloc.h \
+ trainscript/common.h trainscript/tsvm.hpp include/console.h \
+ include/ker/string.hpp include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
+ trainscript/typeid.hpp obj/trainscript.tab.hpp
 	$(CXX) -iquotetrainscript $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.yy.cpp
 
 # obj/trainscript.tab.cpp
 obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
- include/varargs.h include/config.h trainscript/common.h \
+ include/varargs.h include/config.h include/malloc.h trainscript/common.h \
  trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
  include/kernel.h include/ker/pair.hpp trainscript/typeid.hpp \
@@ -158,3 +160,7 @@ obj/main.o: scripts/main.ts
 .PHONY: run
 run:
 	qemu-system-i386 -serial stdio -kernel kernel
+
+.PHONY: debug
+debug:
+	qemu-system-i386 -s -S -serial stdio -kernel kernel

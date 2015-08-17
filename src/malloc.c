@@ -15,6 +15,10 @@ typedef struct List
 	size_t length;
 	size_t used;
 	struct List *next;
+#if defined(ENABLE_MALLOC_MONITORING)
+	const char *allocationFile;
+	int allocationLine;
+#endif
 } List;
 
 size_t mallocCount = 0, freeCount = 0;
@@ -26,6 +30,45 @@ static char * const malloc_heap_end = (char *)0x10000000;
 
 List *listBegin = nullptr;
 
+#if defined(ENABLE_MALLOC_MONITORING)
+void malloc_print_list(int freeList)
+{
+	List *list = listBegin;
+	serial_printf(SERIAL_COM1, "malloc list: \n");
+	size_t count = 0;
+	while(list != nullptr)
+	{
+#if defined(USE_MAGIC_SECURED_MALLOC)
+		if(list->magic != 0xDEADBEEF) {
+			die("malloc::print_list.InvalidMagicNumber");
+		}
+#endif
+		if(freeList || list->used) {
+			serial_printf(SERIAL_COM1,
+					"[%x -> %x] (%s:%d) %d %d\n",
+					list,
+					list->next,
+					list->used ? list->allocationFile : "",
+					list->used ? list->allocationLine : "",
+					list->used,
+					list->length);
+			kprintf("[%x -> %x] (%s:%d) %d %d\n",
+					list,
+					list->next,
+					list->used ? list->allocationFile : "",
+					list->used ? list->allocationLine : "",
+					list->used,
+					list->length);
+			if(list->used) {
+				count++;
+			}
+		}
+		list = list->next;
+	}
+	kprintf("Unfreed objects: %d\n", count);
+	serial_printf(SERIAL_COM1, "Unfreed objects: %d\n", count);
+}
+#else
 static void print_list()
 {
 	List *list = listBegin;
@@ -41,6 +84,7 @@ static void print_list()
 		list = list->next;
 	}
 }
+#endif
 
 static void defragment()
 {
@@ -61,7 +105,11 @@ static void defragment()
 	}
 }
 
+#if defined(ENABLE_MALLOC_MONITORING)
+void *_malloc(size_t len, const char *file, int line)
+#else
 void *malloc(size_t len)
+#endif
 {
 	// Prevent fragmentation, sacrifice memory
 	if(len < minimumAllocSize) {
@@ -85,7 +133,11 @@ void *malloc(size_t len)
 		cursor = cursor->next;
 	}
 	if(cursor == nullptr) {
+#if defined(ENABLE_MALLOC_MONITORING)
+		malloc_print_list(1);
+#else
 		print_list();
+#endif
 		die_extra("malloc.OutOfMemory", itoa(len, nullptr, 10));
 	}
 
@@ -93,17 +145,12 @@ void *malloc(size_t len)
 		die("malloc.FragmentationFailure");
 	}
 
-	if(cursor->length == len)
-	{
-		cursor->used = 1;
-	}
-	else
+	if(cursor->length != len)
 	{
 		// Store total length
 		size_t newLength = cursor->length - sizeof(List) - len;
 
 		// Allocate the memory
-		cursor->used = 1;
 		cursor->length = len;
 
 		// Fragment list
@@ -118,15 +165,29 @@ void *malloc(size_t len)
 		cursor->next = newl;
 	}
 
+	cursor->used = 1;
+#if defined(ENABLE_MALLOC_MONITORING)
+	cursor->allocationFile = file;
+	cursor->allocationLine = line;
+#endif
+
 	allocatedMemory += len;
 	mallocCount++;
 
 	return (void*)((char*)cursor + sizeof(List));
 }
 
+#if defined(ENABLE_MALLOC_MONITORING)
+void* _realloc (void* ptr, size_t size, const char *file, int line)
+#else
 void* realloc (void* ptr, size_t size)
+#endif
 {
+#if defined(ENABLE_MALLOC_MONITORING)
+	void *n = _malloc(size, file, line);
+#else
 	void *n = malloc(size);
+#endif
 	memcpy(n, ptr, size);
 	free(ptr);
 	return n;
@@ -139,13 +200,13 @@ void free(void *ptr)
 		return;
 	}
 	if((uintptr_t)ptr < (uintptr_t)malloc_heap_start) {
-		die_extra("free.InvalidFree", itoa(ptr, nullptr, 16));
+		die_extra("free.InvalidFree", itoa((int)ptr, nullptr, 16));
 	}
 	freeCount++;
 
 	List *entry = (List*)((char*)ptr - sizeof(List));
 	if(entry->used == 0) {
-		die_extra("free.InvalidBlock", itoa(ptr, nullptr, 16));
+		die_extra("free.InvalidBlock", itoa((int)ptr, nullptr, 16));
 	}
 #if defined(USE_MAGIC_SECURED_MALLOC)
 	if(entry->magic != 0xDEADBEEF) {
@@ -175,8 +236,12 @@ void *malloc_d(size_t len, const char *file, int line)
 	serial_write_str(SERIAL_COM1, itoa(line, nullptr, 10));
 	serial_write_str(SERIAL_COM1, ": ");
 
+#if defined(ENABLE_MALLOC_MONITORING)
+	void *ptr = _malloc(len, file, line);
+#else
 	void *ptr = malloc(len);
-	serial_write_str(SERIAL_COM1, itoa(ptr, nullptr, 16));
+#endif
+	serial_write_str(SERIAL_COM1, itoa((int)ptr, nullptr, 16));
 	serial_write_str(SERIAL_COM1, "\n");
 
 	return ptr;
@@ -192,7 +257,7 @@ void free_d(void *ptr, const char *file, int line)
 	serial_write_str(SERIAL_COM1, "Free ");
 	serial_write_str(SERIAL_COM1, itoa(entry->length, nullptr, 10));
 	serial_write_str(SERIAL_COM1, " bytes at ");
-	serial_write_str(SERIAL_COM1, itoa(ptr, nullptr, 16));
+	serial_write_str(SERIAL_COM1, itoa((int)ptr, nullptr, 16));
 	serial_write_str(SERIAL_COM1, " in ");
 	serial_write_str(SERIAL_COM1, file);
 	serial_write_str(SERIAL_COM1, ":");

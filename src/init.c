@@ -208,7 +208,13 @@ void init(const MultibootStructure *mbHeader)
 
     vm_start();
 
+	irq_disable();
+
 	kputs("\x12\x04trainOS stopped.\x12\x07!\n");
+
+#if defined(ENABLE_MALLOC_MONITORING)
+	malloc_print_list(0);
+#endif
 
 	while(1);
 }
