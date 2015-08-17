@@ -11,3 +11,7 @@
 /*
 #define USE_VERBOSE_FREE
 //*/
+
+//*
+#define USE_MAGIC_SECURED_MALLOC
+//*/

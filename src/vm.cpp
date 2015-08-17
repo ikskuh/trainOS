@@ -80,7 +80,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 
 	// Copy arguments
 	size_t stackSize = 0;
-	for(int i = 0; i < arguments.length(); i++) {
+	for(size_t i = 0; i < arguments.length(); i++) {
 		if(arguments[i].type != this->parameters[i]) {
 			// die_extra("NativeMethod.InvalidArgumentType", arguments[i].type.name());
 		}
@@ -94,7 +94,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 
 	uint8_t *stack = (uint8_t*)malloc(stackSize);
 	uint8_t *stackPtr = stack;
-	for(int i = arguments.length() - 1; i >= 0; i--) {
+	for(size_t i = 0; i < arguments.length(); i++) {
 		switch(arguments[i].type.id) {
 			case TypeID::Bool:
 				*reinterpret_cast<Int*>(stackPtr) = arguments[i].boolean ? 1 : 0;

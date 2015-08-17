@@ -9,7 +9,9 @@
 
 typedef struct List
 {
+#if defined(USE_MAGIC_SECURED_MALLOC)
 	size_t magic;
+#endif
 	size_t length;
 	size_t used;
 	struct List *next;
@@ -30,9 +32,11 @@ static void print_list()
 	serial_printf(SERIAL_COM1, "malloc list: \n");
 	while(list != nullptr)
 	{
+#if defined(USE_MAGIC_SECURED_MALLOC)
 		if(list->magic != 0xDEADBEEF) {
 			die("malloc::print_list.InvalidMagicNumber");
 		}
+#endif
 		serial_printf(SERIAL_COM1, "[%x -> %x] %d %d\n", list, list->next, list->used, list->length);
 		list = list->next;
 	}
@@ -69,9 +73,9 @@ void *malloc(size_t len)
 		listBegin->length = (intptr_t)malloc_heap_end - (intptr_t)malloc_heap_start - sizeof(List);
 		listBegin->used = 0;
 		listBegin->next = nullptr;
+#if defined(USE_MAGIC_SECURED_MALLOC)
 		listBegin->magic = 0xDEADBEEF;
-
-		print_list();
+#endif
 	}
 
 	List *cursor = listBegin;
@@ -107,7 +111,9 @@ void *malloc(size_t len)
 		newl->length = newLength;
 		newl->used = 0;
 		newl->next = cursor->next;
+#if defined(USE_MAGIC_SECURED_MALLOC)
 		newl->magic = 0xDEADBEEF;
+#endif
 
 		cursor->next = newl;
 	}
@@ -141,9 +147,11 @@ void free(void *ptr)
 	if(entry->used == 0) {
 		die_extra("free.InvalidBlock", itoa(ptr, nullptr, 16));
 	}
+#if defined(USE_MAGIC_SECURED_MALLOC)
 	if(entry->magic != 0xDEADBEEF) {
 		die_extra("free.InvalidBlockMagic: ", itoa(entry->magic, nullptr, 16));
 	}
+#endif
 
 	if(entry->length > 0x5000) {
 		die_extra("free.InvalidSizedBlock: ", itoa(entry->length, nullptr, 10));
