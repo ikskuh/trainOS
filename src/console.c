@@ -188,50 +188,12 @@ void kputs(const char *str)
 
 void kprintf(const char *format, ...)
 {
-	char buffer[32];
+	static char buffer[1024];
+	memset(buffer, 0, sizeof(buffer));
+
 	va_list vl;
 	va_start(vl, format);
-	while(*format != 0)
-	{
-		char c = *(format++);
-		if(c == '%')
-		{
-			c = *(format++);
-			int i;
-			char *str;
-			switch(c)
-			{
-				case 'd':
-				case 'i':
-					i = va_arg(vl, int);
-					kputs(itoa(i, buffer, 10));
-					break;
-				case 'b':
-					i = va_arg(vl, int);
-					kputs(itoa(i, buffer, 2));
-					break;
-				case 'x':
-				case 'X':
-					i = va_arg(vl, int);
-					kputs(itoa(i, buffer, 16));
-					break;
-				case 'c':
-					c = va_arg(vl, int);
-					kputc(c);
-					break;
-				case 's':
-					str = va_arg(vl, char*);
-					kputs(str);
-					break;
-				default:
-					kputc(c);
-					break;
-			}
-		}
-		else
-		{
-			kputc(c);
-		}
-	}
+	vsprintf(buffer, format, vl);
 	va_end(vl);
+	kputs(buffer);
 }

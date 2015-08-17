@@ -49,7 +49,7 @@ namespace ker
 		~String()
 		{
             if(this->mText != nullptr) {
-                free(this->mText);
+				free(this->mText);
             }
 		}
 
@@ -136,7 +136,7 @@ namespace ker
         void copyFrom(const uint8_t *bytes, size_t length)
         {
             if(this->mText != nullptr) {
-                free(this->mText);
+				// free(this->mText);
             }
             this->mText = (uint8_t*)malloc(length + 1);
             memcpy(this->mText, bytes, length);

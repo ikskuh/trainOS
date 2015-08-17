@@ -15,7 +15,8 @@ SOURCES += \
     trainscript/main.cpp \
     src/timer.c \
     src/cplusplus.cpp \
-    src/vm.cpp
+    src/vm.cpp \
+    src/serial.c
 
 HEADERS += \
 	include/console.h \
@@ -40,7 +41,8 @@ HEADERS += \
     include/string.h \
     include/ker/new.hpp \
     include/dynamic.h \
-    include/config.h
+    include/config.h \
+    include/serial.h
 
 DISTFILES += \
     asm/intr_common_handler.S \

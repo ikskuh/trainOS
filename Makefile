@@ -11,9 +11,9 @@ YACC = bison
 
 # File Lists
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
-SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/stdlib.c src/timer.c src/vmm.c
+SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
 SRCS_CXX = trainscript/tsvm.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.cpp obj/trainscript.tab.cpp
-OBJS     = obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+OBJS     = obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # Flags
 FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
@@ -27,40 +27,47 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
-kernel: obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+kernel: obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
- include/varargs.h
+ include/varargs.h include/config.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
- include/console.h include/interrupts.h include/cpustate.h include/pmm.h \
- include/multiboot.h include/vmm.h include/config.h include/timer.h
+ include/config.h include/console.h include/interrupts.h \
+ include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
+ include/timer.h include/serial.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
 
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
- include/console.h include/stdlib.h include/varargs.h include/io.h \
- src/intr_stubs.h
+ include/console.h include/stdlib.h include/varargs.h include/config.h \
+ include/io.h src/intr_stubs.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
-obj/malloc.o: src/malloc.c include/stdlib.h include/varargs.h
+obj/malloc.o: src/malloc.c include/kernel.h include/stdlib.h \
+ include/varargs.h include/config.h include/console.h include/serial.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
- include/stdlib.h include/varargs.h include/console.h
+ include/stdlib.h include/varargs.h include/config.h include/console.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
+
+# src/serial.c
+obj/serial.o: src/serial.c include/io.h include/serial.h include/stdlib.h \
+ include/varargs.h include/config.h
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
 obj/stdlib.o: src/stdlib.c include/stdlib.h include/varargs.h \
- include/kernel.h
+ include/config.h include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
@@ -76,29 +83,30 @@ obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
 
 # trainscript/tsvm.cpp
 obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
- include/console.h trainscript/common.h trainscript/tsvm.hpp \
- include/ker/string.hpp include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
- trainscript/typeid.hpp trainscript/trainscript.tab.hpp \
- trainscript/trainscript.l.h include/string.h
+ include/config.h include/console.h trainscript/common.h \
+ trainscript/tsvm.hpp include/ker/string.hpp include/ker/vector.hpp \
+ include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
+ include/ker/pair.hpp trainscript/typeid.hpp \
+ trainscript/trainscript.tab.hpp trainscript/trainscript.l.h \
+ include/string.h
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/tsvm.cpp
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
- include/console.h include/ker/new.hpp
+ include/config.h include/console.h include/ker/new.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/vm.cpp
-obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/timer.h \
- include/dynamic.h src/../trainscript/tsvm.hpp include/console.h \
- include/ker/string.hpp include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
- src/../trainscript/typeid.hpp
+obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/config.h \
+ include/timer.h include/dynamic.h src/../trainscript/tsvm.hpp \
+ include/console.h include/ker/string.hpp include/ker/vector.hpp \
+ include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
+ include/ker/pair.hpp src/../trainscript/typeid.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # obj/trainscript.yy.cpp
 obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
- include/stdlib.h include/varargs.h trainscript/common.h \
+ include/stdlib.h include/varargs.h include/config.h trainscript/common.h \
  trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
  include/kernel.h include/ker/pair.hpp trainscript/typeid.hpp \
@@ -107,11 +115,11 @@ obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
 
 # obj/trainscript.tab.cpp
 obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
- include/varargs.h trainscript/common.h trainscript/tsvm.hpp \
- include/console.h include/ker/string.hpp include/ker/vector.hpp \
- include/ker/new.hpp include/ker/dictionary.hpp include/kernel.h \
- include/ker/pair.hpp trainscript/typeid.hpp trainscript/trainscript.l.h \
- include/string.h
+ include/varargs.h include/config.h trainscript/common.h \
+ trainscript/tsvm.hpp include/console.h include/ker/string.hpp \
+ include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
+ include/kernel.h include/ker/pair.hpp trainscript/typeid.hpp \
+ trainscript/trainscript.l.h include/string.h
 	$(CXX) -iquotetrainscript $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.tab.cpp
 
 # asm/dynamic.S
@@ -149,4 +157,4 @@ obj/main.o: scripts/main.ts
 
 .PHONY: run
 run:
-	qemu-system-i386 -kernel kernel kernel
+	qemu-system-i386 -serial stdio -kernel kernel

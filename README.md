@@ -15,3 +15,5 @@ Also it leaks memory. A lot of memory.
 - Adding support for String Type
 - Implement custom malloc that does what it should
 
+## Guidlines
+- Calls to `die` or `die_extra` should follow the following scheme: `ContextName.ErrorName`

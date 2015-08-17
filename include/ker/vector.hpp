@@ -66,7 +66,7 @@ namespace ker
         ~Vector()
         {
             if(this->mData != nullptr) {
-                free(this->mData);
+				free(this->mData);
             }
         }
 

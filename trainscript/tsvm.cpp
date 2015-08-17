@@ -1,7 +1,5 @@
-extern "C"  {
 #include <stdlib.h>
 #include <console.h>
-}
 
 #include "common.h"
 
@@ -41,21 +39,22 @@ namespace trainscript
 
 	Module *VM::load(const void *buffer, size_t length)
 	{
-		void *internalStorage = malloc(length);
+		char *internalStorage = (char*)malloc(length);
 		memcpy(internalStorage, buffer, length);
 
 		Module *module = new Module();
 
 		ParserData data;
+		memset(&data, 0, sizeof(data));
 		data.buffer = reinterpret_cast<char*>(internalStorage);
 		data.index = 0;
 		data.length = length;
 		data.module = module;
+
 		yylex_init_extra(&data, &data.scanner);
-
         bool valid = yyparse(&data) == 0;
-
 		yylex_destroy(data.scanner);
+
 		free(internalStorage);
 
 		for(size_t i = 0; i < 256; i++) {

@@ -5,7 +5,7 @@ BEGIN
 	0 -> i;
 	WHILE ((i + 1) -> i) <= 50 DO
 	BEGIN
-		printInt(i);
+		print2Int(50 - i, i);
 		sleep(2);
 	END
 END

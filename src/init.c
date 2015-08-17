@@ -6,6 +6,7 @@
 #include <vmm.h>
 #include <timer.h>
 #include <config.h>
+#include <serial.h>
 
 void die(const char *msg)
 {
@@ -160,13 +161,16 @@ void init(const MultibootStructure *mbHeader)
 	kclear();
 	kputs("Welcome to \x12\x05trainOS\x12\x07!\n");
 
+	serial_init(SERIAL_COM1, 9600, SERIAL_PARITY_NONE, 8);
+	serial_write_str(SERIAL_COM1, "Debug Console Ready\n");
+
     //dumpMB(mbHeader);
 
     kputs("Initialize physical memory management: ");
 	pmm_init(mbHeader);
 	putsuccess();
 
-	 uint32_t freeMem = pmm_calc_free();
+	uint32_t freeMem = pmm_calc_free();
 	kprintf("Free memory: %d B, %d kB, %d MB\n", freeMem, freeMem >> 10, freeMem >> 20);
 
 #if defined(USE_VIRTUAL_MEMORY_MANAGEMENT)

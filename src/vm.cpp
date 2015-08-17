@@ -93,24 +93,25 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	}
 
 	uint8_t *stack = (uint8_t*)malloc(stackSize);
+	uint8_t *stackPtr = stack;
 	for(int i = arguments.length() - 1; i >= 0; i--) {
 		switch(arguments[i].type.id) {
 			case TypeID::Bool:
-				*reinterpret_cast<Int*>(stack) = arguments[i].boolean ? 1 : 0;
-				stack += sizeof(Int);
+				*reinterpret_cast<Int*>(stackPtr) = arguments[i].boolean ? 1 : 0;
+				stackPtr += sizeof(Int);
 				break;
 			case TypeID::Int:
-				*reinterpret_cast<Int*>(stack) = arguments[i].integer;
-				stack += sizeof(Int);
+				*reinterpret_cast<Int*>(stackPtr) = arguments[i].integer;
+				stackPtr += sizeof(Int);
 				break;
 			case TypeID::Real:
-				*reinterpret_cast<Real*>(stack) = arguments[i].real;
-				stack += sizeof(Real);
+				*reinterpret_cast<Real*>(stackPtr) = arguments[i].real;
+				stackPtr += sizeof(Real);
 				break;
 		}
 	}
 
-	dynamic_call(this->function, stack-stackSize, stackSize);
+	dynamic_call(this->function, stack, stackSize);
 
 	free(stack);
 
@@ -119,6 +120,10 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 
 extern "C" void __cdecl printInt(int i) {
 	kprintf("{%d}\n", i);
+}
+
+extern "C" void __cdecl print2Int(int a, int b) {
+	kprintf("{%d;%d}\n", a, b);
 }
 
 struct NativeModuleDef
@@ -133,6 +138,7 @@ NativeModuleDef methods[] = {
 	{ "timer_get", "", (void*)timer_get },
 	{ "timer_set", "i", (void*)timer_set },
 	{ "printInt", "i", (void*)printInt },
+	{ "print2Int", "ii", (void*)print2Int },
 	{ nullptr, nullptr, 0 }
 };
 

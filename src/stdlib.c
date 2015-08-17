@@ -1,14 +1,6 @@
 #include <stdlib.h>
 #include <kernel.h>
 
-void* realloc (void* ptr, size_t size)
-{
-	void *n = malloc(size);
-	memcpy(n, ptr, size);
-	free(ptr);
-	return n;
-}
-
 void exit(int errorCode)
 {
 	static char buffer[128];
@@ -37,6 +29,11 @@ char *itoa(int num, char *str, int base)
 {
     int i = 0;
     int isNegative = 0;
+
+	if(str == nullptr) {
+		static char tmp[64];
+		str = tmp;
+	}
 
     /* Handle 0 explicitely, otherwise empty string is printed for 0 */
     if (num == 0)
@@ -101,4 +98,92 @@ void *memmove( void *destination, const void *source, size_t num)
 {
 	// TODO: Implement memmove
 	return nullptr;
+}
+
+int sprintf(char *target, const char *format, ...)
+{
+	va_list vl;
+	va_start(vl, format);
+	int len = vsprintf(target, format, vl);
+	va_end(vl);
+
+	return len;
+}
+
+int vsprintf(char *target, const char *format, va_list vl)
+{
+	int length = 0;
+	char buffer[32];
+	while(*format != 0)
+	{
+		char c = *(format++);
+		if(c == '%')
+		{
+			c = *(format++);
+			int i;
+			char *tmp;
+			size_t len;
+			switch(c)
+			{
+				case 'd':
+				case 'i':
+					i = va_arg(vl, int);
+					tmp = itoa(i, buffer, 10);
+					len = strlen(tmp);
+					if(target != nullptr) {
+						strcat(target, tmp);
+						target += len;
+					}
+					length += len;
+					break;
+				case 'b':
+					i = va_arg(vl, int);
+					tmp = itoa(i, buffer, 2);
+					len = strlen(tmp);
+					if(target != nullptr) {
+						strcat(target, tmp);
+						target += len;
+					}
+					length += len;
+					break;
+				case 'x':
+				case 'X':
+					i = va_arg(vl, int);
+					tmp = itoa(i, buffer, 16);
+					len = strlen(tmp);
+					if(target != nullptr) {
+						strcat(target, tmp);
+						target += len;
+					}
+					length += len;
+					break;
+				case 's':
+					tmp = va_arg(vl, char*);
+					len = strlen(tmp);
+					if(target != nullptr) {
+						strcat(target, tmp);
+						target += len;
+					}
+					length += len;
+					break;
+				case 'c':
+					c = va_arg(vl, int);
+				default:
+					if(target != nullptr) {
+						*target++ = c;
+					}
+					length += 1;
+					break;
+			}
+		}
+		else
+		{
+			if(target != nullptr) *target++ = c;
+			length += 1;
+		}
+	}
+	if(target != nullptr) {
+		target[length] = 0;
+	}
+	return length;
 }

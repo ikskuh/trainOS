@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include "varargs.h"
+#include "config.h"
 
 #if defined(__cplusplus)
 extern "C"  {
@@ -11,6 +12,14 @@ extern "C"  {
 char *itoa(int value, char *str, int base);
 int atoi(const char *str);
 float atof(const char *str);
+
+#if defined(USE_VERBOSE_MALLOC)
+void *malloc_d(size_t,const char *,int);
+#endif
+
+#if defined(USE_VERBOSE_FREE)
+void free_d(void *,const char*, int);
+#endif
 
 /**
  * Allocates a block of memory
@@ -132,6 +141,20 @@ static inline char * strdup(const char *str)
 	return n;
 }
 
+int sprintf(char *target, const char *format, ...);
+
+int vsprintf(char *target, const char *format, va_list vl);
+
 #if defined(__cplusplus)
 }
+#endif
+
+
+
+#if defined(USE_VERBOSE_MALLOC)
+#define malloc(size) malloc_d((size), __FILE__, __LINE__)
+#endif
+
+#if defined(USE_VERBOSE_FREE)
+#define free(ptr) free_d((ptr), __FILE__, __LINE__)
 #endif

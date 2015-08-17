@@ -36,4 +36,4 @@ obj/main.o: scripts/main.ts
 
 .PHONY: run
 run:
-	qemu-system-i386 -kernel kernel kernel
+	qemu-system-i386 -serial stdio -kernel kernel
