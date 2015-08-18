@@ -202,6 +202,9 @@ void free(void *ptr)
 	if((uintptr_t)ptr < (uintptr_t)malloc_heap_start) {
 		die_extra("free.InvalidFree", itoa((int)ptr, nullptr, 16));
 	}
+	if((uintptr_t)ptr >= (uintptr_t)malloc_heap_end) {
+		die_extra("free.InvalidFree", itoa((int)ptr, nullptr, 16));
+	}
 	freeCount++;
 
 	List *entry = (List*)((char*)ptr - sizeof(List));

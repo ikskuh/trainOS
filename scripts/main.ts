@@ -3,7 +3,7 @@ VAR global : INT;
 PUB main() | i : INT
 BEGIN
 	0 -> i;
-	WHILE ((i + 1) -> i) <= 50 DO
+	WHILE ((i + 1) -> i) <= 25 DO
 	BEGIN
 		print2Int(50 - i, i);
 		sleep(2);
