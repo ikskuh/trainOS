@@ -46,7 +46,7 @@ size_t allocatedMemory = 0;
 
 static const size_t minimumAllocSize = 2 * sizeof(List);
 static char * const malloc_heap_start = (char *)0x400000;
-static char * const malloc_heap_end = (char *)0x10000000;
+static char * const malloc_heap_end = (char *)0x800000;
 
 List *listBegin = nullptr;
 
@@ -69,16 +69,18 @@ void malloc_print_list(int freeList)
 					list,
 					list->next,
 					list->used ? list->allocationFile : "",
-					list->used ? list->allocationLine : "",
+					list->used ? list->allocationLine : 0,
 					list->used,
 					list->length);
+			/*
 			kprintf("[%x -> %x] (%s:%d) %d %d\n",
 					list,
 					list->next,
 					list->used ? list->allocationFile : "",
-					list->used ? list->allocationLine : "",
+					list->used ? list->allocationLine : 0,
 					list->used,
 					list->length);
+			*/
 			if(list->used) {
 				count++;
 			}

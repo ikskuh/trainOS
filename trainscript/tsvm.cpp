@@ -10,8 +10,6 @@
 
 namespace trainscript
 {
-	bool verbose = false;
-
 	const Type Type::Invalid = { TypeID::Invalid, 0 };
 	const Type Type::Void = { TypeID::Void, 0 };
 	const Type Type::Int = { TypeID::Int, 0 };
@@ -94,7 +92,7 @@ namespace trainscript
 
     Variable ScriptMethod::invoke(ker::Vector<Variable> arguments)
 	{
-		LocalContext context(this->module);
+		ExecutionContext context(this->module);
 
 		ker::Vector<Variable*> temporaries;
 
@@ -143,7 +141,7 @@ namespace trainscript
 			return false;
 		}
 
-		LocalContext context(this->module);
+		ExecutionContext context(this->module);
 
 		for(auto var : this->module->variables)
 		{

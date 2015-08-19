@@ -43,7 +43,17 @@ HEADERS += \
     include/dynamic.h \
     include/config.h \
     include/serial.h \
-    include/malloc.h
+    include/malloc.h \
+    trainscript/instruction.hpp \
+    trainscript/method.hpp \
+    trainscript/module.hpp \
+    trainscript/scriptmethod.hpp \
+    trainscript/type.hpp \
+    trainscript/types.hpp \
+    trainscript/variable.hpp \
+    trainscript/executioncontext.hpp \
+    trainscript/vm.hpp \
+    trainscript/instructions.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \

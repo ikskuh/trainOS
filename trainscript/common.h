@@ -41,6 +41,7 @@ struct ParserData
 			}
 		}
 		die_extra("ParserData::strdup", "out of strings");
+		return nullptr;
 	}
 
 };

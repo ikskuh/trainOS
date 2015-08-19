@@ -1,5 +1,9 @@
 VAR global : INT;
 
+# OBJ timer       : "/sys/timer";
+# OBJ heap        : "/sys/malloc";
+# OBJ interrupts  : "/sys/interrupt";
+
 PUB main() | i : INT
 BEGIN
 	0 -> i;
@@ -12,5 +16,5 @@ END
 
 PUB fun() -> i : INT
 BEGIN
-	30 -> i;
+	60 -> i;
 END

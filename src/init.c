@@ -16,7 +16,7 @@ void die(const char *msg)
 void die_extra(const char *msg, const char *extra)
 {
 	kputs("\n");
-	ksetcolor(COLOR_RED, COLOR_WHITE);
+	ksetcolor(COLOR_LIGHTMAGENTA, COLOR_BLACK);
 	kputs(msg);
 	if((extra != nullptr) && (strlen(extra) > 0)) {
 		kputs(": '");
@@ -102,14 +102,14 @@ static void dumpMB(const MultibootStructure *mbHeader)
     // TODO: MB_BOOTDEVICE
     if(mbHeader->flags & MB_COMMANDLINE)
     {
-        kprintf("Commandline: %s\n", mbHeader->commandline);
+		kprintf("Commandline: %s\n", (const char*)mbHeader->commandline);
     }
     if(mbHeader->flags & MB_MODULES)
     {
         const MultibootModule *mod = (const MultibootModule *)mbHeader->modules;
         for(size_t i = 0; i < mbHeader->moduleCount; i++)
         {
-            kprintf("Module %s [%d - %d]\n", mod[i].name, mod[i].start, mod[i].end);
+			kprintf("Module %s [%d - %d]\n", (const char*)mod[i].name, mod[i].start, mod[i].end);
         }
     }
     if(mbHeader->flags & MB_SYMS_AOUT)
@@ -136,7 +136,7 @@ static void dumpMB(const MultibootStructure *mbHeader)
     // TODO: MB_CONFIG_TABLE
     if(mbHeader->flags & MB_BOOTLOADER_NAME)
     {
-        kprintf("Bootloader Name: %s\n", mbHeader->bootLoaderName);
+		kprintf("Bootloader Name: %s\n", (const char*)mbHeader->bootLoaderName);
     }
     // TODO: MB_APS_TABLE
 }
@@ -204,7 +204,7 @@ void init(const MultibootStructure *mbHeader)
 	cpp_init();
     putsuccess();
 
-    timer_add_callback(1, update_statusbar);
+	timer_add_callback(1, update_statusbar);
 
     vm_start();
 

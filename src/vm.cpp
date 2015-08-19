@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <timer.h>
 #include <dynamic.h>
+#include <console.h>
 #include "../trainscript/tsvm.hpp"
 
 using namespace ker;
