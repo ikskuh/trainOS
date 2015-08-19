@@ -7,10 +7,12 @@
 #undef malloc
 #undef free
 
+static const uint32_t magic = 0xDEADBEEF;
+
 typedef struct List
 {
 #if defined(USE_MAGIC_SECURED_MALLOC)
-	size_t magic;
+	size_t hash;
 #endif
 	size_t length;
 	size_t used;
@@ -20,6 +22,24 @@ typedef struct List
 	int allocationLine;
 #endif
 } List;
+
+static uint32_t hash(List *list)
+{
+	uint32_t h = magic;
+	h ^= list->length;
+	h ^= list->used;
+	h ^= (uint32_t)list->next;
+#if defined(ENABLE_MALLOC_MONITORING)
+	h ^= (uint32_t)list->allocationFile;
+	h ^= list->allocationLine;
+#endif
+	return h;
+}
+
+static int isValid(List *list)
+{
+	return list->hash == hash(list);
+}
 
 size_t mallocCount = 0, freeCount = 0;
 size_t allocatedMemory = 0;
@@ -39,7 +59,7 @@ void malloc_print_list(int freeList)
 	while(list != nullptr)
 	{
 #if defined(USE_MAGIC_SECURED_MALLOC)
-		if(list->magic != 0xDEADBEEF) {
+		if(isValid(list) == 0) {
 			die("malloc::print_list.InvalidMagicNumber");
 		}
 #endif
@@ -102,6 +122,10 @@ static void defragment()
 			list->length += list->next->length + sizeof(List);
 			list->next = n;
 		}
+
+#if defined(USE_MAGIC_SECURED_MALLOC)
+		list->hash = hash(list);
+#endif
 	}
 }
 
@@ -122,7 +146,7 @@ void *malloc(size_t len)
 		listBegin->used = 0;
 		listBegin->next = nullptr;
 #if defined(USE_MAGIC_SECURED_MALLOC)
-		listBegin->magic = 0xDEADBEEF;
+		listBegin->hash = hash(listBegin);
 #endif
 	}
 
@@ -159,7 +183,7 @@ void *malloc(size_t len)
 		newl->used = 0;
 		newl->next = cursor->next;
 #if defined(USE_MAGIC_SECURED_MALLOC)
-		newl->magic = 0xDEADBEEF;
+		newl->hash = hash(newl);
 #endif
 
 		cursor->next = newl;
@@ -170,6 +194,7 @@ void *malloc(size_t len)
 	cursor->allocationFile = file;
 	cursor->allocationLine = line;
 #endif
+	cursor->hash = hash(cursor);
 
 	allocatedMemory += len;
 	mallocCount++;
@@ -212,8 +237,8 @@ void free(void *ptr)
 		die_extra("free.InvalidBlock", itoa((int)ptr, nullptr, 16));
 	}
 #if defined(USE_MAGIC_SECURED_MALLOC)
-	if(entry->magic != 0xDEADBEEF) {
-		die_extra("free.InvalidBlockMagic: ", itoa(entry->magic, nullptr, 16));
+	if(isValid(entry) == 0) {
+		die_extra("free.InvalidBlockMagic: ", itoa(entry->hash, nullptr, 16));
 	}
 #endif
 

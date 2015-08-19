@@ -3,14 +3,14 @@ VAR global : INT;
 PUB main() | i : INT
 BEGIN
 	0 -> i;
-	WHILE ((i + 1) -> i) <= 25 DO
+	WHILE ((i + 1) -> i) <= fun() DO
 	BEGIN
-		print2Int(50 - i, i);
+		print2Int(fun() - i, i);
 		sleep(2);
 	END
 END
 
 PUB fun() -> i : INT
 BEGIN
-	10 -> i;
+	30 -> i;
 END
