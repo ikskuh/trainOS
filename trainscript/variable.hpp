@@ -5,15 +5,66 @@
 
 namespace trainscript
 {
-	struct Variable
+	class Variable
 	{
-		Type type;
-		union {
-			Int integer;
-			Real real;
-			// Text text;
-			Bool boolean;
-		};
+		friend class Type;
+	private:
+		Type mType;
+		void *mValue;
+	private:
+		// To be called by Type::createInstance
+		Variable(const Type &type, void *value) :
+			mType(type),
+			mValue(value)
+		{
+
+		}
+	public:
+		Variable() :
+			mType(Type::Invalid),
+			mValue(nullptr)
+		{
+
+		}
+
+		Variable(const Variable &other) :
+			mType(other.mType),
+			mValue(nullptr)
+		{
+			*this = other;
+		}
+
+		Variable(Variable &&other) :
+			mType(other.mType),
+			mValue(other.mValue)
+		{
+			other.mType = Type::Invalid;
+			other.mValue = nullptr;
+		}
+		~Variable();
+
+		Variable &operator =(const Variable &other);
+
+		void *data() const
+		{
+			return this->mValue;
+		}
+
+		template<typename T>
+		T& value()
+		{
+			return *reinterpret_cast<T*>(this->mValue);
+		}
+
+		template<typename T>
+		const T& value() const
+		{
+			return *reinterpret_cast<T*>(this->mValue);
+		}
+
+		const Type &type() const {
+			return this->mType;
+		}
 
 #if defined(TSVM_PRINTVAL)
 		void printval() const
@@ -27,29 +78,16 @@ namespace trainscript
 		}
 #endif
 
+		static Variable fromInt(trainscript::Int i);
+		static Variable fromReal(trainscript::Real r);
+		static Variable fromText(trainscript::Text t);
+		static Variable fromBool(Bool b);
+
 		static const Variable Invalid;
 		static const Variable Void;
 		static const Variable Int;
 		static const Variable Real;
 		static const Variable Text;
-		static const Variable Boolean;
+		static const Variable Bool;
 	};
-
-	static inline Variable mkvar(Int value) {
-		Variable v = Variable::Int;
-		v.integer = value;
-		return v;
-	}
-
-	static inline Variable mkvar(Real value) {
-		Variable v = Variable::Real;
-		v.real = value;
-		return v;
-	}
-
-	static inline Variable mkbool(Bool value) {
-		Variable v = Variable::Boolean;
-		v.boolean = value;
-		return v;
-	}
 }

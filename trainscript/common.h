@@ -49,7 +49,7 @@ struct ParserData
 struct VariableDeclaration
 {
 	char *name;
-	trainscript::Variable variable;
+	trainscript::Type type;
 };
 
 struct LocalVariable

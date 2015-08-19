@@ -15,14 +15,14 @@ namespace trainscript
 	const Type Type::Int = { TypeID::Int, 0 };
 	const Type Type::Real = { TypeID::Real, 0 };
 	const Type Type::Text = { TypeID::Text, 0 };
-	const Type Type::Boolean = { TypeID::Bool, 0 };
+	const Type Type::Bool = { TypeID::Bool, 0 };
 
     const Variable Variable::Invalid = { Type::Invalid, 0 };
     const Variable Variable::Void = { Type::Void, 0 };
     const Variable Variable::Int = { Type::Int, 0 };
     const Variable Variable::Real = { Type::Real, 0 };
     const Variable Variable::Text = { Type::Text, 0 };
-    const Variable Variable::Boolean = { Type::Boolean, 0 };
+	const Variable Variable::Bool = { Type::Bool, 0 };
 
 	bool Module::validate(ker::String &errorCode) const
 	{
@@ -101,9 +101,7 @@ namespace trainscript
 			context.add(var.first, var.second);
 		}
 
-		Variable returnVariable = {
-			this->mReturnValue.second, 0
-		};
+		Variable returnVariable = this->mReturnValue.second.createInstance();
 
 		if(this->mReturnValue.second.usable()) {
 			context.add(this->mReturnValue.first, &returnVariable);
@@ -112,7 +110,7 @@ namespace trainscript
 			die_extra("ScriptMethod::invoke", "Invalid argument count.");
 		}
 		for(size_t i = 0; i < this->mArguments.length(); i++) {
-			if(this->mArguments[i].second != arguments[i].type) {
+			if(this->mArguments[i].second != arguments[i].type()) {
 				die_extra("ScriptMethod::invoke", "Invalid argument type.");
 			}
 			auto *v = new Variable(arguments[i]);
@@ -120,7 +118,7 @@ namespace trainscript
 			context.add(this->mArguments[i].first, v);
 		}
 		for(auto local : this->mLocals) {
-			auto *v = new Variable { local.second, 0 };
+			auto *v = new Variable(local.second.createInstance());
 			temporaries.append(v);
 			context.add(local.first, v);
 		}
@@ -148,9 +146,7 @@ namespace trainscript
 			context.add(var.first, var.second);
 		}
 
-		Variable returnVariable = {
-			this->mReturnValue.second, 0
-		};
+		Variable returnVariable = this->mReturnValue.second.createInstance();
 
 		if(this->mReturnValue.second.usable()) {
 			if(context.get(this->mReturnValue.first) != nullptr) {
@@ -165,14 +161,14 @@ namespace trainscript
 				errorCode = "Parameter overlaps a variable.";
 				return false;
 			}
-			context.add(this->mArguments[i].first, new Variable { this->mArguments[i].second, 0 });
+			context.add(this->mArguments[i].first, new Variable(this->mArguments[i].second.createInstance()));
 		}
 		for(auto local : this->mLocals) {
 			if(context.get(local.first) != nullptr) {
 				errorCode = "Local variable overlaps a variable.";
 				return false;
 			}
-			context.add(local.first, new Variable { local.second, 0 });
+			context.add(local.first, new Variable(local.second.createInstance()));
 		}
 
 		if(this->block->validate(context, errorCode) == false) {
@@ -184,6 +180,7 @@ namespace trainscript
 
 	namespace ops
 	{
+		/*
 		Variable add(Variable lhs, Variable rhs)
 		{
 			switch(lhs.type.id) {
@@ -297,5 +294,7 @@ namespace trainscript
 					return Variable::Invalid;
 			}
 		}
+
+		*/
 	}
 }

@@ -2,7 +2,7 @@
 Artifact=kernel
 TempDir=obj
 SourceDir=asm src
-Files=trainscript/trainscript.y trainscript/trainscript.l trainscript/tsvm.cpp
+Files=trainscript/trainscript.y trainscript/trainscript.l trainscript/tsvm.cpp trainscript/variable.cpp
 AdditionalObjects=obj/main.o
 
 LexUseCpp

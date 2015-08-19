@@ -145,7 +145,7 @@ void yyerror(void *scanner, const char *s);
 input:
 	%empty
 |   input variableDeclaration SEMICOLON {
-        auto *var = new Variable($2.variable);
+		auto *var = new Variable($2.type.createInstance());
         context->module->variables.add( ker::String($2.name), var );
 	}
 |   input method {
@@ -328,9 +328,9 @@ elseIfLoop:
 ;
 
 expression:
-	INT                                         { $$ = new ConstantExpression(mkvar($1)); }
-|	REAL                                        { $$ = new ConstantExpression(mkvar($1)); }
-// |   TEXT                                     { $$ = new ConstantExpression(mkvar($1)); }
+	INT                                         { $$ = new ConstantExpression(Variable::fromInt($1)); }
+|	REAL                                        { $$ = new ConstantExpression(Variable::fromReal($1)); }
+// |   TEXT                                     { $$ = new ConstantExpression(Variable::fromText($1)); }
 |   IDENTIFIER                                  { $$ = new VariableExpression($1); }
 |   IDENTIFIER LBRACKET expressionList RBRACKET {
 		auto *call = new MethodInvokeExpression($1);
@@ -379,8 +379,7 @@ expressionList:
 variableDeclaration:
 	KW_VAR IDENTIFIER COLON typeName {
 		$$.name = $2;
-		$$.variable.type = $4;
-		$$.variable.integer = 0; // Initialize with zeroes
+		$$.type = $4;
 	}
 ;
 

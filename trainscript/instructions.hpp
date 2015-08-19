@@ -46,7 +46,7 @@ namespace trainscript
 		}
 
 		Type expectedResult(ExecutionContext &) const override {
-			return this->value.type;
+			return this->value.type();
 		}
 	};
 
@@ -79,7 +79,7 @@ namespace trainscript
 			if(var == nullptr) {
 				return Type::Invalid;
 			} else {
-				return var->type;
+				return var->type();
 			}
 		}
 	};
@@ -109,18 +109,13 @@ namespace trainscript
 				die_extra("VariableAssignmentExpression.VariableNotFound", this->variableName.str());
 			}
 
-			if(target->type != result.type) {
-				die_extra("VariableAssignmentExpression.ExpectedType", result.type.name());
+			if(target->type() != result.type()) {
+				die_extra("VariableAssignmentExpression.ExpectedType", result.type().name());
 			}
 
-			switch(target->type.id) {
-				case TypeID::Int: target->integer = result.integer; break;
-				case TypeID::Real: target->real = result.real; break;
-				case TypeID::Bool: target->boolean = result.boolean; break;
-				default: break;
-			}
+			*target = result;
 
-			return result;
+			return *target;
 		}
 
 		bool validate(ExecutionContext &context, ker::String &errorCode) const override {
@@ -143,7 +138,7 @@ namespace trainscript
 				errorCode = "Variable " + this->variableName + " not found.";
 				return false;
 			}
-			if(var->type != result) {
+			if(var->type() != result) {
 				errorCode = "Variable assignment has invalid type.";
 				return false;
 			}
@@ -248,14 +243,14 @@ namespace trainscript
 			Variable left = this->lhs->execute(context);
 			Variable right = this->rhs->execute(context);
 
-			if(left.type != right.type) {
+			if(left.type() != right.type()) {
 				die("ArithmeticExpression.TypeMismatch");
 			}
 
 			Variable result = OP(left, right);
 
-			if(result.type.usable() == false) {
-				die_extra("ArithmeticExpression.InvalidResult", result.type.name());
+			if(result.type().usable() == false) {
+				die_extra("ArithmeticExpression.InvalidResult", result.type().name());
 			}
 			return result;
 		}
@@ -324,13 +319,13 @@ namespace trainscript
 			}
 
 			Variable result = this->condition->execute(context);
-			if(result.type != Type::Boolean) {
-				die_extra("IfExpression.TypeMismatch", result.type.name());
+			if(result.type() != Type::Bool) {
+				die_extra("IfExpression.TypeMismatch", result.type().name());
 			}
-			if((result.boolean == true) && (this->blockTrue != nullptr)) {
+			if((result.value<Bool>() == true) && (this->blockTrue != nullptr)) {
 				this->blockTrue->execute(context);
 			}
-			if((result.boolean == false) && (this->blockFalse != nullptr)) {
+			if((result.value<Bool>() == false) && (this->blockFalse != nullptr)) {
 				this->blockFalse->execute(context);
 			}
 			return Variable::Void;
@@ -389,10 +384,10 @@ namespace trainscript
 			while(true)
 			{
 				Variable cond = this->condition->execute(context);
-				if(cond.type != Type::Boolean) {
+				if(cond.type() != Type::Bool) {
 					return Variable::Invalid;
 				}
-				if(cond.boolean == false) {
+				if(cond.value<Bool>() == false) {
 					break;
 				}
 

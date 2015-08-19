@@ -12,8 +12,8 @@ YACC = bison
 # File Lists
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
-SRCS_CXX = trainscript/tsvm.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.cpp obj/trainscript.tab.cpp
-OBJS     = obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+SRCS_CXX = trainscript/tsvm.cpp trainscript/variable.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.cpp obj/trainscript.tab.cpp
+OBJS     = obj/tsvm.o obj/variable.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # Flags
 FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
@@ -27,10 +27,10 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/tsvm.o obj/variable.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
-kernel: obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+kernel: obj/tsvm.o obj/variable.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/variable.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/main.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
@@ -95,6 +95,13 @@ obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
  trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \
  obj/trainscript.tab.hpp trainscript/trainscript.l.h include/string.h
 	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/tsvm.cpp
+
+# trainscript/variable.cpp
+obj/variable.o: trainscript/variable.cpp include/kernel.h \
+ trainscript/variable.hpp trainscript/type.hpp trainscript/types.hpp \
+ include/ker/string.hpp include/stdlib.h include/varargs.h \
+ include/config.h include/malloc.h trainscript/typeid.hpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/variable.cpp
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \

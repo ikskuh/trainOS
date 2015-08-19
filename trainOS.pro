@@ -16,7 +16,8 @@ SOURCES += \
     src/timer.c \
     src/cplusplus.cpp \
     src/vm.cpp \
-    src/serial.c
+    src/serial.c \
+    trainscript/variable.cpp
 
 HEADERS += \
 	include/console.h \

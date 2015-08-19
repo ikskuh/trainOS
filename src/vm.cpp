@@ -82,33 +82,22 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	// Copy arguments
 	size_t stackSize = 0;
 	for(size_t i = 0; i < arguments.length(); i++) {
-		if(arguments[i].type != this->parameters[i]) {
+		if(arguments[i].type() != this->parameters[i]) {
 			// die_extra("NativeMethod.InvalidArgumentType", arguments[i].type.name());
 		}
-		switch(arguments[i].type.id) {
-			case TypeID::Bool: stackSize += sizeof(Int); break;
-			case TypeID::Int:  stackSize += sizeof(Int); break;
-			case TypeID::Real: stackSize += sizeof(Real); break;
-			default: die_extra("NativeMethod.InvalidArgument", arguments[i].type.name()); break;
-		}
+		stackSize += arguments[i].type().size();
 	}
 
 	uint8_t *stack = (uint8_t*)malloc(stackSize);
 	uint8_t *stackPtr = stack;
 	for(size_t i = 0; i < arguments.length(); i++) {
-		switch(arguments[i].type.id) {
-			case TypeID::Bool:
-				*reinterpret_cast<Int*>(stackPtr) = arguments[i].boolean ? 1 : 0;
-				stackPtr += sizeof(Int);
-				break;
-			case TypeID::Int:
-				*reinterpret_cast<Int*>(stackPtr) = arguments[i].integer;
-				stackPtr += sizeof(Int);
-				break;
-			case TypeID::Real:
-				*reinterpret_cast<Real*>(stackPtr) = arguments[i].real;
-				stackPtr += sizeof(Real);
-				break;
+
+		size_t size = arguments[i].type().size();
+		void *data = arguments[i].data();
+
+		if(size > 0) {
+			memcpy(stackPtr, data, size);
+			stackPtr += size;
 		}
 	}
 
@@ -116,7 +105,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 
 	free(stack);
 
-	return mkvar((Int)0);
+	return Type::Int.createInstance();
 }
 
 extern "C" void __cdecl printInt(int i) {

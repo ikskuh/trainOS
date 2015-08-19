@@ -48,7 +48,26 @@ It also features a surveillance mode that logs all allocations / frees. It can b
 |0x20 - 0x27| IRQ0 - IRQ7       |
 |0x28 - 0x2F| IRQ8 - IRQ15      |
 
-### 
+## Virtual Machine Architecture
+
+### Type Format
+The virtual machine supports 5 base types:
+
+| Name    | Description                                    | Size   |
+|---------|------------------------------------------------|--------|
+| Void    | A type that specifies a non-existent value.    | 0      |
+| Int     | An integral number.                            | 32     |
+| Real    | A decimal number.                              | 32/64¹ |
+| Text    | A string value containing a sequence of bytes. | any²   |
+| Bool    | A boolen value, either `true` or `false`.      | 1³     |
+
+¹) A real number is either a float (32 bits) or a double (64 bits) depending on the configuration in `types.hpp`.
+²) A string value is sized the length of the string in bytes plus the size of the length specifier (32 bits).
+³) A boolean is representet as a 1 bit value but due to architecture limitations it is stored with 32 bits.
+
+### Variable Format
+Variables are stored in a `type+pointer` format where `type` stores the type of the variable and `pointer` either a pointer to the variable value or, if `type` is a pointer type, the pointer value of the variable.
+
 
 ## OS Architecture
 To be done.
