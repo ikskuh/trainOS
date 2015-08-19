@@ -62,7 +62,9 @@ The virtual machine supports 5 base types:
 | Bool    | A boolen value, either `true` or `false`.      | 1³     |
 
 ¹) A real number is either a float (32 bits) or a double (64 bits) depending on the configuration in `types.hpp`.
+
 ²) A string value is sized the length of the string in bytes plus the size of the length specifier (32 bits).
+
 ³) A boolean is representet as a 1 bit value but due to architecture limitations it is stored with 32 bits.
 
 ### Variable Format
