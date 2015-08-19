@@ -13,7 +13,6 @@ Also it leaks memory. A lot of memory.
 - Adding support for Modules
 - Adding support for Pointer Types
 - Adding support for String Type
-- Changing malloc magic number to hash value for complete validation.
 
 ## Guidlines
 - Calls to `die` or `die_extra` should follow the following scheme: `ContextName.ErrorName`
