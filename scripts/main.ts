@@ -4,9 +4,11 @@ VAR global : INT;
 # OBJ heap        : "/sys/malloc";
 # OBJ interrupts  : "/sys/interrupt";
 
-PUB main() | i : INT
+PUB main() | i : INT, str : TEXT
 BEGIN
 	0 -> i;
+	"Hello " -> str;
+	printStr(str + "World!");
 	WHILE ((i + 1) -> i) <= fun() DO
 	BEGIN
 		hlp(i, fun() - i);

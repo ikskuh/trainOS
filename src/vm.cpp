@@ -85,7 +85,12 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 		if(arguments[i].type() != this->parameters[i]) {
 			die_extra("NativeMethod.InvalidArgumentType", arguments[i].type().name());
 		}
-		stackSize += arguments[i].type().size();
+		// Special case TEXT: Copy const char * instead of object
+		if(arguments[i].type() == Type::Text) {
+			stackSize += sizeof(const char *);
+		} else {
+			stackSize += arguments[i].type().size();
+		}
 	}
 
 	uint8_t *stack = (uint8_t*)malloc(stackSize);
@@ -95,9 +100,18 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 		size_t size = arguments[i].type().size();
 		void *data = arguments[i].data();
 
-		if(size > 0) {
-			memcpy(stackPtr, data, size);
-			stackPtr += size;
+		if(arguments[i].type() == Type::Text) {
+			// Copy const char *
+			const char *text = arguments[i].value<Text>();
+
+			memcpy(stackPtr, &text, sizeof(const char *));
+			stackPtr += sizeof(const char *);
+		}
+		else {
+			if(size > 0) {
+				memcpy(stackPtr, data, size);
+				stackPtr += size;
+			}
 		}
 	}
 
@@ -116,6 +130,10 @@ extern "C" void __cdecl print2Int(int a, int b) {
 	kprintf("{%d;%d}\n", a, b);
 }
 
+extern "C" void __cdecl printStr(const char *text) {
+	kprintf("{%s}", text);
+}
+
 struct NativeModuleDef
 {
 	const char *name;
@@ -128,6 +146,7 @@ NativeModuleDef methods[] = {
 	{ "timer_get", "", (void*)timer_get },
 	{ "timer_set", "i", (void*)timer_set },
 	{ "printInt", "i", (void*)printInt },
+	{ "printStr", "t", (void*)printStr },
 	{ "print2Int", "ii", (void*)print2Int },
 	{ nullptr, nullptr, 0 }
 };

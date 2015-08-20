@@ -9,6 +9,9 @@
 %option reentrant
 %option bison-bridge
 %option yylineno
+
+%x strparse
+
 %%
 \#[^\n]*        ; // Eat all the comments!
 [ \t]+          ; // Eat all the whitespace!
@@ -56,6 +59,11 @@ TO              { return KW_TO; }
 UNTIL           { return KW_UNTIL; }
 WHILE           { return KW_WHILE; }
 DO              { return KW_DO; }
+
+"\""			BEGIN(strparse);
+<strparse>[^\"]* { yylval->text = yyextra->strdup(yytext); return TEXT;  }
+<strparse>"\""	BEGIN(INITIAL);
+
 [0-9]+\.[0-9]*  { yylval->fval = atof(yytext); return REAL; }
 [0-9]+          { yylval->ival = atoi(yytext); return INT; }
 [a-zA-Z0-9'_]+  { yylval->text = yyextra->strdup(yytext); return IDENTIFIER; }

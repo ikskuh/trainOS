@@ -66,6 +66,7 @@ void yyerror(void *scanner, const char *s);
 %token <fval> REAL
 %token <ival> INT
 %token <text> IDENTIFIER
+%token <text> TEXT
 
 %token KW_PUB
 %token KW_PRI
@@ -319,7 +320,7 @@ elseIfLoop:
 expression:
 	INT                                         { $$ = new ConstantExpression(Variable::fromInt($1)); }
 |	REAL                                        { $$ = new ConstantExpression(Variable::fromReal($1)); }
-// |   TEXT                                     { $$ = new ConstantExpression(Variable::fromText($1)); }
+|   TEXT                                        { $$ = new ConstantExpression(Variable::fromText($1)); }
 |   IDENTIFIER                                  { $$ = new VariableExpression($1); }
 |   IDENTIFIER LBRACKET expressionList RBRACKET {
 		auto *call = new MethodInvokeExpression($1);
