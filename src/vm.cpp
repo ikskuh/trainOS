@@ -83,7 +83,7 @@ Variable NativeMethod::invoke(Vector<Variable> arguments)
 	size_t stackSize = 0;
 	for(size_t i = 0; i < arguments.length(); i++) {
 		if(arguments[i].type() != this->parameters[i]) {
-			// die_extra("NativeMethod.InvalidArgumentType", arguments[i].type.name());
+			die_extra("NativeMethod.InvalidArgumentType", arguments[i].type().name());
 		}
 		stackSize += arguments[i].type().size();
 	}

@@ -9,9 +9,14 @@ BEGIN
 	0 -> i;
 	WHILE ((i + 1) -> i) <= fun() DO
 	BEGIN
-		print2Int(fun() - i, i);
+		hlp(i, fun() - i);
 		sleep(2);
 	END
+END
+
+PRI hlp(i : INT, j : INT)
+BEGIN
+	print2Int(i, j);
 END
 
 PUB fun() -> i : INT

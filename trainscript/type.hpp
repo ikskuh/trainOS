@@ -86,10 +86,10 @@ namespace trainscript
 				switch(id) {
 					case TypeID::Invalid: return 0;
 					case TypeID::Void: return 0;
-					case TypeID::Int: return sizeof(Int);
-					case TypeID::Real: return sizeof(Real);
-					case TypeID::Text: return sizeof(Text);
-					case TypeID::Bool: return sizeof(Bool);
+					case TypeID::Int: return sizeof(trainscript::Int);
+					case TypeID::Real: return sizeof(trainscript::Real);
+					case TypeID::Text: return sizeof(trainscript::Text);
+					case TypeID::Bool: return sizeof(trainscript::Bool);
 					default: die("Type::size.UnknownTypeID");
 				}
 			}
