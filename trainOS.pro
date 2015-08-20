@@ -17,7 +17,8 @@ SOURCES += \
     src/cplusplus.cpp \
     src/vm.cpp \
     src/serial.c \
-    trainscript/variable.cpp
+    trainscript/variable.cpp \
+    trainscript/type.cpp
 
 HEADERS += \
 	include/console.h \
@@ -72,7 +73,8 @@ DISTFILES += \
     Makefile.new \
     scripts/main.ts \
     asm/dynamic.S \
-    README.md
+    README.md \
+    trainscript/type-operators.cpp.tt
 
 QMAKE_INCDIR =
 

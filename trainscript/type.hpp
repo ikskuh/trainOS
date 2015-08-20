@@ -8,17 +8,40 @@ namespace trainscript
 {
 	class Variable;
 
+	using Operator = Variable (*)(const Variable & rhs, const Variable &lhs);
+
+	enum class Operation
+	{
+		Add = 0,
+		Subtract,
+		Multiply,
+		Divide,
+		Modulo,
+		Less,
+		LessEquals,
+		Greater,
+		GreaterEquals,
+		Equals,
+		Inequals,
+		LIMIT
+	};
+
+	struct TypeOps {
+		Operator ops[(int)Operation::LIMIT];
+	};
+
 	struct Type
 	{
 		TypeID id;
 		int pointer;
+		const TypeOps *operators;
 
 		Type reference() const {
-			return { id, pointer + 1 };
+			return Type { id, pointer + 1, operators };
 		}
 
 		Type dereference() const {
-			return { id, pointer - 1 };
+			return Type { id, pointer - 1, operators };
 		}
 
 		bool usable() const {
@@ -73,7 +96,27 @@ namespace trainscript
 			return 0;
 		}
 
+		/**
+		 * @brief Creates an instance of this type.
+		 * @return Variable with a value of this type.
+		 */
 		Variable createInstance() const;
+
+		/**
+		 * @brief Checks if the type has the operation defined.
+		 * @param op Operation that should be checked
+		 * @return True if the operation is defined, else false
+		 */
+		bool hasOperator(Operation op) const;
+
+		/**
+		 * @brief Applies the operation to the operands.
+		 * @param lhs Left hand side
+		 * @param op Operation
+		 * @param rhs Right hand side
+		 * @return Result of the operation or Variable::Invalid if operation is not defined.
+		 */
+		Variable apply(const Variable &lhs, Operation op, const Variable &rhs) const;
 
 		static const Type Invalid;
 		static const Type Void;

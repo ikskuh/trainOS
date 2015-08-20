@@ -39,7 +39,7 @@ namespace trainscript
 	{
 	public:
 		Variable value;
-		ConstantExpression(Variable value) : value(value) { }
+		ConstantExpression(const Variable &value) : value(value) { }
 
 		Variable execute(ExecutionContext &) const override {
 			return this->value;
@@ -179,7 +179,7 @@ namespace trainscript
 			ker::Vector<Variable> vars(this->parameters.length());
 			vars.resize(this->parameters.length());
 			for(size_t i =  0; i < vars.length(); i++) {
-				vars[i] = this->parameters.at(i)->execute(context);
+				vars[i].replace(this->parameters.at(i)->execute(context));
 			}
 
 			return method->invoke(vars);
@@ -218,14 +218,15 @@ namespace trainscript
 		}
 	};
 
-	template<Variable (*OP)(Variable, Variable)>
 	class ArithmeticExpression :
 			public Instruction
 	{
 	public:
+		Operation op;
 		Instruction *lhs, *rhs;
 
-		ArithmeticExpression(Instruction *lhs, Instruction *rhs) :
+		ArithmeticExpression(Instruction *lhs, Instruction *rhs, Operation op) :
+			op(op),
 			lhs(lhs),
 			rhs(rhs)
 		{
@@ -247,7 +248,11 @@ namespace trainscript
 				die("ArithmeticExpression.TypeMismatch");
 			}
 
-			Variable result = OP(left, right);
+			if(left.type().hasOperator(this->op) == false) {
+				die_extra("ArithmeticExpression.InvalidOperator", "The operator was not defined for this type.");
+			}
+
+			Variable result = left.type().apply(left, this->op, right);
 
 			if(result.type().usable() == false) {
 				die_extra("ArithmeticExpression.InvalidResult", result.type().name());
@@ -277,6 +282,11 @@ namespace trainscript
 			}
 			if(rhsType == Type::Void) {
 				errorCode = "VOID type can't be used for operand.";
+				return false;
+			}
+
+			if(lhsType.hasOperator(this->op) == false) {
+				errorCode = "The operator is not defined for this type.";
 				return false;
 			}
 

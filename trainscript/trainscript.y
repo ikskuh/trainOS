@@ -9,23 +9,6 @@
 
 using namespace trainscript;
 
-namespace trainscript {
-	namespace ops {
-		Variable add(Variable lhs, Variable rhs);
-		Variable subtract(Variable lhs, Variable rhs);
-		Variable multiply(Variable lhs, Variable rhs);
-		Variable divide(Variable lhs, Variable rhs);
-		Variable modulo(Variable lhs, Variable rhs);
-
-		Variable equals(Variable lhs, Variable rhs);
-		Variable inequals(Variable lhs, Variable rhs);
-		Variable less(Variable lhs, Variable rhs);
-		Variable lessEqual(Variable lhs, Variable rhs);
-		Variable greater(Variable lhs, Variable rhs);
-		Variable greaterEqual(Variable lhs, Variable rhs);
-	}
-}
-
 typedef union YYSTYPE YYSTYPE;
 
 // stuff from flex that bison needs to know about:
@@ -162,12 +145,16 @@ input:
 		LocalVariable *local = $2.header.locals;
 		while(local) {
 			method->mLocals.add( local->name, local->type );
+			LocalVariable *tmp = local;
 			local = local->next;
+			delete tmp;
 		}
 		LocalVariable *arg = $2.header.arguments;
 		while(arg) {
 			method->mArguments.append( { arg->name, arg->type} );
+			LocalVariable *tmp = local;
 			arg = arg->next;
+			delete tmp;
 		}
 
         context->module->methods.add( $2.header.name, method );
@@ -189,7 +176,9 @@ block:
 			if(mb->instruction != nullptr) {
                 block->instructions.append(mb->instruction);
 			}
+			MethodBody *tmp = mb;
 			mb = mb->next;
+			delete mb;
 		}
 		$$ = block;
 	}
@@ -342,17 +331,17 @@ expression:
 		$$ = call;
 	}
 |   LBRACKET expression RBRACKET                { $$ = $2; }
-|   expression PLUS expression                  { $$ = new ArithmeticExpression<trainscript::ops::add>($1, $3); }
-|   expression MINUS expression                 { $$ = new ArithmeticExpression<trainscript::ops::subtract>($1, $3); }
-|   expression MULTIPLY expression              { $$ = new ArithmeticExpression<trainscript::ops::multiply>($1, $3); }
-|   expression DIVIDE expression                { $$ = new ArithmeticExpression<trainscript::ops::divide>($1, $3); }
-|   expression MODULO expression                { $$ = new ArithmeticExpression<trainscript::ops::modulo>($1, $3); }
-|   expression OP_LT expression                 { $$ = new ArithmeticExpression<trainscript::ops::less>($1, $3); }
-|   expression OP_LE expression                 { $$ = new ArithmeticExpression<trainscript::ops::lessEqual>($1, $3); }
-|   expression OP_GT expression                 { $$ = new ArithmeticExpression<trainscript::ops::greater>($1, $3); }
-|   expression OP_GE expression                 { $$ = new ArithmeticExpression<trainscript::ops::greaterEqual>($1, $3); }
-|   expression OP_EQ expression                 { $$ = new ArithmeticExpression<trainscript::ops::equals>($1, $3); }
-|   expression OP_NEQ expression                { $$ = new ArithmeticExpression<trainscript::ops::inequals>($1, $3); }
+|   expression PLUS expression                  { $$ = new ArithmeticExpression($1, $3, Operation::Add); }
+|   expression MINUS expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Subtract); }
+|   expression MULTIPLY expression              { $$ = new ArithmeticExpression($1, $3, Operation::Multiply); }
+|   expression DIVIDE expression                { $$ = new ArithmeticExpression($1, $3, Operation::Divide); }
+|   expression MODULO expression                { $$ = new ArithmeticExpression($1, $3, Operation::Modulo); }
+|   expression OP_LT expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Less); }
+|   expression OP_LE expression                 { $$ = new ArithmeticExpression($1, $3, Operation::LessEquals); }
+|   expression OP_GT expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Greater); }
+|   expression OP_GE expression                 { $$ = new ArithmeticExpression($1, $3, Operation::GreaterEquals); }
+|   expression OP_EQ expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Equals); }
+|   expression OP_NEQ expression                { $$ = new ArithmeticExpression($1, $3, Operation::Inequals); }
 |   expression RARROW IDENTIFIER                { $$ = new VariableAssignmentExpression($3, $1); }
 ;
 
@@ -384,12 +373,12 @@ variableDeclaration:
 ;
 
 typeName:
-	KW_VOID                           { $$.id = TypeID::Void; $$.pointer = 0; }
-|   KW_INT                            { $$.id = TypeID::Int; $$.pointer = 0; }
-|   KW_REAL                           { $$.id = TypeID::Real; $$.pointer = 0; }
-|   KW_TEXT                           { $$.id = TypeID::Text; $$.pointer = 0; }
-|   KW_BOOL                           { $$.id = TypeID::Bool; $$.pointer = 0; }
-|   KW_PTR LBRACKET typeName RBRACKET { $$ = $3; $$.pointer++; }
+	KW_VOID                           { $$ = Type::Void; }
+|   KW_INT                            { $$ = Type::Int; }
+|   KW_REAL                           { $$ = Type::Real; }
+|   KW_TEXT                           { $$ = Type::Text; }
+|   KW_BOOL                           { $$ = Type::Bool; }
+|   KW_PTR LBRACKET typeName RBRACKET { $$ = $3.reference(); }
 ;
 
 %%

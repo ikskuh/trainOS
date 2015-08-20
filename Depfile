@@ -2,7 +2,9 @@
 Artifact=kernel
 TempDir=obj
 SourceDir=asm src
-Files=trainscript/trainscript.y trainscript/trainscript.l trainscript/tsvm.cpp trainscript/variable.cpp
+Files=trainscript/trainscript.y trainscript/trainscript.l
+Files=trainscript/tsvm.cpp trainscript/variable.cpp trainscript/type.cpp
+Files=trainscript/type-operators.cpp.tt
 AdditionalObjects=obj/main.o
 
 LexUseCpp
@@ -15,6 +17,7 @@ CXX=g++
 LD=g++
 LEX=flex
 YACC=bison
+TEMPLE=mono /home/felix/projects/temple/bin/Debug/temple.exe
 
 # Flags
 FLAGS=-m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx

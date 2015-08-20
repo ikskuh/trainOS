@@ -28,9 +28,10 @@ namespace trainscript
 		}
 
 		Variable(const Variable &other) :
-			mType(other.mType),
-			mValue(nullptr)
+			mType(),
+			mValue()
 		{
+			this->setType(other.mType);
 			*this = other;
 		}
 
@@ -44,6 +45,14 @@ namespace trainscript
 		~Variable();
 
 		Variable &operator =(const Variable &other);
+
+		/**
+		 * @brief Replaces the value and type of this variable.
+		 * @param other The reference variable to copy.
+		 */
+		void replace(const Variable &other);
+
+		void setType(const Type &type);
 
 		void *data() const
 		{
