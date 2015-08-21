@@ -12,6 +12,7 @@ Also it leaks memory. A lot of memory.
 - Fixing Memory Leaks
 - Adding support for Modules
 - Adding support for Pointer Types
+-
 
 ## Guidlines
 - Calls to `die` or `die_extra` should follow the following scheme: `ContextName.ErrorName`
@@ -68,6 +69,24 @@ The virtual machine supports 5 base types:
 
 ### Variable Format
 Variables are stored in a `type+pointer` format where `type` stores the type of the variable and `pointer` either a pointer to the variable value or, if `type` is a pointer type, the pointer value of the variable.
+
+### Native Interoperation
+The virtual machine features a `NativeMethod` that allows calling a C function (`result_t __cdecl name(args...)`) from the
+virtual machine. Parameters are passed as the VM types declared in `types.hpp`, except for ker::String which is passed as a `const char*`.
+
+### Native Modules
+The kernel provides native modules that can be used to interoperate with the kernel and the system hardware.
+
+Following modules are planned:
+
+#### Timer
+The timer module provides interaction with the system timer.
+
+#### Memory
+The memory module allows allocating and freeing memory as well as getting predefined named memory areas.
+
+#### Interrupts
+The interrupt module allows handling interrupts by the current module.
 
 
 ## OS Architecture

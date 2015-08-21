@@ -13,16 +13,22 @@ namespace trainscript
 	public:
 		ker::Dictionary<ker::String, Variable*> variables;
 		ker::Dictionary<ker::String, Method*> methods;
+		ker::Dictionary<ker::String, Module*> objects;
 	public:
 		Module();
 		~Module();
 
-		Method *method(const char *name)
+		Module *object(const ker::String &name)
+		{
+			return this->objects.get(name);
+		}
+
+		Method *method(const ker::String &name)
 		{
 			return this->methods.get(name);
 		}
 
-		Variable *variable(const char *name)
+		Variable *variable(const ker::String &name)
 		{
 			return this->variables.get(name);
 		}

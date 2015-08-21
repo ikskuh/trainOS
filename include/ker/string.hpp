@@ -66,6 +66,11 @@ namespace ker
             return memcmp(this->mText, other.mText, this->mLength) == 0;
 		}
 
+		bool equals(const char *other) const
+		{
+			return strcmp(this->str(), other) == 0;
+		}
+
 		String append(const String &other) const
 		{
 			uint8_t *data = (uint8_t*)malloc(this->mLength + other.mLength);
@@ -122,7 +127,17 @@ namespace ker
 			return this->equals(other);
 		}
 
+		bool operator ==(const char *other) const
+		{
+			return this->equals(other);
+		}
+
 		bool operator !=(const String &other) const
+		{
+			return !this->equals(other);
+		}
+
+		bool operator !=(const char *other) const
 		{
 			return !this->equals(other);
 		}

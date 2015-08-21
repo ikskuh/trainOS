@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <ker/vector.hpp>
+#include <ker/dictionary.hpp>
 
 #include "tsvm.hpp"
 
@@ -28,20 +30,19 @@ struct ParserData
 	size_t length;
 	trainscript::Module *module;
 	void *scanner;
-	char* strings[256];
+	ker::Vector<char*> strings;
+	ker::Dictionary<ker::String, ker::String> objects;
 
 	char *strdup(const char *str)
 	{
-		for(size_t i = 0; i < 256; i++) {
-			if(this->strings[i] == nullptr) {
-				return this->strings[i] = ::strdup(str);
-			}
-			else if(strcmp(this->strings[i], str) == 0) {
+		for(size_t i = 0; i < this->strings.length(); i++) {
+			if(strcmp(this->strings[i], str) == 0) {
 				return this->strings[i];
 			}
 		}
-		die_extra("ParserData::strdup", "out of strings");
-		return nullptr;
+		char *nstr = ::strdup(str);
+		this->strings.append(nstr);
+		return nstr;
 	}
 
 };
@@ -50,6 +51,12 @@ struct VariableDeclaration
 {
 	char *name;
 	trainscript::Type type;
+};
+
+struct ObjectDeclaration
+{
+	char *name;
+	char *moduleName;
 };
 
 struct LocalVariable

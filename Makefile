@@ -87,9 +87,9 @@ obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
 # trainscript/tsvm.cpp
 obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h trainscript/common.h \
- trainscript/tsvm.hpp trainscript/vm.hpp trainscript/module.hpp \
- include/ker/string.hpp include/ker/dictionary.hpp include/kernel.h \
- include/ker/pair.hpp include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
+ include/kernel.h include/ker/pair.hpp trainscript/tsvm.hpp \
+ trainscript/vm.hpp trainscript/module.hpp include/ker/string.hpp \
  trainscript/variable.hpp trainscript/type.hpp trainscript/types.hpp \
  trainscript/typeid.hpp trainscript/method.hpp \
  trainscript/instructions.hpp trainscript/instruction.hpp \
@@ -134,10 +134,10 @@ obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/config.h \
 # obj/trainscript.yy.cpp
 obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
  include/stdlib.h include/varargs.h include/config.h include/malloc.h \
- trainscript/common.h trainscript/tsvm.hpp trainscript/vm.hpp \
- trainscript/module.hpp include/ker/string.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp include/ker/vector.hpp \
- include/ker/new.hpp trainscript/variable.hpp trainscript/type.hpp \
+ trainscript/common.h include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
+ trainscript/tsvm.hpp trainscript/vm.hpp trainscript/module.hpp \
+ include/ker/string.hpp trainscript/variable.hpp trainscript/type.hpp \
  trainscript/types.hpp trainscript/typeid.hpp trainscript/method.hpp \
  trainscript/instructions.hpp trainscript/instruction.hpp \
  trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \
@@ -147,10 +147,10 @@ obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
 # obj/trainscript.tab.cpp
 obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
  include/varargs.h include/config.h include/malloc.h include/console.h \
- trainscript/common.h trainscript/tsvm.hpp trainscript/vm.hpp \
- trainscript/module.hpp include/ker/string.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp include/ker/vector.hpp \
- include/ker/new.hpp trainscript/variable.hpp trainscript/type.hpp \
+ trainscript/common.h include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
+ trainscript/tsvm.hpp trainscript/vm.hpp trainscript/module.hpp \
+ include/ker/string.hpp trainscript/variable.hpp trainscript/type.hpp \
  trainscript/types.hpp trainscript/typeid.hpp trainscript/method.hpp \
  trainscript/instructions.hpp trainscript/instruction.hpp \
  trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \

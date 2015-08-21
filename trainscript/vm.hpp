@@ -7,8 +7,15 @@ namespace trainscript
 	class VM
 	{
 	public:
-		static Module *load(const void *buffer, size_t length);
+		Module *load(const void *buffer, size_t length);
 
-		static Module *load(const char *text);
+		Module *load(const char *text);
+
+		/**
+		 * @brief Creates a module by the module name.
+		 * @param name The name of the module
+		 * @return New module or nullptr if the named module does not exist.
+		 */
+		virtual Module *create(const ker::String &name);
 	};
 }

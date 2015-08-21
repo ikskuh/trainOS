@@ -32,6 +32,7 @@ void yyerror(void *scanner, const char *s);
 	int indentation;
 	trainscript::Type type;
 	VariableDeclaration varDecl;
+	ObjectDeclaration objDecl;
 	MethodDeclaration method;
 	MethodBody *body;
 	MethodHeader methodHeader;
@@ -44,6 +45,7 @@ void yyerror(void *scanner, const char *s);
 %token TYPENAME
 %token SEMICOLON
 %token COLON
+%token DOT
 %token COMMA
 %token PIPE
 %token PLUS
@@ -71,6 +73,7 @@ void yyerror(void *scanner, const char *s);
 %token KW_PUB
 %token KW_PRI
 %token KW_VAR
+%token KW_OBJ
 %token KW_PTR
 
 %token KW_VOID
@@ -95,7 +98,7 @@ void yyerror(void *scanner, const char *s);
 
 %type <type> typeName
 %type <varDecl> variableDeclaration
-
+%type <objDecl> objectDeclaration
 // %type <indentation> indentation
 
 %type <method> method
@@ -131,6 +134,9 @@ input:
 |   input variableDeclaration SEMICOLON {
 		auto *var = new Variable($2.type.createInstance());
         context->module->variables.add( ker::String($2.name), var );
+	}
+|	input objectDeclaration SEMICOLON {
+		context->objects.add($2.name, $2.moduleName);
 	}
 |   input method {
 		using namespace trainscript;
@@ -323,7 +329,7 @@ expression:
 |   TEXT                                        { $$ = new ConstantExpression(Variable::fromText($1)); }
 |   IDENTIFIER                                  { $$ = new VariableExpression($1); }
 |   IDENTIFIER LBRACKET expressionList RBRACKET {
-		auto *call = new MethodInvokeExpression($1);
+		auto *call = new MethodInvokeExpression("", $1);
 		auto *list = $3;
 		while(list) {
             call->parameters.append(list->instruction);
@@ -331,6 +337,15 @@ expression:
 		}
 		$$ = call;
 	}
+|   IDENTIFIER DOT IDENTIFIER LBRACKET expressionList RBRACKET {
+			auto *call = new MethodInvokeExpression($1, $3);
+			auto *list = $5;
+			while(list) {
+				call->parameters.append(list->instruction);
+				list = list->next;
+			}
+			$$ = call;
+		}
 |   LBRACKET expression RBRACKET                { $$ = $2; }
 |   expression PLUS expression                  { $$ = new ArithmeticExpression($1, $3, Operation::Add); }
 |   expression MINUS expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Subtract); }
@@ -370,6 +385,13 @@ variableDeclaration:
 	KW_VAR IDENTIFIER COLON typeName {
 		$$.name = $2;
 		$$.type = $4;
+	}
+;
+
+objectDeclaration:
+	KW_OBJ IDENTIFIER COLON TEXT {
+		$$.name = $2;
+		$$.moduleName = $4;
 	}
 ;
 

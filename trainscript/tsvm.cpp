@@ -21,6 +21,11 @@ namespace trainscript
 		return true;
 	}
 
+	Module *VM::create(const ker::String &)
+	{
+		return nullptr;
+	}
+
 	Module *VM::load(const void *buffer, size_t length)
 	{
 		char *internalStorage = (char*)malloc(length);
@@ -41,10 +46,19 @@ namespace trainscript
 
 		free(internalStorage);
 
-		for(size_t i = 0; i < 256; i++) {
-			if(data.strings[i] != nullptr) {
-				free(data.strings[i]);
+		for(char *ptr : data.strings) {
+			free(ptr);
+		}
+
+		for(const ker::Pair<ker::String, ker::String> &mod : data.objects)
+		{
+			Module *obj = this->create(mod.second);
+			if(obj == nullptr) {
+				kprintf("Module \"%s\" not found.\n", mod.second.str());
+				delete module;
+				return nullptr;
 			}
+			module->objects.add(mod.first, obj);
 		}
 
 		if(valid) {

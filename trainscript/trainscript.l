@@ -40,6 +40,7 @@ VAR             { return KW_VAR; }
 PUB             { return KW_PUB; }
 PRI             { return KW_PRI; }
 PTR             { return KW_PTR; }
+OBJ             { return KW_OBJ; }
 
 VOID            { return KW_VOID; }
 INT             { return KW_INT; }
@@ -67,6 +68,7 @@ DO              { return KW_DO; }
 [0-9]+\.[0-9]*  { yylval->fval = atof(yytext); return REAL; }
 [0-9]+          { yylval->ival = atoi(yytext); return INT; }
 [a-zA-Z0-9'_]+  { yylval->text = yyextra->strdup(yytext); return IDENTIFIER; }
+\.              { return DOT; }
 .               { yyerror(NULL, "illegal token"); }
 %%
 /*

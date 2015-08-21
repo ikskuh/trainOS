@@ -160,10 +160,12 @@ namespace trainscript
 			public Instruction
 	{
 	public:
+		ker::String moduleName;
 		ker::String methodName;
 		ker::Vector<Instruction*> parameters;
 
-		MethodInvokeExpression(ker::String methodName) :
+		MethodInvokeExpression(const ker::String moduleName, const ker::String &methodName) :
+			moduleName(moduleName),
 			methodName(methodName)
 		{
 
@@ -171,7 +173,17 @@ namespace trainscript
 
 		Variable execute(ExecutionContext &context) const override
 		{
-			Method *method = context.module->method(this->methodName.str());
+			Module *module = nullptr;
+			if((this->moduleName.length() == 0) || (this->moduleName == ker::String("this"))) {
+				module = context.module;
+			} else {
+				module = context.module->object(this->moduleName);
+			}
+			if(module == nullptr) {
+				die_extra("MethodInvokeExpression.InvalidModule", this->moduleName.str());
+			}
+
+			Method *method = module->method(this->methodName.str());
 			if(method == nullptr) {
 				die_extra("MethodInvokeExpression.MethodNotFound", this->methodName.str());
 			}
@@ -186,7 +198,15 @@ namespace trainscript
 		}
 
 		bool validate(ExecutionContext &context, ker::String &errorCode) const override {
-			Method *method = context.module->method(this->methodName.str());
+
+			Module *module = nullptr;
+			if((this->moduleName.length() == 0) || (this->moduleName == ker::String("this"))) {
+				module = context.module;
+			} else {
+				module = context.module->object(this->moduleName);
+			}
+
+			Method *method = module->method(this->methodName.str());
 			if(method == nullptr) {
 				errorCode = "The method " + this->methodName + " does not exist.";
 				return false;

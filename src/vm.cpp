@@ -141,14 +141,43 @@ struct NativeModuleDef
 	void *function;
 };
 
-NativeModuleDef methods[] = {
-	{ "sleep", "i", (void*)sleep },
-	{ "timer_get", "", (void*)timer_get },
-	{ "timer_set", "i", (void*)timer_set },
+NativeModuleDef consoleModule[] = {
 	{ "printInt", "i", (void*)printInt },
 	{ "printStr", "t", (void*)printStr },
 	{ "print2Int", "ii", (void*)print2Int },
 	{ nullptr, nullptr, 0 }
+};
+
+static NativeModuleDef timerModule[] = {
+	{ "sleep", "i", (void*)sleep },
+	{ "timer_get", "", (void*)timer_get },
+	{ "timer_set", "i", (void*)timer_set },
+	{ nullptr, nullptr, 0 }
+};
+
+class KernelVM : public VM
+{
+public:
+	Module *createNative(NativeModuleDef *mod)
+	{
+		Module *module = new Module();
+		while(mod->name != nullptr) {
+			module->methods.add(mod->name, new NativeMethod(mod->signature, mod->function));
+			mod++;
+		}
+		return module;
+	}
+
+	Module *create(const ker::String &name) override
+	{
+		if(name == "/sys/timer") {
+			return createNative(timerModule);
+		}
+		if(name == "/sys/console") {
+			return createNative(consoleModule);
+		}
+		return nullptr;
+	}
 };
 
 extern "C" void vm_start()
@@ -164,22 +193,16 @@ extern "C" void vm_start()
 	// cpp_test();
 
 	kprintf("Parse kernel module: ");
-	Module *module = VM::load(mainfile.ptr, mainfile.size);
+
+	KernelVM vm;
+
+	Module *module = vm.load(mainfile.ptr, mainfile.size);
 	if(module == nullptr) {
 		kprintf("Could not load module :(\n");
 		return;
 	}
 
 	kprintf("Module successfully loaded :)\n");
-
-
-
-	// Load native modules
-	NativeModuleDef *mod = methods;
-	while(mod->name != nullptr) {
-		module->methods.add(mod->name, new NativeMethod(mod->signature, mod->function));
-		mod++;
-	}
 
 	String errorCode;
 	if(module->validate(errorCode) == false) {
