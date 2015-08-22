@@ -8,6 +8,10 @@ which is used to execute all user code in a virtual machine.
 The vm can execute some code and is able to call native code.
 Also it leaks memory. A lot of memory.
 
+## Screenshots
+![Screenshot of current version]
+(http://s.mq32.de/?x6a3)
+
 ## Todo List
 - Fix memory leaks
 -- Validation code leaks memory

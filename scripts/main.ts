@@ -41,5 +41,5 @@ END
 
 PUB fun() -> i : INT
 BEGIN
-	10 -> i;
+	5 -> i;
 END
