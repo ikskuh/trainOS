@@ -9,10 +9,16 @@ The vm can execute some code and is able to call native code.
 Also it leaks memory. A lot of memory.
 
 ## Todo List
-- Fixing Memory Leaks
-- Adding support for Modules
-- Adding support for Pointer Types
--
+- Fix memory leaks
+-- Validation code leaks memory
+-- ???
+- Improve virtual machine / trainScript
+-- Add support for pointer types
+-- Restructre code execution into loop-based execution instead of a recursion-based one
+-- Add support for feature restriction
+-- Add JIT compiler with thunkers
+- Improve kernel
+-- Add support for "delegates" (callback + state): `void callback(void *state)
 
 ## Guidlines
 - Calls to `die` or `die_extra` should follow the following scheme: `ContextName.ErrorName`
@@ -91,3 +97,40 @@ The interrupt module allows handling interrupts by the current module.
 
 ## OS Architecture
 To be done.
+
+## trainScript
+
+trainScript is the language of trainOS. All programs are written in trainScript and are compiled on execution.
+
+trainScript programs are executed in the kernels virtual machine and can be restricted in their feature set.
+
+### Example
+This example first prints "Hello World!", then counts to 60 and displays every pair of (n, 60 - n).
+
+	OBJ timer   : "/sys/timer";
+	OBJ console : "/sys/console";
+	
+	PUB main() | i : INT, str : TEXT
+	BEGIN
+		0 → i;
+		"Hello " → str;
+		console.printStr(str + "World!");
+		WHILE ((i + 1) → i) <= fun() DO
+		BEGIN
+			console.print2Int(i, fun() - i);
+			timer.sleep(2);
+		END
+	END
+	
+	PUB fun() → i : INT
+	BEGIN
+		60 → i;
+	END
+
+### Features
+trainScript is a pure imperative language with strict typing. Operators can only be called on variables of the same type, there is no auto-casting (which means you need to write 0.0 instead of 0 for getting a REAL constant).
+
+It also features the concept of "Modules" and "Objects". Each trainScript file represents a module that exports a set of methods. An object is an imported module instance. So it is possible to use a module multiple times in another module.
+
+### Types
+trainScript features 4 base types: `INT`, `REAL`, `BOOL` and `TEXT`. The description of the four types can be found in the section `Virtual Machine Architecture: Type Format`.
