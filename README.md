@@ -14,15 +14,15 @@ Also it leaks memory. A lot of memory.
 
 ## Todo List
 - Fix memory leaks
--- Validation code leaks memory
--- ???
+ - Validation code leaks memory
+ - ???
 - Improve virtual machine / trainScript
--- Restructre code execution into loop-based execution instead of a recursion-based one
--- Add support for feature restriction
--- Add variable modifier `SHARED`: C/C++ `static` counterpart
--- Add JIT compiler with thunkers
+ - Restructre code execution into loop-based execution instead of a recursion-based one
+ - Add support for feature restriction
+ - Add variable modifier `SHARED`: C/C++ `static` counterpart
+ - Add JIT compiler with thunkers
 - Improve kernel
--- Add support for "delegates" (callback + state): `void callback(void *state)
+ - Add support for "delegates" (callback + state): `void callback(void *state)
 
 ## Guidlines
 - Calls to `die` or `die_extra` should follow the following scheme: `ContextName.ErrorName`
