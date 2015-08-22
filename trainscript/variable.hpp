@@ -1,5 +1,6 @@
 #pragma once
 #include <inttypes.h>
+#include <ker/string.hpp>
 
 #include "type.hpp"
 
@@ -59,6 +60,17 @@ namespace trainscript
 			return this->mValue;
 		}
 
+		/**
+		 * @brief Sets the data pointer.
+		 * @param data The new data pointer
+		 * @remarks The old data pointer will be replaced,
+		 *          there will be no cleanup and the new data
+		 *          pointer will be deleted by the Variable.
+		 */
+		void setData(void *data) {
+			this->mValue = data;
+		}
+
 		template<typename T>
 		T& value()
 		{
@@ -75,17 +87,7 @@ namespace trainscript
 			return this->mType;
 		}
 
-#if defined(TSVM_PRINTVAL)
-		void printval() const
-		{
-			switch(this->type.id) {
-				case TypeID::Int: kprintf("%d", this->integer); break;
-				case TypeID::Real: kprintf("%f", this->real); break;
-				case TypeID::Bool: kprintf("%s", this->boolean ? "TRUE" : "FALSE"); break;
-				default: kprintf("???"); break;
-			}
-		}
-#endif
+		ker::String toString() const;
 
 		static Variable fromInt(trainscript::Int i);
 		static Variable fromReal(trainscript::Real r);

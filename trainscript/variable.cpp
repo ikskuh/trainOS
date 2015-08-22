@@ -26,6 +26,8 @@ namespace trainscript
 				DELETE(Text);
 #undef DELETE
 			}
+		} else {
+			delete reinterpret_cast<trainscript::Pointer*>(this->mValue); \
 		}
 	}
 
@@ -37,6 +39,9 @@ namespace trainscript
 
 	void Variable::setType(const Type &type)
 	{
+		if(this->mValue != nullptr) {
+			die_extra("Variable::setType.AlreadyInitialized", "Variable was already initialized!");
+		}
 		this->mType = type;
 		this->mValue = nullptr;
 		if(mType.pointer == 0) {
@@ -57,6 +62,8 @@ namespace trainscript
 					die_extra("Variable::setType.InvalidTypeID", mType.name());
 					break;
 			}
+		} else {
+			this->mValue = new trainscript::Pointer(nullptr); \
 		}
 	}
 
@@ -76,17 +83,17 @@ namespace trainscript
 		}
 		if(this->mType.pointer == 0) {
 			switch(this->mType.id) {
-#define COPY(type) case TypeID::type: \
+	#define COPY(type) case TypeID::type: \
 					*reinterpret_cast<trainscript::type*>(this->mValue) = *reinterpret_cast<trainscript::type*>(other.mValue); \
 					break
 			COPY(Bool);
 			COPY(Int);
 			COPY(Real);
 			COPY(Text);
-#undef COPY
+	#undef COPY
 			}
 		} else {
-			this->mValue = other.mValue;
+			*reinterpret_cast<trainscript::Pointer*>(this->mValue) = *reinterpret_cast<trainscript::Pointer*>(other.mValue); \
 		}
 		return *this;
 	}
@@ -103,4 +110,34 @@ namespace trainscript
 	fromType(Real)
 	fromType(Text)
 	fromType(Bool)
+
+	ker::String Variable::toString() const
+	{
+		if(this->mType.pointer > 0) {
+			return "0x" + ker::String::fromNumber(*reinterpret_cast<int32_t*>(this->mValue), 16);
+		}
+		trainscript::Int iVal;
+		trainscript::Real rVal;
+		switch(this->mType.id) {
+			case TypeID::Bool:
+				if(*reinterpret_cast<trainscript::Bool*>(this->mValue) == true)
+					return "TRUE";
+				else
+					return "FALSE";
+			case TypeID::Int:
+				iVal = *reinterpret_cast<trainscript::Int*>(this->mValue);
+				return ker::String::fromNumber(iVal, 10);
+			case TypeID::Real:
+				rVal = *reinterpret_cast<trainscript::Real*>(this->mValue);
+				// return ker::String::fromNumber(rVal);
+				return "<REAL missing>";
+			case TypeID::Text:
+				return *reinterpret_cast<trainscript::Text*>(this->mValue);
+			case TypeID::Void:
+				return "VOID";
+			case TypeID::Invalid:
+				return "INVALID";
+		}
+		return "???";
+	}
 }

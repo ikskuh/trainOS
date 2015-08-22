@@ -84,6 +84,144 @@ namespace trainscript
 		}
 	};
 
+	class VariableRefExpression :
+			public Instruction
+	{
+	public:
+		ker::String variableName;
+		VariableRefExpression(ker::String variableName) : variableName(variableName) { }
+
+		Variable execute(ExecutionContext &context) const override {
+			auto *var = context.get(this->variableName);
+			if(var == nullptr) {
+				die_extra("VariableRefExpression.VariableNotFound", this->variableName.str());
+			}
+			Variable ref = var->type().reference().createInstance();
+			ref.value<void*>() = var->data();
+			return ref;
+		}
+
+		bool validate(ExecutionContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			Variable *var = context.get(this->variableName);
+			if(var == nullptr) {
+				errorCode = "Variable " + this->variableName + " not found.";
+				return false;
+			}
+			return true;
+		}
+
+		Type expectedResult(ExecutionContext &context) const override {
+			Variable *var = context.get(this->variableName);
+			if(var == nullptr) {
+				return Type::Invalid;
+			} else {
+				return var->type().reference();
+			}
+		}
+	};
+
+	class PointerValExpression :
+			public Instruction
+	{
+	public:
+		Instruction *expression;
+		PointerValExpression(Instruction *expression) :
+			expression(expression) { }
+
+		Variable execute(ExecutionContext &context) const override {
+			Variable result = this->expression->execute(context);
+
+			if(result.type().pointer == 0) {
+				die_extra("PointerValExpression.InvalidType", "Cannot dereference non-pointer type");
+			}
+
+			Variable ref = result.type().dereference().createInstance();
+
+			// Some hacky variable assignment
+			Variable tmp(ref); // use temporary variable for copying data
+			void *buf = tmp.data(); // Store original pointer
+			tmp.setData(result.value<void*>()); // Replace original pointer for correct copy
+			ref = tmp; // Copy data with copy operator
+			tmp.setData(buf); // Reset orignal pointer for deletion
+
+			return ref;
+		}
+
+		bool validate(ExecutionContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			if(this->expression == nullptr) {
+				errorCode = "Expression missing";
+				return false;
+			}
+			if(this->expression->expectedResult(context).pointer == 0) {
+				errorCode = "Expression has non-pointer type.";
+				return false;
+			}
+			return true;
+		}
+
+		Type expectedResult(ExecutionContext &context) const override {
+			return this->expression->expectedResult(context).dereference();
+		}
+	};
+
+	class PointerValAssignmentExpression :
+			public Instruction
+	{
+	public:
+		Instruction *expression;
+		Instruction *target;
+		PointerValAssignmentExpression(Instruction *target, Instruction *expression) :
+			expression(expression),
+			target(target)
+		{ }
+
+		Variable execute(ExecutionContext &context) const override {
+			Variable src = this->expression->execute(context);
+			Variable dst = this->target->execute(context);
+
+			if(dst.type().pointer == 0) {
+				die_extra("PointerValAssignmentExpression.InvalidType", "Cannot dereference non-pointer type");
+			}
+
+			// Some hacky variable assignment
+			Variable tmp(src); // use temporary variable for copying data
+			void *buf = tmp.data(); // Store original pointer
+			tmp.setData(dst.value<void*>()); // Replace original pointer for correct copy
+			tmp = src; // Copy data with copy operator
+			tmp.setData(buf); // Reset orignal pointer for deletion
+
+			return src; // Return expression value
+		}
+
+		bool validate(ExecutionContext &context, ker::String &errorCode) const override {
+			errorCode = "";
+			if(this->expression == nullptr) {
+				errorCode = "Expression missing";
+				return false;
+			}
+			if(this->target == nullptr) {
+				errorCode = "Target missing";
+				return false;
+			}
+			Type src = this->expression->expectedResult(context);
+			Type dst = this->target->expectedResult(context);
+			if(dst.pointer == 0) {
+				errorCode = "Target has non-pointer type.";
+				return false;
+			}
+			if(dst.dereference() != src) {
+				errorCode = "Type mismatch.";
+				return false;
+			}
+			return true;
+		}
+
+		Type expectedResult(ExecutionContext &context) const override {
+			return this->expression->expectedResult(context).dereference();
+		}
+	};
 
 	class VariableAssignmentExpression :
 			public Instruction

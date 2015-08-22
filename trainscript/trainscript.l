@@ -39,8 +39,11 @@
 VAR             { return KW_VAR; }
 PUB             { return KW_PUB; }
 PRI             { return KW_PRI; }
-PTR             { return KW_PTR; }
 OBJ             { return KW_OBJ; }
+
+PTR             { return KW_PTR; }
+VAL             { return KW_VAL; }
+REF             { return KW_REF; }
 
 VOID            { return KW_VOID; }
 INT             { return KW_INT; }

@@ -99,9 +99,9 @@ obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
 
 # trainscript/variable.cpp
 obj/variable.o: trainscript/variable.cpp include/kernel.h include/console.h \
- trainscript/variable.hpp trainscript/type.hpp trainscript/types.hpp \
- include/ker/string.hpp include/stdlib.h include/varargs.h \
- include/config.h include/malloc.h trainscript/typeid.hpp
+ trainscript/variable.hpp include/ker/string.hpp include/stdlib.h \
+ include/varargs.h include/config.h include/malloc.h trainscript/type.hpp \
+ trainscript/types.hpp trainscript/typeid.hpp
 	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/variable.cpp
 
 # trainscript/type.cpp

@@ -218,6 +218,15 @@ extern "C" void vm_start()
 
 	main->invoke({ });
 
+	for(auto &pair : module->variables) {
+
+		kprintf("%s : %s -> %s\n",
+				pair.first.str(),
+				pair.second->type().name(),
+				pair.second->toString().str());
+
+	}
+
 	delete module;
 }
 

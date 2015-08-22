@@ -10,4 +10,5 @@ namespace trainscript
 	using Void = void;
 	using Bool = bool;
 	using Text = ker::String;
+	using Pointer = void*;
 }

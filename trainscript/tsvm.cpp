@@ -88,6 +88,9 @@ namespace trainscript
 		for(auto val : variables) {
 			delete val.second;
 		}
+		for(auto obj : objects) {
+			delete obj.second;
+		}
 	}
 
     Variable ScriptMethod::invoke(ker::Vector<Variable> arguments)

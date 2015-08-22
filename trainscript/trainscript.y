@@ -74,7 +74,10 @@ void yyerror(void *scanner, const char *s);
 %token KW_PRI
 %token KW_VAR
 %token KW_OBJ
+
 %token KW_PTR
+%token KW_VAL
+%token KW_REF
 
 %token KW_VOID
 %token KW_INT
@@ -185,7 +188,7 @@ block:
 			}
 			MethodBody *tmp = mb;
 			mb = mb->next;
-			delete mb;
+			delete tmp;
 		}
 		$$ = block;
 	}
@@ -328,6 +331,8 @@ expression:
 |	REAL                                        { $$ = new ConstantExpression(Variable::fromReal($1)); }
 |   TEXT                                        { $$ = new ConstantExpression(Variable::fromText($1)); }
 |   IDENTIFIER                                  { $$ = new VariableExpression($1); }
+|   KW_REF LBRACKET IDENTIFIER RBRACKET         { $$ = new VariableRefExpression($3); }
+|   KW_VAL LBRACKET expression RBRACKET         { $$ = new PointerValExpression($3); }
 |   IDENTIFIER LBRACKET expressionList RBRACKET {
 		auto *call = new MethodInvokeExpression("", $1);
 		auto *list = $3;
@@ -359,6 +364,9 @@ expression:
 |   expression OP_EQ expression                 { $$ = new ArithmeticExpression($1, $3, Operation::Equals); }
 |   expression OP_NEQ expression                { $$ = new ArithmeticExpression($1, $3, Operation::Inequals); }
 |   expression RARROW IDENTIFIER                { $$ = new VariableAssignmentExpression($3, $1); }
+|   expression RARROW KW_VAL LBRACKET expression RBRACKET {
+		$$ = new PointerValAssignmentExpression($5, $1);
+	}
 ;
 
 expressionList:

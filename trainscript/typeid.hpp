@@ -9,6 +9,6 @@ namespace trainscript
 		Int = 2,
 		Real = 3,
 		Text = 4,
-		Bool = 5,
+		Bool = 5
 	};
 }

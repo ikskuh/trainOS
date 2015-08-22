@@ -13,9 +13,9 @@ Also it leaks memory. A lot of memory.
 -- Validation code leaks memory
 -- ???
 - Improve virtual machine / trainScript
--- Add support for pointer types
 -- Restructre code execution into loop-based execution instead of a recursion-based one
 -- Add support for feature restriction
+-- Add variable modifier `SHARED`: C/C++ `static` counterpart
 -- Add JIT compiler with thunkers
 - Improve kernel
 -- Add support for "delegates" (callback + state): `void callback(void *state)
@@ -134,3 +134,5 @@ It also features the concept of "Modules" and "Objects". Each trainScript file r
 
 ### Types
 trainScript features 4 base types: `INT`, `REAL`, `BOOL` and `TEXT`. The description of the four types can be found in the section `Virtual Machine Architecture: Type Format`.
+
+### Pointers
