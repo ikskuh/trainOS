@@ -10,15 +10,12 @@ SOURCES += \
     src/malloc.c \
     src/pmm.c \
     src/stdlib.c \
-    src/vmm.c \
-    trainscript/tsvm.cpp \
-    trainscript/main.cpp \
+	src/vmm.c \
     src/timer.c \
     src/cplusplus.cpp \
     src/vm.cpp \
-    src/serial.c \
-    trainscript/variable.cpp \
-    trainscript/type.cpp
+	src/serial.c \
+    src/cpp-test.cpp
 
 HEADERS += \
 	include/console.h \
@@ -32,9 +29,6 @@ HEADERS += \
 	include/stdlib.h \
 	include/varargs.h \
 	include/vmm.h \
-	trainscript/common.h \
-    trainscript/tsvm.hpp \
-    trainscript/typeid.hpp \
 	include/timer.h \
     include/ker/string.hpp \
     include/ker/pair.hpp \
@@ -45,36 +39,20 @@ HEADERS += \
     include/dynamic.h \
     include/config.h \
     include/serial.h \
-    include/malloc.h \
-    trainscript/instruction.hpp \
-    trainscript/method.hpp \
-    trainscript/module.hpp \
-    trainscript/scriptmethod.hpp \
-    trainscript/type.hpp \
-    trainscript/types.hpp \
-    trainscript/variable.hpp \
-    trainscript/executioncontext.hpp \
-    trainscript/vm.hpp \
-    trainscript/instructions.hpp
+	include/malloc.h
 
 DISTFILES += \
     asm/intr_common_handler.S \
     asm/multiboot.S \
     asm/start.S \
     trainscript.md \
-    Makefile \
-	trainscript/trainscript.l \
-    trainscript/file01.ts \
-	trainscript/Makefile \
-	trainscript/trainscript.y \
-    trainscript/file02.ts \
+	Makefile \
     kernel.ld \
     Depfile \
     Makefile.new \
     scripts/main.ts \
     asm/dynamic.S \
-    README.md \
-    trainscript/type-operators.cpp.tt
+	README.md
 
 QMAKE_INCDIR =
 

@@ -8,13 +8,12 @@ CXX  = g++
 LD   = g++
 LEX  = flex
 YACC = bison
-TEMPLE = mono /home/felix/projects/temple/bin/Debug/temple.exe
 
 # File Lists
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
-SRCS_CXX = trainscript/tsvm.cpp trainscript/variable.cpp trainscript/type.cpp src/cplusplus.cpp src/vm.cpp obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/type-operators.cpp
-OBJS     = obj/tsvm.o obj/variable.o obj/type.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/type-operators.o obj/main.o
+SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp
+OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
 
 # Flags
 FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
@@ -28,142 +27,78 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/trainscript.yy.cpp obj/trainscript.tab.cpp obj/type-operators.cpp obj/tsvm.o obj/variable.o obj/type.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/type-operators.o obj/main.o
+	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
 
-kernel: obj/tsvm.o obj/variable.o obj/type.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/type-operators.o obj/main.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/tsvm.o obj/variable.o obj/type.o obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/trainscript.yy.o obj/trainscript.tab.o obj/type-operators.o obj/main.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/interrupts.h \
  include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
  include/timer.h include/serial.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
 
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
  include/console.h include/stdlib.h include/varargs.h include/config.h \
  include/malloc.h include/io.h src/intr_stubs.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
 obj/malloc.o: src/malloc.c include/kernel.h include/stdlib.h \
  include/varargs.h include/config.h include/malloc.h include/console.h \
  include/serial.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
  include/stdlib.h include/varargs.h include/config.h include/malloc.h \
  include/console.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
 
 # src/serial.c
 obj/serial.o: src/serial.c include/io.h include/serial.h include/stdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
 obj/stdlib.o: src/stdlib.c include/stdlib.h include/varargs.h \
  include/config.h include/malloc.h include/kernel.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
 obj/timer.o: src/timer.c include/timer.h include/kernel.h \
  include/interrupts.h include/cpustate.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
 
 # src/vmm.c
 obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
  include/multiboot.h include/stdlib.h include/varargs.h include/malloc.h \
  include/console.h include/kernel.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
-
-# trainscript/tsvm.cpp
-obj/tsvm.o: trainscript/tsvm.cpp include/stdlib.h include/varargs.h \
- include/config.h include/malloc.h include/console.h trainscript/common.h \
- include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp trainscript/tsvm.hpp \
- trainscript/vm.hpp trainscript/module.hpp include/ker/string.hpp \
- trainscript/variable.hpp trainscript/type.hpp trainscript/types.hpp \
- trainscript/typeid.hpp trainscript/method.hpp \
- trainscript/instructions.hpp trainscript/instruction.hpp \
- trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \
- obj/trainscript.tab.hpp trainscript/trainscript.l.h include/string.h
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/tsvm.cpp
-
-# trainscript/variable.cpp
-obj/variable.o: trainscript/variable.cpp include/kernel.h include/console.h \
- trainscript/variable.hpp include/ker/string.hpp include/stdlib.h \
- include/varargs.h include/config.h include/malloc.h trainscript/type.hpp \
- trainscript/types.hpp trainscript/typeid.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/variable.cpp
-
-# trainscript/type.cpp
-obj/type.o: trainscript/type.cpp include/kernel.h include/console.h \
- trainscript/type.hpp trainscript/types.hpp include/ker/string.hpp \
- include/stdlib.h include/varargs.h include/config.h include/malloc.h \
- trainscript/typeid.hpp trainscript/variable.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c trainscript/type.cpp
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/ker/new.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
+
+# src/cpp-test.cpp
+obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
+ include/stdlib.h include/varargs.h include/config.h include/malloc.h \
+ include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
+ include/kernel.h include/ker/pair.hpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cpp-test.cpp
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/config.h \
- include/malloc.h include/timer.h include/dynamic.h include/console.h \
- src/../trainscript/tsvm.hpp src/../trainscript/vm.hpp \
- src/../trainscript/module.hpp include/ker/string.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
- include/ker/vector.hpp include/ker/new.hpp \
- src/../trainscript/variable.hpp src/../trainscript/type.hpp \
- src/../trainscript/types.hpp src/../trainscript/typeid.hpp \
- src/../trainscript/method.hpp src/../trainscript/instructions.hpp \
- src/../trainscript/instruction.hpp \
- src/../trainscript/executioncontext.hpp \
- src/../trainscript/scriptmethod.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
-
-# obj/trainscript.yy.cpp
-obj/trainscript.yy.o: obj/trainscript.yy.cpp include/string.h \
- include/stdlib.h include/varargs.h include/config.h include/malloc.h \
- trainscript/common.h include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
- trainscript/tsvm.hpp trainscript/vm.hpp trainscript/module.hpp \
- include/ker/string.hpp trainscript/variable.hpp trainscript/type.hpp \
- trainscript/types.hpp trainscript/typeid.hpp trainscript/method.hpp \
- trainscript/instructions.hpp trainscript/instruction.hpp \
- trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \
- obj/trainscript.tab.hpp
-	$(CXX) -iquotetrainscript -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.yy.cpp
-
-# obj/trainscript.tab.cpp
-obj/trainscript.tab.o: obj/trainscript.tab.cpp include/stdlib.h \
- include/varargs.h include/config.h include/malloc.h include/console.h \
- trainscript/common.h include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp \
- trainscript/tsvm.hpp trainscript/vm.hpp trainscript/module.hpp \
- include/ker/string.hpp trainscript/variable.hpp trainscript/type.hpp \
- trainscript/types.hpp trainscript/typeid.hpp trainscript/method.hpp \
- trainscript/instructions.hpp trainscript/instruction.hpp \
- trainscript/executioncontext.hpp trainscript/scriptmethod.hpp \
- trainscript/trainscript.l.h include/string.h
-	$(CXX) -iquotetrainscript -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c obj/trainscript.tab.cpp
-
-# obj/type-operators.cpp
-obj/type-operators.o: obj/type-operators.cpp include/kernel.h \
- include/console.h trainscript/type.hpp trainscript/types.hpp \
- include/ker/string.hpp include/stdlib.h include/varargs.h \
- include/config.h include/malloc.h trainscript/typeid.hpp \
- trainscript/variable.hpp
-	$(CXX) -iquotetrainscript -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c obj/type-operators.cpp
+ include/malloc.h include/timer.h include/dynamic.h include/console.h
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # asm/dynamic.S
 obj/dynamic.o: asm/dynamic.S
@@ -180,15 +115,6 @@ obj/multiboot.o: asm/multiboot.S
 # asm/start.S
 obj/start.o: asm/start.S
 	$(AS) $(FLAGS) $(ASFLAGS) -o $@ -c asm/start.S
-
-obj/trainscript.yy.cpp: trainscript/trainscript.l
-	$(LEX) --header-file=trainscript/trainscript.l.h -o obj/trainscript.yy.cpp -d trainscript/trainscript.l
-
-obj/trainscript.tab.cpp: trainscript/trainscript.y
-	$(YACC) -o obj/trainscript.tab.cpp -d trainscript/trainscript.y
-
-obj/type-operators.cpp: trainscript/type-operators.cpp.tt
-	$(TEMPLE) trainscript/type-operators.cpp.tt obj/type-operators.cpp
 
 # Custom Targets
 obj/main.o: scripts/main.ts
