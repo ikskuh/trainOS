@@ -159,7 +159,7 @@ void init(const MultibootStructure *mbHeader)
 
 	ksetcolor(COLOR_BLACK, COLOR_LIGHTGRAY);
 	kclear();
-	kputs("Welcome to \x12\x05trainOS\x12\x07!\n");
+    kputs("Welcome to \x12\005CircuitOS\x12\007!\n");
 
 	serial_init(SERIAL_COM1, 9600, SERIAL_PARITY_NONE, 8);
 	serial_write_str(SERIAL_COM1, "Debug Console Ready\n");
@@ -210,7 +210,7 @@ void init(const MultibootStructure *mbHeader)
 
 	irq_disable();
 
-	kputs("\x12\x04trainOS stopped.\x12\x07!\n");
+    kputs("\x12\x04" "CircuitOS stopped." "\x12\x07" "\n");
 
 #if defined(ENABLE_MALLOC_MONITORING)
 	malloc_print_list(0);
