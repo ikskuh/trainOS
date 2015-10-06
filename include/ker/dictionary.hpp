@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kernel.h>
+#include <initializer_list>
 
 #include "pair.hpp"
 #include "vector.hpp"
@@ -22,6 +23,13 @@ namespace ker
 
 		}
 
+        Dictionary(const std::initializer_list<Entry> &items)
+        {
+            for(const Entry &entry : items) {
+                this->contents.append(entry);
+            }
+        }
+
         Dictionary(const Dictionary &other) :
             contents(other.contents)
         {
@@ -40,6 +48,14 @@ namespace ker
             return *this;
         }
 
+        size_t length() const {
+            return this->contents.length();
+        }
+
+        void clear() {
+            this->contents.clear();
+        }
+
 		Value &at(const Key &key)
 		{
 			for(auto &&pair : this->contents)
@@ -47,9 +63,8 @@ namespace ker
 				if(pair.first == key) {
 					return pair.second;
 				}
-			}
-			die("Key not found in dictionary.");
-			return _default;
+            }
+            return this->add(key, Value());
 		}
 
 		const Value &at(const Key &key) const
@@ -85,18 +100,19 @@ namespace ker
 			return false;
 		}
 
-		void add(const Key &key, const Value &value)
+        Value &add(const Key &key, const Value &value)
         {
 			if(this->contains(key)) {
 				for(auto &&pair : this->contents)
 				{
 					if(pair.first == key) {
 						pair.second = value;
-						return;
+                        return pair.second;
 					}
 				}
+                return _default;
 			} else {
-				this->contents.append(Entry(key, value));
+                return this->contents.append(Entry(key, value)).second;
 			}
 		}
 

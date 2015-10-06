@@ -1,7 +1,14 @@
 #pragma once
 
 #include <inttypes.h>
+#include <stddef.h>
+#include <string.h>
 #include "new.hpp"
+
+#if !defined(CIRCUIT_OS)
+#include <stdlib.h>
+#include <new>
+#endif
 
 namespace ker
 {
@@ -96,6 +103,46 @@ namespace ker
 			return this->mData[this->mLength - 1];
 		}
 
+        /**
+         * @brief Removes the last element.
+         */
+        void pop()
+        {
+            if(this->length() > 0) {
+                this->resize(this->length() - 1);
+            }
+        }
+
+        void clear()
+        {
+            this->resize(0);
+        }
+
+        T& insert(size_t index, const T& value)
+        {
+            if(this->mReserved < (this->mLength + 1)) {
+                this->resize(this->mLength + 1);
+            }
+            for(int32_t i = this->mLength - 1; i > static_cast<int32_t>(index); i--) {
+                // Move every item backwards
+                this->mData[i+1] = this->mData[i];
+            }
+            // then override
+            this->mData[index] = value;
+            return this->mData[index];
+        }
+
+        void remove(size_t index)
+        {
+            for(uint32_t i = index; i < this->mLength; i++) {
+                // Move every item backwards
+                this->mData[i] = this->mData[i+1];
+            }
+            // then override
+            this->mData[this->mLength - 1].~T();
+            this->mLength -= 1;
+        }
+
 		void resize(size_t size)
 		{
 			size_t current = this->mLength;
@@ -141,6 +188,14 @@ namespace ker
 			return this->at(idx);
 		}
 
+        const T &front() const {
+            return this->mData[0];
+        }
+
+        const T &back() const {
+            return this->mData[this->mLength - 1];
+        }
+
 		T* begin()
 		{
 			return &this->mData[0];
@@ -160,5 +215,10 @@ namespace ker
 		{
 			return &this->mData[this->mLength];
 		}
+
+        const T *data() const
+        {
+            return &this->mData[0];
+        }
 	};
 }

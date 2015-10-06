@@ -2,6 +2,12 @@
 
 #include <stdlib.h>
 #include <inttypes.h>
+#if !defined(CIRCUIT_OS)
+    #include <stdlib.h>
+    #include <string.h>
+#endif
+
+#define KER_STRING_AVAILABLE
 
 namespace ker
 {
@@ -170,15 +176,21 @@ namespace ker
 			itoa(number, buffer, radix);
 			return String(buffer);
 		}
+
+        template<typename T>
+        static String from(const T &)
+        {
+            return "Not implemented yet";
+        }
 	};
 
 
-	static String operator + (const char *lhs, const String &rhs)
+    static inline String operator + (const char *lhs, const String &rhs)
 	{
 		return String::concat(lhs, rhs);
 	}
 
-	static String operator + (const String &lhs, const char *rhs)
+    static inline String operator + (const String &lhs, const char *rhs)
 	{
 		return String::concat(lhs, rhs);
 	}

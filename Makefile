@@ -13,24 +13,24 @@ YACC = bison
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
 SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp
-OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
+OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
 
 # Flags
-FLAGS    = -m32 -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx
+FLAGS    = -m32 -DCONDUCTANCE_64BIT -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
 ASFLAGS  = -masm=intel
 CCFLAGS  = -g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld
+LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld -L/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/ -lConductance
 
 # Targets
 all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
+	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/stdlib.h \
@@ -91,8 +91,8 @@ obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
 # src/cpp-test.cpp
 obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
  include/stdlib.h include/varargs.h include/config.h include/malloc.h \
- include/ker/vector.hpp include/ker/new.hpp include/ker/dictionary.hpp \
- include/kernel.h include/ker/pair.hpp
+ include/string.h include/ker/vector.hpp include/ker/new.hpp \
+ include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cpp-test.cpp
 
 # src/vm.cpp
