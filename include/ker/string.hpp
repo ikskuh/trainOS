@@ -1,10 +1,45 @@
 #pragma once
 
-#include <stdlib.h>
 #include <inttypes.h>
-#if !defined(CIRCUIT_OS)
-    #include <stdlib.h>
-    #include <string.h>
+#if defined(CIRCUIT_OS)
+#include <kstdlib.h>
+#error "???"
+#else
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+// itoa is not ANSI C
+/**
+ * C++ version 0.4 char* style "itoa":
+ * Written by Lukás Chmela
+ * Released under GPLv3.
+ */
+static inline char* itoa(int value, char* result, int base) {
+	// check that the base if valid
+	if (base < 2 || base > 36) { *result = '\0'; return result; }
+
+	char* ptr = result, *ptr1 = result, tmp_char;
+	int tmp_value;
+
+	do {
+		tmp_value = value;
+		value /= base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+	} while ( value );
+
+	// Apply negative sign
+	if (tmp_value < 0) *ptr++ = '-';
+	*ptr-- = '\0';
+	while(ptr1 < ptr) {
+		tmp_char = *ptr;
+		*ptr--= *ptr1;
+		*ptr1++ = tmp_char;
+	}
+	return result;
+}
+
+
 #endif
 
 #define KER_STRING_AVAILABLE
@@ -45,6 +80,12 @@ namespace ker
             this->copyFrom(reinterpret_cast<const uint8_t*>(text), strlen(text));
 		}
 
+		String(const char *bytes, size_t length) :
+			String(reinterpret_cast<const uint8_t *>(bytes), length)
+		{
+
+		}
+
 		String(const uint8_t *bytes, size_t length) :
             mText(nullptr),
 			mLength(length)
@@ -57,6 +98,11 @@ namespace ker
             if(this->mText != nullptr) {
 				free(this->mText);
             }
+		}
+
+		uint8_t at(size_t index) const
+		{
+			return this->mText[index];
 		}
 
 		size_t length() const

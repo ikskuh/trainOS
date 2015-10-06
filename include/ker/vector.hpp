@@ -2,11 +2,13 @@
 
 #include <inttypes.h>
 #include <stddef.h>
-#include <string.h>
-#include "new.hpp"
 
-#if !defined(CIRCUIT_OS)
+#if defined(CIRCUIT_OS)
+#include "kstdlib.h"
+#include "new.hpp"
+#else
 #include <stdlib.h>
+#include <string.h>
 #include <new>
 #endif
 
@@ -119,11 +121,9 @@ namespace ker
         }
 
         T& insert(size_t index, const T& value)
-        {
-            if(this->mReserved < (this->mLength + 1)) {
-                this->resize(this->mLength + 1);
-            }
-            for(int32_t i = this->mLength - 1; i > static_cast<int32_t>(index); i--) {
+		{
+			this->resize(this->mLength + 1);
+			for(int32_t i = this->mLength - 2; i >= static_cast<int32_t>(index); i--) {
                 // Move every item backwards
                 this->mData[i+1] = this->mData[i];
             }
@@ -150,7 +150,7 @@ namespace ker
 
 			if(current > size) {
 				// "Downgrade"
-				for(size_t i = this->mLength - 1; i > size; i--) {
+				for(int32_t i = static_cast<int32_t>(this->mLength) - 1; i > static_cast<int32_t>(size); i--) {
 					this->mData[i].~T();
 				}
 			} else {
@@ -195,6 +195,14 @@ namespace ker
         const T &back() const {
             return this->mData[this->mLength - 1];
         }
+
+		T &front() {
+			return this->mData[0];
+		}
+
+		T &back() {
+			return this->mData[this->mLength - 1];
+		}
 
 		T* begin()
 		{
