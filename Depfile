@@ -1,7 +1,7 @@
 #Config
 Artifact=kernel
 TempDir=obj
-SourceDir=asm src
+SourceDir=asm src csl
 AdditionalObjects=obj/main.o
 ExternalObjects=conductance/|*.o
 
@@ -27,7 +27,7 @@ LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 --
 
 obj/main.o: scripts/main.spark
-	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
+	/home/felix/projects/Electronics/build-Electronics-Clang-Debug/bin/spark \
 		scripts/main.spark \
 		obj/main.ca
 	objcopy -B i386 -I binary -O elf32-i386 \

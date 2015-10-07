@@ -9,6 +9,8 @@
 
 #include <interrupts.h>
 
+#include "../csl/cpustatetype.hpp"
+
 extern "C" {
 	extern const char mainscript_start;
 	extern const char mainscript_end;
@@ -80,18 +82,20 @@ extern "C" void vm_handle_interrupt(CpuState *state)
 {
     irqFiFo.items[irqFiFo.write] = *state;
     irqFiFo.write += 1;
-    if(irqFiFo.write >= irqFiFo.length) {
-        // TODO: Don't die
-        die("irqList overflow.");
-    }
+	if(irqFiFo.write >= irqFiFo.length) {
+		// TODO: Don't die!
+		// Logging, statistics...
+		die("irqFiFo overflow.");
+	}
 }
 
 extern "C" void vm_start()
 {
-    intr_set_handler(0x20, vm_handle_interrupt);
+	// intr_set_handler(0x20, vm_handle_interrupt);
     intr_set_handler(0x21, vm_handle_interrupt);
 
     VirtualMachine machine;
+	machine.type("CPUSTATE") = csl::CpuStateType;
     machine.import("print") = printArguments;
 
     Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
@@ -125,7 +129,10 @@ extern "C" void vm_start()
             CpuState *cpu = &irqFiFo.items[irqFiFo.read];
 
             auto *thread = irqService->createThread(irqRoutine);
-            thread->start({ VMValue::Int32(cpu->intr), VMValue::Int32(cpu->eip) });
+			thread->start({
+				VMValue::Int32(cpu->intr),
+				csl::createCpuState(cpu)
+			});
 
             irqFiFo.read += 1;
 
