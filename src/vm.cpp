@@ -69,15 +69,15 @@ void code()
     struct {
         const char *ptr;
         uint32_t size;
-    } firstrun {
-        &firstrun_start,
-        (uint32_t)&firstrun_size
+    } mainAssembly {
+        &mainscript_start,
+        (uint32_t)&mainscript_size
     };
 
     VirtualMachine vm;
     vm.import("print") = printArguments;
 
-    Assembly *assembly = vm.load(firstrun.ptr, firstrun.size);
+    Assembly *assembly = vm.load(mainAssembly.ptr, mainAssembly.size);
     if(assembly == nullptr) {
         kprintf("failed to load assembly :(\n");
         return;

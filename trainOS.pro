@@ -50,9 +50,9 @@ DISTFILES += \
     kernel.ld \
     Depfile \
     Makefile.new \
-    scripts/main.ts \
     asm/dynamic.S \
-	README.md
+	README.md \
+    scripts/main.spark
 
 INCLUDEPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")
 DEPENDPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")

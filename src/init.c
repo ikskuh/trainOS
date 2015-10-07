@@ -208,6 +208,8 @@ void init(const MultibootStructure *mbHeader)
 
 	timer_add_callback(1, update_statusbar);
 
+    kputs("\n");
+
     vm_start();
 
 	irq_disable();

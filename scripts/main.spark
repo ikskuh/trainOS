@@ -1,0 +1,29 @@
+.name   OS
+.author "Felix Queißner"
+.descr  "The main file of the operating system"
+
+main:
+	pushi 0
+
+	pusht "Hello World from Conductance!\n"
+	calln print 1
+
+_loop:
+	load 0
+	pushi 5
+	comp_less
+	jmp_if_not _end
+
+	load 0
+	pushi 1
+	add
+	store 0
+
+	pusht "counter: "
+	load 0
+	pusht "\n"
+	calln print 3
+
+	jmp _loop
+_end:
+	ret

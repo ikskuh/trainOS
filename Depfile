@@ -2,8 +2,8 @@
 Artifact=kernel
 TempDir=obj
 SourceDir=asm src
-AdditionalObjects=obj/main.o obj/firstcode.o
-ExternalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/|*.o
+AdditionalObjects=obj/main.o
+ExternalObjects=conductance/|*.o
 
 LexUseCpp
 YaccUseCpp
@@ -26,24 +26,17 @@ LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 --
 
-obj/main.o: scripts/main.ts
+obj/main.o: scripts/main.spark
+	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
+		scripts/main.spark \
+		obj/main.ca
 	objcopy -B i386 -I binary -O elf32-i386 \
-		scripts/main.ts obj/main.o
+		obj/main.ca obj/main.o
 	objcopy  \
-		--redefine-sym _binary_scripts_main_ts_start=mainscript_start \
-		--redefine-sym _binary_scripts_main_ts_end=mainscript_end \
-		--redefine-sym _binary_scripts_main_ts_size=mainscript_size \
+		--redefine-sym _binary_obj_main_ca_start=mainscript_start \
+		--redefine-sym _binary_obj_main_ca_end=mainscript_end \
+		--redefine-sym _binary_obj_main_ca_size=mainscript_size \
 		obj/main.o
-
-obj/firstcode.o: /home/felix/projects/Electronics/first-run.ca
-	cp /home/felix/projects/Electronics/first-run.ca obj/firstrun.ca
-	objcopy -B i386 -I binary -O elf32-i386 \
-		obj/firstrun.ca obj/firstcode.o
-	objcopy  \
-		--redefine-sym _binary_obj_firstrun_ca_start=firstrun_start \
-		--redefine-sym _binary_obj_firstrun_ca_end=firstrun_end \
-		--redefine-sym _binary_obj_firstrun_ca_size=firstrun_size \
-		obj/firstcode.o
 
 .PHONY: run
 run:

@@ -13,7 +13,7 @@ YACC = bison
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
 SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp
-OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o
+OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
 
 # Flags
 FLAGS    = -m32 -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
@@ -27,10 +27,10 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o
+	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/opcodes.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmpointertype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/opcodes.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmpointertype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/string.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/string.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/kstdlib.h \
@@ -117,24 +117,17 @@ obj/start.o: asm/start.S
 
 # Custom Targets
 
-obj/main.o: scripts/main.ts
+obj/main.o: scripts/main.spark
+	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
+		scripts/main.spark \
+		obj/main.ca
 	objcopy -B i386 -I binary -O elf32-i386 \
-		scripts/main.ts obj/main.o
+		obj/main.ca obj/main.o
 	objcopy  \
-		--redefine-sym _binary_scripts_main_ts_start=mainscript_start \
-		--redefine-sym _binary_scripts_main_ts_end=mainscript_end \
-		--redefine-sym _binary_scripts_main_ts_size=mainscript_size \
+		--redefine-sym _binary_obj_main_ca_start=mainscript_start \
+		--redefine-sym _binary_obj_main_ca_end=mainscript_end \
+		--redefine-sym _binary_obj_main_ca_size=mainscript_size \
 		obj/main.o
-
-obj/firstcode.o: /home/felix/projects/Electronics/first-run.ca
-	cp /home/felix/projects/Electronics/first-run.ca obj/firstrun.ca
-	objcopy -B i386 -I binary -O elf32-i386 \
-		obj/firstrun.ca obj/firstcode.o
-	objcopy  \
-		--redefine-sym _binary_obj_firstrun_ca_start=firstrun_start \
-		--redefine-sym _binary_obj_firstrun_ca_end=firstrun_end \
-		--redefine-sym _binary_obj_firstrun_ca_size=firstrun_size \
-		obj/firstcode.o
 
 .PHONY: run
 run:
