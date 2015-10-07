@@ -2,7 +2,7 @@
 Artifact=kernel
 TempDir=obj
 SourceDir=asm src
-AdditionalObjects=obj/main.o
+AdditionalObjects=obj/main.o obj/firstcode.o
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o
@@ -10,6 +10,7 @@ AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Deb
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o
 AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+AdditionalObjects=/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o
 
 LexUseCpp
 YaccUseCpp
@@ -28,9 +29,10 @@ FLAGS=-m32 -DCONDUCTANCE_64BIT -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__
 ASFLAGS=-masm=intel
 CCFLAGS=-g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS=-g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld -L/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/ -lConductance
+LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 --
+
 obj/main.o: scripts/main.ts
 	objcopy -B i386 -I binary -O elf32-i386 \
 		scripts/main.ts obj/main.o
@@ -40,6 +42,15 @@ obj/main.o: scripts/main.ts
 		--redefine-sym _binary_scripts_main_ts_size=mainscript_size \
 		obj/main.o
 
+obj/firstcode.o: /home/felix/projects/Electronics/first-run.ca
+	cp /home/felix/projects/Electronics/first-run.ca obj/firstrun.ca
+	objcopy -B i386 -I binary -O elf32-i386 \
+		obj/firstrun.ca obj/firstcode.o
+	objcopy  \
+		--redefine-sym _binary_obj_firstrun_ca_start=firstrun_start \
+		--redefine-sym _binary_obj_firstrun_ca_end=firstrun_end \
+		--redefine-sym _binary_obj_firstrun_ca_size=firstrun_size \
+		obj/firstcode.o
 
 .PHONY: run
 run:

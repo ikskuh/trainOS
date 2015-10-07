@@ -1,6 +1,6 @@
 #include <io.h>
 #include <serial.h>
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <varargs.h>
 
 // Funktion zum initialisieren eines COM-Ports

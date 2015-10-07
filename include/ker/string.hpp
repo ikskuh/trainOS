@@ -3,7 +3,6 @@
 #include <inttypes.h>
 #if defined(CIRCUIT_OS)
 #include <kstdlib.h>
-#error "???"
 #else
 #include <stdint.h>
 #include <stdlib.h>
@@ -224,10 +223,7 @@ namespace ker
 		}
 
         template<typename T>
-        static String from(const T &)
-        {
-            return "Not implemented yet";
-        }
+		static String from(const T &);
 	};
 
 

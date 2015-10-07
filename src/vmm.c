@@ -1,7 +1,7 @@
 #include <config.h>
 #include <vmm.h>
 #include <pmm.h>
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <console.h>
 #include <kernel.h>
 

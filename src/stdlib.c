@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <kernel.h>
 
 void exit(int errorCode)

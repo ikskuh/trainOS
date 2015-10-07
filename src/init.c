@@ -1,5 +1,5 @@
 #include <kernel.h>
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <console.h>
 #include <interrupts.h>
 #include <pmm.h>
@@ -143,6 +143,8 @@ static void dumpMB(const MultibootStructure *mbHeader)
 
 void cpp_init();
 
+void cpp_exit();
+
 void putsuccess()
 {
 	int y; kgetpos(nullptr, &y);
@@ -209,6 +211,8 @@ void init(const MultibootStructure *mbHeader)
     vm_start();
 
 	irq_disable();
+
+    cpp_exit();
 
     kputs("\x12\x04" "CircuitOS stopped." "\x12\x07" "\n");
 

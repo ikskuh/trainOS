@@ -13,7 +13,7 @@ extern "C"  {
 
 char *itoa(int value, char *str, int base);
 int atoi(const char *str);
-float atof(const char *str);
+// float atof(const char *str);
 
 void exit(int errorCode);
 

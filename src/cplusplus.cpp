@@ -1,5 +1,5 @@
 
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <console.h>
 #include <inttypes.h>
 #include <ker/new.hpp>
@@ -68,6 +68,28 @@ void initialiseConstructors()
 }
 
 extern "C" void cpp_init()
+{
+    initialiseConstructors();
+}
+
+
+
+typedef void (*destructor)();
+/*
+// Im Linkerskript definiert
+extern "C" destructor start_dtors;
+extern "C" destructor end_dtors;
+
+extern "C" void initialiseDestructors();
+
+// Ruft die Konstruktoren für globale/statische Objekte auf
+void initialiseDestructors()
+{
+    for (destructor* i = &start_dtors;i != &end_dtors;++i)
+        (*i)();
+}
+*/
+extern "C" void cpp_exit()
 {
     initialiseConstructors();
 }

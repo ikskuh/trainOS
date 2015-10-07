@@ -26,7 +26,7 @@ HEADERS += \
 	include/kernel.h \
 	include/multiboot.h \
 	include/pmm.h \
-	include/stdlib.h \
+	include/kstdlib.h \
 	include/varargs.h \
 	include/vmm.h \
 	include/timer.h \
@@ -34,7 +34,7 @@ HEADERS += \
     include/ker/pair.hpp \
     include/ker/vector.hpp \
     include/ker/dictionary.hpp \
-    include/string.h \
+	include/kstring.h \
     include/ker/new.hpp \
     include/dynamic.h \
     include/config.h \

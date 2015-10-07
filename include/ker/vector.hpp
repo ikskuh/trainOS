@@ -150,7 +150,7 @@ namespace ker
 
 			if(current > size) {
 				// "Downgrade"
-				for(int32_t i = static_cast<int32_t>(this->mLength) - 1; i > static_cast<int32_t>(size); i--) {
+                for(int32_t i = static_cast<int32_t>(this->mLength) - 1; i >= static_cast<int32_t>(size); i--) {
 					this->mData[i].~T();
 				}
 			} else {

@@ -1,6 +1,6 @@
 #include "interrupts.h"
 #include "console.h"
-#include "stdlib.h"
+#include "kstdlib.h"
 #include "cpustate.h"
 #include "io.h"
 

@@ -1,5 +1,6 @@
+#include <inttypes.h>
 #include "console.h"
-#include "stdlib.h"
+#include "kstdlib.h"
 
 typedef enum
 {

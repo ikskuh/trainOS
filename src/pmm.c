@@ -1,7 +1,7 @@
 #include <inttypes.h>
 #include "pmm.h"
 #include "kernel.h"
-#include "stdlib.h"
+#include "kstdlib.h"
 
 #include "console.h"
 

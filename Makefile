@@ -13,32 +13,32 @@ YACC = bison
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
 SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp
-OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o
 
 # Flags
 FLAGS    = -m32 -DCONDUCTANCE_64BIT -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
 ASFLAGS  = -masm=intel
 CCFLAGS  = -g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
 CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld -L/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/ -lConductance
+LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 # Targets
 all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/main.o obj/firstcode.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/virtualmachine.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/assembly.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvalue.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmprimitivetype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/compoundtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/vmvoidtype.o /home/felix/projects/Electronics/build-Electronics-Desktop-Debug/Conductance/string.o
 
 # src/console.c
-obj/console.o: src/console.c include/console.h include/stdlib.h \
+obj/console.o: src/console.c include/console.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
-obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
+obj/init.o: src/init.c include/kernel.h include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/interrupts.h \
  include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
  include/timer.h include/serial.h
@@ -46,29 +46,29 @@ obj/init.o: src/init.c include/kernel.h include/stdlib.h include/varargs.h \
 
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
- include/console.h include/stdlib.h include/varargs.h include/config.h \
+ include/console.h include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/io.h src/intr_stubs.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
-obj/malloc.o: src/malloc.c include/kernel.h include/stdlib.h \
- include/varargs.h include/config.h include/malloc.h include/console.h \
+obj/malloc.o: src/malloc.c include/config.h include/kernel.h \
+ include/kstdlib.h include/varargs.h include/malloc.h include/console.h \
  include/serial.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
- include/stdlib.h include/varargs.h include/config.h include/malloc.h \
+ include/kstdlib.h include/varargs.h include/config.h include/malloc.h \
  include/console.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
 
 # src/serial.c
-obj/serial.o: src/serial.c include/io.h include/serial.h include/stdlib.h \
+obj/serial.o: src/serial.c include/io.h include/serial.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
-obj/stdlib.o: src/stdlib.c include/stdlib.h include/varargs.h \
+obj/stdlib.o: src/stdlib.c include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
@@ -79,24 +79,23 @@ obj/timer.o: src/timer.c include/timer.h include/kernel.h \
 
 # src/vmm.c
 obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
- include/multiboot.h include/stdlib.h include/varargs.h include/malloc.h \
+ include/multiboot.h include/kstdlib.h include/varargs.h include/malloc.h \
  include/console.h include/kernel.h
 	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # src/cplusplus.cpp
-obj/cplusplus.o: src/cplusplus.cpp include/stdlib.h include/varargs.h \
+obj/cplusplus.o: src/cplusplus.cpp include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/ker/new.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/cpp-test.cpp
 obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
- include/stdlib.h include/varargs.h include/config.h include/malloc.h \
- include/string.h include/ker/vector.hpp include/ker/new.hpp \
- include/ker/dictionary.hpp include/kernel.h include/ker/pair.hpp
+ include/ker/vector.hpp include/ker/dictionary.hpp include/kernel.h \
+ include/ker/pair.hpp
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cpp-test.cpp
 
 # src/vm.cpp
-obj/vm.o: src/vm.cpp include/stdlib.h include/varargs.h include/config.h \
+obj/vm.o: src/vm.cpp include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/timer.h include/dynamic.h include/console.h
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
@@ -117,6 +116,7 @@ obj/start.o: asm/start.S
 	$(AS) $(FLAGS) $(ASFLAGS) -o $@ -c asm/start.S
 
 # Custom Targets
+
 obj/main.o: scripts/main.ts
 	objcopy -B i386 -I binary -O elf32-i386 \
 		scripts/main.ts obj/main.o
@@ -126,6 +126,15 @@ obj/main.o: scripts/main.ts
 		--redefine-sym _binary_scripts_main_ts_size=mainscript_size \
 		obj/main.o
 
+obj/firstcode.o: /home/felix/projects/Electronics/first-run.ca
+	cp /home/felix/projects/Electronics/first-run.ca obj/firstrun.ca
+	objcopy -B i386 -I binary -O elf32-i386 \
+		obj/firstrun.ca obj/firstcode.o
+	objcopy  \
+		--redefine-sym _binary_obj_firstrun_ca_start=firstrun_start \
+		--redefine-sym _binary_obj_firstrun_ca_end=firstrun_end \
+		--redefine-sym _binary_obj_firstrun_ca_size=firstrun_size \
+		obj/firstcode.o
 
 .PHONY: run
 run:

@@ -1,5 +1,6 @@
+#include <config.h>
 #include <kernel.h>
-#include <stdlib.h>
+#include <kstdlib.h>
 #include <stdint.h>
 #include <console.h>
 #include <serial.h>
@@ -38,13 +39,17 @@ static uint32_t hash(List *list)
 
 static int isValid(List *list)
 {
+#if defined(USE_MAGIC_SECURED_MALLOC)
 	return list->hash == hash(list);
+#else
+    return 1; // Yes, it is always valid. What a pity....
+#endif
 }
 
 size_t mallocCount = 0, freeCount = 0;
 size_t allocatedMemory = 0;
 
-static const size_t minimumAllocSize = 2 * sizeof(List);
+static const size_t minimumAllocSize = 1; // 2 * sizeof(List);
 static char * const malloc_heap_start = (char *)0x400000;
 static char * const malloc_heap_end = (char *)0x800000;
 
@@ -196,7 +201,10 @@ void *malloc(size_t len)
 	cursor->allocationFile = file;
 	cursor->allocationLine = line;
 #endif
+
+#if defined(USE_MAGIC_SECURED_MALLOC)
 	cursor->hash = hash(cursor);
+#endif
 
 	allocatedMemory += len;
 	mallocCount++;
