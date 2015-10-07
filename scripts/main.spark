@@ -33,9 +33,9 @@ _end:
 
 ; PUB irq( id : INT32, data : CPUSTATE )
 irq:
-	pusht "Hello IRQ: "
+	pusht "Hello IRQ "
 	load -1
-	pusht ", "
+	pusht ", EAX="
 	load -2
 	readfld eax
 	pusht "\n"
