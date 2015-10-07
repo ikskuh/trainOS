@@ -2,6 +2,7 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <initializer_list>
 
 #if defined(CIRCUIT_OS)
 #include "kstdlib.h"
@@ -54,6 +55,15 @@ namespace ker
             other.mData = nullptr;
             other.mLength = 0;
             other.mReserved = 0;
+        }
+
+        Vector(const std::initializer_list<T> &init) :
+            Vector()
+        {
+            this->reserve(init.size());
+            for(auto & value : init) {
+                this->append(value);
+            }
         }
 
         Vector & operator = (const Vector &other)

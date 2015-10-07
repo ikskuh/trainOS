@@ -7,6 +7,8 @@
 #include <vmtype.hpp>
 #include <types/vmprimitivetype.hpp>
 
+#include <interrupts.h>
+
 extern "C" {
 	extern const char mainscript_start;
 	extern const char mainscript_end;
@@ -56,59 +58,90 @@ struct dtortest {
     ~dtortest() { free(mem); }
 };
 
-extern "C" void vm_start()
-{
 
-/*
+struct {
+    const char *ptr;
+    uint32_t size;
+} mainAssembly {
+    &mainscript_start,
+    (uint32_t)&mainscript_size
+};
+
+struct IrqList {
+    static const size_t length = 64;
+    volatile uint32_t read;
+    volatile uint32_t write;
+    CpuState items[IrqList::length];
+} irqFiFo {
+    0, 0, {}
+};
+
+extern "C" void vm_handle_interrupt(CpuState *state)
+{
+    irqFiFo.items[irqFiFo.write] = *state;
+    irqFiFo.write += 1;
+    if(irqFiFo.write >= irqFiFo.length) {
+        // TODO: Don't die
+        die("irqList overflow.");
+    }
 }
 
-void code()
+extern "C" void vm_start()
 {
-//*/
+    intr_set_handler(0x20, vm_handle_interrupt);
+    intr_set_handler(0x21, vm_handle_interrupt);
 
-    struct {
-        const char *ptr;
-        uint32_t size;
-    } mainAssembly {
-        &mainscript_start,
-        (uint32_t)&mainscript_size
-    };
+    VirtualMachine machine;
+    machine.import("print") = printArguments;
 
-    VirtualMachine vm;
-    vm.import("print") = printArguments;
-
-    Assembly *assembly = vm.load(mainAssembly.ptr, mainAssembly.size);
+    Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
     if(assembly == nullptr) {
         kprintf("failed to load assembly :(\n");
         return;
     }
 
-    /*
-    kprintf("Assembly:\n");
-    kprintf("  Name:        %s\n", assembly->name().str());
-    kprintf("  Author:      %s\n", assembly->author().str());
-    kprintf("  Description: %s\n", assembly->description().str());
-    //*/
-    /*
-    kprintf("Type list:\n");
-    for(const auto &type : vm.types()) {
-        kprintf("%s: %x\n", type.first.str(), vm.type(type.first));
-    }
-    //*/
-
-    Process *process = vm.createProcess(assembly);
-    if(process == nullptr) {
+    Process *irqService = machine.createProcess(assembly, true);
+    if(irqService == nullptr) {
         kprintf("Failed to create process.\n");
         return;
     }
 
+    uint32_t irqRoutine = irqService->assembly()->exports()["irq"];
 
-    while(vm.step())
+    while(machine.step())
     {
-        // kprintf(".");
+        // check for IRQ requests
+        do
+        {
+            // atomic checking for existing IRQ item
+            irq_disable();
+            bool hasItem = (irqFiFo.read < irqFiFo.write);
+            irq_enable();
+
+            if(hasItem == false) {
+                break; // we don't have anything to read
+            }
+
+            CpuState *cpu = &irqFiFo.items[irqFiFo.read];
+
+            auto *thread = irqService->createThread(irqRoutine);
+            thread->start({ VMValue::Int32(cpu->intr), VMValue::Int32(cpu->eip) });
+
+            irqFiFo.read += 1;
+
+            irq_disable();
+            // When fifo is emptied, reset list pointers
+            if(irqFiFo.read == irqFiFo.write) {
+                irqFiFo.read = 0;
+                irqFiFo.write = 0;
+            }
+            irq_enable();
+        } while(true);
     }
 
-    process->release();
+    irqService->release();
+    irqService = nullptr;
+
     assembly->release();
 
     kprintf("\n");

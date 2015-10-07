@@ -26,4 +26,16 @@ _loop:
 
 	jmp _loop
 _end:
+; Our OS should not end.
+	jmp _end
+	ret
+
+irq:
+	pusht "Hello IRQ: "
+	load -1
+	pusht ", "
+	load -2
+	pusht "\n"
+	calln print 5
+
 	ret

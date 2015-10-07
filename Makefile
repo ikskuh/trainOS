@@ -96,7 +96,8 @@ obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/kstdlib.h include/varargs.h include/config.h \
- include/malloc.h include/timer.h include/dynamic.h include/console.h
+ include/malloc.h include/timer.h include/dynamic.h include/console.h \
+ include/interrupts.h include/cpustate.h
 	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # asm/dynamic.S

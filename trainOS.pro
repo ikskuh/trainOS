@@ -54,10 +54,12 @@ DISTFILES += \
 	README.md \
     scripts/main.spark
 
+INCLUDEPATH += include
+DEPENDPATH += include
+
 INCLUDEPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")
 DEPENDPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")
 
-QMAKE_INCDIR =
 
 QMAKE_CFLAGS = -m32 -Dnullptr=0 -std=c11 -Wall -fno-stack-protector -ffreestanding
 

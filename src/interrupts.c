@@ -80,11 +80,12 @@ void intr_routine(CpuState *state)
 	if(state->intr < interruptNameCount)
 		name = interruptNames[state->intr];
 	InterruptHandler handler = handlers[state->intr];
+    if(handler != nullptr) {
+        handler(state);
+    }
 	if(state->intr < 0x20)
 	{
-		if(handler != nullptr) {
-			handler(state);
-		} else {
+        if(handler == nullptr) {
             kprintf("\n\x12\x04 Exception [%d] %s!\x12\0x07  \n", state->intr, name);
             kprintf(
                 "EIP: %x"
@@ -98,9 +99,7 @@ void intr_routine(CpuState *state)
 	}
 	if (state->intr >= 0x20 && state->intr <= 0x2f)
 	{
-		if(handler != nullptr) {
-			handler(state);
-		} else {
+        if(handler == nullptr) {
 			kprintf("[Unhandled IRQ: %d]", state->intr);
 		}
 
@@ -114,9 +113,7 @@ void intr_routine(CpuState *state)
 	}
 	else
 	{
-		if(handler != nullptr) {
-			handler(state);
-		} else {
+        if(handler == nullptr) {
 			kprintf("\n\x12\x04Interrupt [%d] %s occurred!\x12\0x7\n", state->intr, name);
 			while(1)
 			{
