@@ -2,6 +2,9 @@
 .author "Felix Queißner"
 .descr  "The main file of the operating system"
 
+.export main
+.export irq
+
 ; PUB main()
 main:
 	pushi 0
