@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DCIRCUIT_OS
 CFLAGS        = -pipe -m32 -g -fPIC -Wall -W $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -Wextra -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -ffreestanding -m32 -fno-leading-underscore -g -fPIC -std=c++0x -Wall -W $(DEFINES)
-INCPATH       = -I../../Electronics/Electronics/Conductance -I. -I../../Electronics/Electronics/Tools -I/home/felix/projects/trainOS/include -I/usr/lib/qt/mkspecs/linux-g++
+INCPATH       = -I../../Electronics/Electronics/Conductance -I. -I../../Electronics/Electronics/Tools -I../include -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -33,7 +33,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = Conductance1.0.0
-DISTDIR = /data/projects/trainOS/conductance/.tmp/Conductance1.0.0
+DISTDIR = /home/felix/projects/trainOS/conductance/.tmp/Conductance1.0.0
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -75,6 +75,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
 		/usr/lib/qt/mkspecs/modules/qt_Attica.pri \
+		/usr/lib/qt/mkspecs/modules/qt_BluezQt.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KActivities.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KArchive.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KAuth.pri \
@@ -110,6 +111,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KWidgetsAddons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_clucene_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -132,8 +135,14 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_location.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_location_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimedia.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimedia_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -148,6 +157,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldevtools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmltest.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmltest_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
@@ -170,8 +180,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webchannel.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webchannel_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webengine.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webengine_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkit.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkit_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkitwidgets.pri \
@@ -275,6 +293,7 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
 		/usr/lib/qt/mkspecs/modules/qt_Attica.pri \
+		/usr/lib/qt/mkspecs/modules/qt_BluezQt.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KActivities.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KArchive.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KAuth.pri \
@@ -310,6 +329,8 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 		/usr/lib/qt/mkspecs/modules/qt_KWidgetsAddons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_clucene_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -332,8 +353,14 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_location.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_location_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimedia.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimedia_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -348,6 +375,7 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldevtools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmltest.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmltest_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
@@ -370,8 +398,16 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webchannel.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webchannel_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webengine.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webengine_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkit.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkit_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_webkitwidgets.pri \
@@ -420,6 +456,7 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 /usr/lib/qt/mkspecs/common/g++-unix.conf:
 /usr/lib/qt/mkspecs/qconfig.pri:
 /usr/lib/qt/mkspecs/modules/qt_Attica.pri:
+/usr/lib/qt/mkspecs/modules/qt_BluezQt.pri:
 /usr/lib/qt/mkspecs/modules/qt_KActivities.pri:
 /usr/lib/qt/mkspecs/modules/qt_KArchive.pri:
 /usr/lib/qt/mkspecs/modules/qt_KAuth.pri:
@@ -455,6 +492,8 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 /usr/lib/qt/mkspecs/modules/qt_KWidgetsAddons.pri:
 /usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri:
 /usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_clucene_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri:
@@ -477,8 +516,14 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 /usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_location.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_location_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_multimedia.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_multimedia_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_network.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri:
@@ -493,6 +538,7 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 /usr/lib/qt/mkspecs/modules/qt_lib_qmldevtools_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_qmltest.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_qmltest_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quick.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri:
@@ -515,8 +561,16 @@ Makefile: ../../Electronics/Electronics/Conductance/Conductance.pro /usr/lib/qt/
 /usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_webchannel.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_webchannel_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webengine.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webengine_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webenginecore_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_webenginewidgets_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_webkit.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_webkit_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_webkitwidgets.pri:
@@ -595,71 +649,88 @@ compiler_clean:
 ####### Compile
 
 compoundtype.o: ../../Electronics/Electronics/Conductance/types/compoundtype.cpp ../../Electronics/Electronics/Conductance/types/compoundtype.hpp \
-		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
-		/home/felix/projects/trainOS/include/kernel.h \
-		/home/felix/projects/trainOS/include/ker/pair.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../include/ker/vector.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		../../Electronics/Electronics/Conductance/vmvalue.hpp
+		../include/ker/string.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o compoundtype.o ../../Electronics/Electronics/Conductance/types/compoundtype.cpp
 
 vmpointertype.o: ../../Electronics/Electronics/Conductance/types/vmpointertype.cpp ../../Electronics/Electronics/Conductance/types/vmpointertype.hpp \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		../../Electronics/Electronics/Conductance/vmvalue.hpp
+		../include/ker/string.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmpointertype.o ../../Electronics/Electronics/Conductance/types/vmpointertype.cpp
 
 vmprimitivetype.o: ../../Electronics/Electronics/Conductance/types/vmprimitivetype.cpp ../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
+		../include/ker/string.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		../../Electronics/Electronics/Conductance/vmvalue.hpp
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmprimitivetype.o ../../Electronics/Electronics/Conductance/types/vmprimitivetype.cpp
 
 vmvoidtype.o: ../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp ../../Electronics/Electronics/Conductance/types/vmvoidtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		../../Electronics/Electronics/Conductance/vmvalue.hpp
+		../include/ker/string.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmvoidtype.o ../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp
 
 assembly.o: ../../Electronics/Electronics/Conductance/assembly.cpp ../../Electronics/Electronics/Conductance/assembly.hpp \
-		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
-		/home/felix/projects/trainOS/include/kernel.h \
-		/home/felix/projects/trainOS/include/ker/pair.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../include/ker/vector.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/new.hpp \
+		../include/ker/string.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		../../Electronics/Electronics/Tools/refcounted.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp \
@@ -668,35 +739,35 @@ assembly.o: ../../Electronics/Electronics/Conductance/assembly.cpp ../../Electro
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o assembly.o ../../Electronics/Electronics/Conductance/assembly.cpp
 
 opcodes.o: ../../Electronics/Electronics/Conductance/opcodes.cpp ../../Electronics/Electronics/Conductance/opcodes.hpp \
-		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
-		/home/felix/projects/trainOS/include/kernel.h \
-		/home/felix/projects/trainOS/include/ker/pair.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../include/ker/vector.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/new.hpp \
+		../include/ker/string.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o opcodes.o ../../Electronics/Electronics/Conductance/opcodes.cpp
 
-virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp /home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
+virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp ../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
+		../include/ker/string.hpp \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
-		../../Electronics/Electronics/Conductance/virtualmachine.hpp \
 		../../Electronics/Electronics/Conductance/opcodes.hpp \
-		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
-		/home/felix/projects/trainOS/include/kernel.h \
-		/home/felix/projects/trainOS/include/ker/pair.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp \
+		../../Electronics/Electronics/Conductance/virtualmachine.hpp \
 		../../Electronics/Electronics/Tools/binaryreader.hpp \
 		../../Electronics/Electronics/Tools/refcounted.hpp \
 		../../Electronics/Electronics/Conductance/assembly.hpp \
@@ -705,35 +776,45 @@ virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp /
 
 vmtype.o: ../../Electronics/Electronics/Conductance/vmtype.cpp ../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
+		../include/ker/string.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp \
 		../../Electronics/Electronics/Conductance/types/vmvoidtype.hpp \
 		../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmtype.o ../../Electronics/Electronics/Conductance/vmtype.cpp
 
 vmvalue.o: ../../Electronics/Electronics/Conductance/vmvalue.cpp ../../Electronics/Electronics/Conductance/vmvalue.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		../../Electronics/Electronics/Conductance/vmtype.hpp
+		../include/ker/string.hpp \
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmtype.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmvalue.o ../../Electronics/Electronics/Conductance/vmvalue.cpp
 
 string.o: ../ker/string.cpp ../include/ker/string.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h
+		../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o string.o ../ker/string.cpp
 
 ####### Install
