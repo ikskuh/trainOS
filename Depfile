@@ -26,9 +26,12 @@ LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 --
 
-obj/main.o: scripts/main.spark
+obj/main.o: scripts/main.cu
+	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/copper \
+		scripts/main.cu > \
+		scripts/main.cu.spark
 	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
-		scripts/main.spark \
+		scripts/main.cu.spark \
 		obj/main.ca
 	objcopy -B i386 -I binary -O elf32-i386 \
 		obj/main.ca obj/main.o

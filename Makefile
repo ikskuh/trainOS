@@ -29,8 +29,8 @@ all: kernel
 clean:
 	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/string.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/string.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/kstdlib.h \
@@ -123,9 +123,12 @@ obj/start.o: asm/start.S
 
 # Custom Targets
 
-obj/main.o: scripts/main.spark
+obj/main.o: scripts/main.cu
+	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/copper \
+		scripts/main.cu > \
+		scripts/main.cu.spark
 	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
-		scripts/main.spark \
+		scripts/main.cu.spark \
 		obj/main.ca
 	objcopy -B i386 -I binary -O elf32-i386 \
 		obj/main.ca obj/main.o

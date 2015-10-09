@@ -1,0 +1,58 @@
+; =============================================
+; compiled with Copper 1.0
+; 2015-10-09 23:28:07
+; =============================================
+
+; fndecl
+; 1, main
+.export main
+main:
+	pushnil ; return value
+	pushnil ; i:INT
+	; Here be dragons!
+	pusht "Hello World!\n"
+	calln print 1
+
+	pushi 1
+	store 1
+
+_private_0:
+	load 1
+	pushi 5
+	op2 8
+	jmp_if_not _private_1
+	load 1
+	pusht "\n"
+	calln print 2
+
+	load 1
+	pushi 1
+	op2 0
+	store 1
+
+	jmp _private_0
+_private_1:
+
+	ret
+; end of main
+
+; fndecl
+; 1, irq
+.export irq
+irq:
+	pushnil ; return value
+	; Here be dragons!
+	pusht "irq:"
+	load -1
+	pusht ", "
+	load -2
+	readfld eax
+	pusht " "
+	load -2
+	readfld ebx
+	pusht "\n"
+	calln print 7
+
+	ret
+; end of irq
+

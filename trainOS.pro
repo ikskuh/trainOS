@@ -54,7 +54,8 @@ DISTFILES += \
     Makefile.new \
     asm/dynamic.S \
 	README.md \
-    scripts/main.spark
+    scripts/main.spark \
+    scripts/main.cu
 
 INCLUDEPATH += include
 DEPENDPATH += include

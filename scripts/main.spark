@@ -7,19 +7,19 @@
 
 ; PUB main()
 main:
-	pushi 0
+	pushi 2 0
 
 	pusht "Hello World from Conductance!\n"
 	calln print 1
 
 _loop:
 	load 0
-	pushi 5
+	pushi 2 5
 	comp_less
 	jmp_if_not _end
 
 	load 0
-	pushi 1
+	pushi 2 1
 	add
 	store 0
 
