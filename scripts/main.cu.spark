@@ -1,57 +1,116 @@
 ; =============================================
 ; compiled with Copper 1.0
-; 2015-10-09 23:28:07
+; 2015-10-10 23:51:17
 ; =============================================
 
-; fndecl
+; native method: print(…)
+; native method: outb(…)
+; native method: inb(…) → UINT8
+.type CpuState {
+	eax : UINT32;
+	ebx : UINT32;
+	ecx : UINT32;
+}
+
+
+
+; 0, sendCommand
+sendCommand:
+	pushnil ; return value
+_private_0:
+	pushi 4 100
+	callnr  inb 1
+	pushi 3 2
+	op2 12
+	pushi 3 0
+	op2 6
+	jmp_if_not _private_1
+	jmp _private_0
+_private_1:
+
+	load -1
+	pushi 4 96
+	calln outb 2
+
+	ret
+; end of sendCommand
+
+; 0, initKeyboard
+initKeyboard:
+	pushnil ; return value
+_private_2:
+	pushi 4 100
+	callnr  inb 1
+	pushi 3 1
+	op2 12
+	pushi 3 0
+	op2 6
+	jmp_if_not _private_3
+	pushi 4 96
+	calln inb 1
+
+	jmp _private_2
+_private_3:
+
+	ret
+; end of initKeyboard
+
 ; 1, main
 .export main
 main:
 	pushnil ; return value
-	pushnil ; i:INT
-	; Here be dragons!
+	pushnil ; i:INT32
+	pusht "Initialize keyboard...\n"
+	calln print 1
+
+	call initKeyboard 0
+
 	pusht "Hello World!\n"
 	calln print 1
 
-	pushi 1
+	pushi 2 1
 	store 1
 
-_private_0:
+_private_4:
 	load 1
-	pushi 5
+	pushi 2 5
 	op2 8
-	jmp_if_not _private_1
-	load 1
+	jmp_if_not _private_5
 	pusht "\n"
+	load 1
 	calln print 2
 
 	load 1
-	pushi 1
+	pushi 2 1
 	op2 0
 	store 1
 
-	jmp _private_0
-_private_1:
+	jmp _private_4
+_private_5:
 
 	ret
 ; end of main
 
-; fndecl
+
 ; 1, irq
 .export irq
 irq:
 	pushnil ; return value
-	; Here be dragons!
-	pusht "irq:"
+	pushnil ; scancode:UINT8
 	load -1
-	pusht ", "
-	load -2
-	readfld eax
-	pusht " "
-	load -2
-	readfld ebx
+	pushi 2 33
+	op2 5
+	jmp_if_not _private_6
+	pushi 4 96
+	callnr  inb 1
+	store 1
+
 	pusht "\n"
-	calln print 7
+	load 1
+	pusht "keypress: "
+	calln print 3
+
+_private_6:
 
 	ret
 ; end of irq

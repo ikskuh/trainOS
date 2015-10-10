@@ -53,6 +53,35 @@ ExceptionCode printArguments(VMValue &, const VMArray &args)
     return ExceptionCode::None;
 }
 
+#include <io.h>
+
+ExceptionCode vmOutB(VMValue &, const VMArray &args)
+{
+    if(args.length() != 2)
+        return ExceptionCode::InvalidArgument;
+    if(args[0].type() != VMType::UInt16)
+        return ExceptionCode::InvalidArgument;
+    if(args[1].type() != VMType::UInt8)
+        return ExceptionCode::InvalidArgument;
+
+    outb(args[0].value<VMUInt16>(), args[1].value<VMUInt8>());
+
+    return ExceptionCode::None;
+}
+
+ExceptionCode vmInB(VMValue &result, const VMArray &args)
+{
+    if(args.length() != 1)
+        return ExceptionCode::InvalidArgument;
+    if(args[0].type() != VMType::UInt16)
+        return ExceptionCode::InvalidArgument;
+
+    result = VMValue::UInt8(
+        inb(args[0].value<VMUInt16>()));
+
+    return ExceptionCode::None;
+}
+
 struct dtortest {
     void *mem;
 
@@ -89,6 +118,31 @@ extern "C" void vm_handle_interrupt(CpuState *state)
 	}
 }
 
+
+const char *execptionName(ExceptionCode ex)
+{
+    switch(ex) {
+#define CASE(ex) case ExceptionCode::ex: return #ex
+        CASE(None);
+        CASE(Terminated);
+        CASE(InvalidOpcode);
+        CASE(InvalidOperands);
+        CASE(StackUnderflow);
+        CASE(StackOverflow);
+        CASE(DivideByZero);
+        CASE(InvalidJump);
+        CASE(CallrWithoutResult);
+
+        CASE(InvalidOperator);
+        CASE(InvalidType);
+        CASE(InvalidGlobal);
+        CASE(NullPointer);
+        CASE(InvalidMember);
+#undef CASE
+        default: return "Unknown";
+    }
+}
+
 extern "C" void vm_start()
 {
 	// intr_set_handler(0x20, vm_handle_interrupt);
@@ -97,6 +151,8 @@ extern "C" void vm_start()
     VirtualMachine machine;
 	machine.type("CPUSTATE") = csl::CpuStateType;
     machine.import("print") = printArguments;
+    machine.import("inb") = vmInB;
+    machine.import("outb") = vmOutB;
 
     Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
     if(assembly == nullptr) {
@@ -110,7 +166,11 @@ extern "C" void vm_start()
         return;
     }
 
+    Thread *mainThread = irqService->mainThread();
+
     uint32_t irqRoutine = irqService->assembly()->exports()["irq"];
+
+    bool osIsFailed = false;
 
     while(machine.step())
     {
@@ -144,7 +204,16 @@ extern "C" void vm_start()
             }
             irq_enable();
         } while(true);
+
+        if(mainThread->isRunning() == false) {
+            if(osIsFailed == false) {
+                osIsFailed = true;
+
+                kprintf("OS failed with: %s\n", execptionName(mainThread->exception()));
+            }
+        }
     }
+    mainThread->release();
 
     irqService->release();
     irqService = nullptr;

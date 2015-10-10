@@ -56,7 +56,8 @@ SOURCES       = ../../Electronics/Electronics/Conductance/types/compoundtype.cpp
 		../../Electronics/Electronics/Conductance/vmvalue.cpp \
 		../ker/string.cpp \
 		../../Electronics/Electronics/Conductance/thread.cpp \
-		../../Electronics/Electronics/Conductance/process.cpp 
+		../../Electronics/Electronics/Conductance/process.cpp \
+		../../Electronics/Electronics/Conductance/instructions.cpp 
 OBJECTS       = compoundtype.o \
 		vmpointertype.o \
 		vmprimitivetype.o \
@@ -68,7 +69,8 @@ OBJECTS       = compoundtype.o \
 		vmvalue.o \
 		string.o \
 		thread.o \
-		process.o
+		process.o \
+		instructions.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -254,7 +256,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		../../Electronics/Electronics/Conductance/vmvalue.cpp \
 		../ker/string.cpp \
 		../../Electronics/Electronics/Conductance/thread.cpp \
-		../../Electronics/Electronics/Conductance/process.cpp
+		../../Electronics/Electronics/Conductance/process.cpp \
+		../../Electronics/Electronics/Conductance/instructions.cpp
 QMAKE_TARGET  = Conductance
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = libConductance.a
@@ -866,6 +869,28 @@ process.o: ../../Electronics/Electronics/Conductance/process.cpp ../include/kstd
 		../../Electronics/Electronics/Conductance/assembly.hpp \
 		../../Electronics/Electronics/Conductance/types/compoundtype.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o process.o ../../Electronics/Electronics/Conductance/process.cpp
+
+instructions.o: ../../Electronics/Electronics/Conductance/instructions.cpp ../include/kstdlib.h \
+		../include/varargs.h \
+		../include/config.h \
+		../include/malloc.h \
+		../../Electronics/Electronics/Conductance/vmtype.hpp \
+		../../Electronics/Electronics/Conductance/vmtypes.hpp \
+		../include/ker/string.hpp \
+		../include/ker/vector.hpp \
+		../include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		../include/ker/dictionary.hpp \
+		../include/kernel.h \
+		../include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp \
+		../../Electronics/Electronics/Conductance/virtualmachine.hpp \
+		../../Electronics/Electronics/Tools/binaryreader.hpp \
+		../../Electronics/Electronics/Tools/refcounted.hpp \
+		../../Electronics/Electronics/Conductance/assembly.hpp \
+		../../Electronics/Electronics/Conductance/types/compoundtype.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o instructions.o ../../Electronics/Electronics/Conductance/instructions.cpp
 
 ####### Install
 
