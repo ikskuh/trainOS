@@ -26,19 +26,21 @@ LDFLAGS=-g -m32 -nostdlib -fno-builtin -Tkernel.ld
 
 --
 
+TOOLS=/home/felix/projects/Electronics/build-Electronics-Clang-Debug/bin
+
 obj/main.o: scripts/main.cu
-	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/copper \
+	$(TOOLS)/copper \
 		scripts/main.cu > \
 		scripts/main.cu.spark
-	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
+	$(TOOLS)/spark \
 		scripts/main.cu.spark \
-		obj/main.ca
+		obj/main.in
 	objcopy -B i386 -I binary -O elf32-i386 \
-		obj/main.ca obj/main.o
+		obj/main.in obj/main.o
 	objcopy  \
-		--redefine-sym _binary_obj_main_ca_start=mainscript_start \
-		--redefine-sym _binary_obj_main_ca_end=mainscript_end \
-		--redefine-sym _binary_obj_main_ca_size=mainscript_size \
+		--redefine-sym _binary_obj_main_in_start=mainscript_start \
+		--redefine-sym _binary_obj_main_in_end=mainscript_end \
+		--redefine-sym _binary_obj_main_in_size=mainscript_size \
 		obj/main.o
 
 .PHONY: run

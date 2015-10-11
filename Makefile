@@ -8,12 +8,13 @@ CXX  = g++
 LD   = g++
 LEX  = flex
 YACC = bison
+TEMPLE = mono temple.exe
 
 # File Lists
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
 SRCS_CC  = src/console.c src/init.c src/interrupts.c src/malloc.c src/pmm.c src/serial.c src/stdlib.c src/timer.c src/vmm.c
-SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp csl/cpustatetype.cpp
-OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o
+SRCS_CXX = src/cplusplus.cpp src/cpp-test.cpp src/vm.cpp csl/casts.cpp csl/cpustatetype.cpp csl/io.cpp
+OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o
 
 # Flags
 FLAGS    = -m32 -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
@@ -27,84 +28,92 @@ all: kernel
 
 .PHONY: clean
 clean:
-	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o
+	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/cpustatetype.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/interrupts.h \
  include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
  include/timer.h include/serial.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
 
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
  include/console.h include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/io.h src/intr_stubs.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
 obj/malloc.o: src/malloc.c include/config.h include/kernel.h \
  include/kstdlib.h include/varargs.h include/malloc.h include/console.h \
  include/serial.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
  include/kstdlib.h include/varargs.h include/config.h include/malloc.h \
  include/console.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
 
 # src/serial.c
 obj/serial.o: src/serial.c include/io.h include/serial.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
 obj/stdlib.o: src/stdlib.c include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/kernel.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
 obj/timer.o: src/timer.c include/timer.h include/kernel.h \
  include/interrupts.h include/cpustate.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
 
 # src/vmm.c
 obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
  include/multiboot.h include/kstdlib.h include/varargs.h include/malloc.h \
  include/console.h include/kernel.h
-	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
+	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/ker/new.hpp
-	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/cpp-test.cpp
 obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
  include/ker/vector.hpp include/ker/dictionary.hpp include/kernel.h \
  include/ker/pair.hpp
-	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cpp-test.cpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cpp-test.cpp
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/timer.h include/dynamic.h include/console.h \
  include/interrupts.h include/cpustate.h src/../csl/cpustatetype.hpp \
- include/io.h
-	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
+ src/../csl/io.hpp src/../csl/casts.hpp include/io.h
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
+
+# csl/casts.cpp
+obj/casts.o: csl/casts.cpp csl/casts.hpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/casts.cpp
 
 # csl/cpustatetype.cpp
 obj/cpustatetype.o: csl/cpustatetype.cpp csl/cpustatetype.hpp \
  include/cpustate.h include/console.h
-	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/cpustatetype.cpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/cpustatetype.cpp
+
+# csl/io.cpp
+obj/io.o: csl/io.cpp include/io.h csl/io.hpp
+	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/io.cpp
 
 # asm/dynamic.S
 obj/dynamic.o: asm/dynamic.S
@@ -124,19 +133,21 @@ obj/start.o: asm/start.S
 
 # Custom Targets
 
+TOOLS=/home/felix/projects/Electronics/build-Electronics-Clang-Debug/bin
+
 obj/main.o: scripts/main.cu
-	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/copper \
+	$(TOOLS)/copper \
 		scripts/main.cu > \
 		scripts/main.cu.spark
-	/home/felix/projects/Electronics/build-Electronics-Desktop-Debug/bin/spark \
+	$(TOOLS)/spark \
 		scripts/main.cu.spark \
-		obj/main.ca
+		obj/main.in
 	objcopy -B i386 -I binary -O elf32-i386 \
-		obj/main.ca obj/main.o
+		obj/main.in obj/main.o
 	objcopy  \
-		--redefine-sym _binary_obj_main_ca_start=mainscript_start \
-		--redefine-sym _binary_obj_main_ca_end=mainscript_end \
-		--redefine-sym _binary_obj_main_ca_size=mainscript_size \
+		--redefine-sym _binary_obj_main_in_start=mainscript_start \
+		--redefine-sym _binary_obj_main_in_end=mainscript_end \
+		--redefine-sym _binary_obj_main_in_size=mainscript_size \
 		obj/main.o
 
 .PHONY: run

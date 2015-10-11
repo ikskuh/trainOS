@@ -10,6 +10,8 @@
 #include <interrupts.h>
 
 #include "../csl/cpustatetype.hpp"
+#include "../csl/io.hpp"
+#include "../csl/casts.hpp"
 
 extern "C" {
 	extern const char mainscript_start;
@@ -138,6 +140,7 @@ const char *execptionName(ExceptionCode ex)
         CASE(InvalidGlobal);
         CASE(NullPointer);
         CASE(InvalidMember);
+		CASE(InvalidArgument);
 #undef CASE
         default: return "Unknown";
     }
@@ -151,8 +154,15 @@ extern "C" void vm_start()
     VirtualMachine machine;
 	machine.type("CPUSTATE") = csl::CpuStateType;
     machine.import("print") = printArguments;
-    machine.import("inb") = vmInB;
-    machine.import("outb") = vmOutB;
+	machine.import("inb") = csl::inb;
+	machine.import("outb") = csl::outb;
+
+	machine.import("toInt8") = csl::toInt8;
+	machine.import("toInt16") = csl::toInt16;
+	machine.import("toInt32") = csl::toInt32;
+	machine.import("toUInt8") = csl::toUInt8;
+	machine.import("toUInt16") = csl::toUInt16;
+	machine.import("toUInt32") = csl::toUInt32;
 
     Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
     if(assembly == nullptr) {

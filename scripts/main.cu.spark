@@ -1,16 +1,28 @@
 ; =============================================
 ; compiled with Copper 1.0
-; 2015-10-10 23:51:17
+; 2015-10-11 12:46:04
 ; =============================================
 
 ; native method: print(…)
 ; native method: outb(…)
 ; native method: inb(…) → UINT8
+; native method: toInt8(…) → INT8
+; native method: toInt16(…) → INT16
+; native method: toInt32(…) → INT32
+; native method: toUInt8(…) → UINT8
+; native method: toUInt16(…) → UINT16
+; native method: toUInt32(…) → UINT32
 .type CpuState {
 	eax : UINT32;
 	ebx : UINT32;
 	ecx : UINT32;
 }
+
+
+
+
+
+
 
 
 
@@ -29,7 +41,8 @@ _private_0:
 _private_1:
 
 	load -1
-	pushi 4 96
+	pushi 2 96
+	callnr  toUInt16 1
 	calln outb 2
 
 	ret
@@ -64,6 +77,11 @@ main:
 	calln print 1
 
 	call initKeyboard 0
+
+	pusht "\n"
+	pushi 2 16
+	callnr  toInt8 1
+	calln print 2
 
 	pusht "Hello World!\n"
 	calln print 1

@@ -3,13 +3,24 @@ NATIVE print(...);
 NATIVE outb(port : UINT16, value : UINT8);
 NATIVE inb(port : UINT16) → UINT8;
 
+NATIVE toInt8(…) → INT8;
+NATIVE toInt16(…) → INT16;
+NATIVE toInt32(…) → INT32;
+
+NATIVE toUInt8(…) → UINT8;
+NATIVE toUInt16(…) → UINT16;
+NATIVE toUInt32(…) → UINT32;
+
+# NATIVE toBool(…) → BOOL;
+# NATIVE toText(…) → TEXT;
+
 PRI sendCommand(cmd : UINT8)
 BEGIN
     # Warten bis die Tastatur bereit ist, und der Befehlspuffer leer ist
     WHILE (inb(100u16) & 2u8) =/= 0u8 DO
 
     END
-    outb(96u16, cmd);
+	outb(toUInt16(96), cmd);
 END
 
 PRI initKeyboard()
@@ -27,6 +38,8 @@ PUB main() | i : INT
 BEGIN
     print("Initialize keyboard...\n");
     initKeyboard();
+
+	print(toInt8(16), "\n");
 
     print("Hello World!\n");
     1 → i;

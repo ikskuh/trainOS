@@ -16,7 +16,9 @@ SOURCES += \
     src/vm.cpp \
 	src/serial.c \
     src/cpp-test.cpp \
-    csl/cpustatetype.cpp
+    csl/cpustatetype.cpp \
+    csl/casts.cpp \
+    csl/io.cpp
 
 HEADERS += \
 	include/console.h \
@@ -41,7 +43,9 @@ HEADERS += \
     include/config.h \
     include/serial.h \
 	include/malloc.h \
-    csl/cpustatetype.hpp
+    csl/cpustatetype.hpp \
+    csl/casts.hpp \
+    csl/io.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \
