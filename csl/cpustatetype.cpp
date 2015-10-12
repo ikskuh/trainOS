@@ -4,6 +4,8 @@
 
 #include <console.h>
 
+VMText text("hello!");
+
 static CompoundType type {
 	"CPUSTATE",
 	{

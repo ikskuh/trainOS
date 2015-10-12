@@ -1,5 +1,7 @@
 NATIVE print(...);
 
+NATIVE shutdown();
+
 NATIVE outb(port : UINT16, value : UINT8);
 NATIVE inb(port : UINT16) → UINT8;
 
@@ -61,6 +63,9 @@ BEGIN
     IF id = 33 THEN
         inb(96u16) → scancode;
         print("keypress: ", scancode, "\n");
+		IF scancode = 1u8 THEN
+			shutdown();
+		END
     END
 END
 

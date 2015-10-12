@@ -75,21 +75,13 @@ extern "C" void cpp_init()
 
 
 typedef void (*destructor)();
-/*
+
 // Im Linkerskript definiert
 extern "C" destructor start_dtors;
 extern "C" destructor end_dtors;
 
-extern "C" void initialiseDestructors();
-
-// Ruft die Konstruktoren für globale/statische Objekte auf
-void initialiseDestructors()
-{
-    for (destructor* i = &start_dtors;i != &end_dtors;++i)
-        (*i)();
-}
-*/
 extern "C" void cpp_exit()
 {
-    initialiseConstructors();
+	for (destructor* i = &start_dtors; i != &end_dtors;++i)
+		(*i)();
 }

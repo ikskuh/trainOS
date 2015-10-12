@@ -94,7 +94,7 @@ namespace ker
 
 		~String()
 		{
-            if(this->mText != nullptr) {
+			if(this->mText != nullptr) {
 				free(this->mText);
             }
 		}

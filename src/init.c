@@ -210,7 +210,7 @@ void init(const MultibootStructure *mbHeader)
 
     kputs("\n");
 
-    vm_start();
+	vm_start();
 
 	irq_disable();
 

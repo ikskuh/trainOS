@@ -50,7 +50,6 @@ SOURCES       = ../../Electronics/Electronics/Conductance/types/compoundtype.cpp
 		../../Electronics/Electronics/Conductance/types/vmprimitivetype.cpp \
 		../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp \
 		../../Electronics/Electronics/Conductance/assembly.cpp \
-		../../Electronics/Electronics/Conductance/opcodes.cpp \
 		../../Electronics/Electronics/Conductance/virtualmachine.cpp \
 		../../Electronics/Electronics/Conductance/vmtype.cpp \
 		../../Electronics/Electronics/Conductance/vmvalue.cpp \
@@ -63,7 +62,6 @@ OBJECTS       = compoundtype.o \
 		vmprimitivetype.o \
 		vmvoidtype.o \
 		assembly.o \
-		opcodes.o \
 		virtualmachine.o \
 		vmtype.o \
 		vmvalue.o \
@@ -232,7 +230,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		../../Electronics/Electronics/Conductance/types/vmprimitivetype.cpp \
 		../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp \
 		../../Electronics/Electronics/Conductance/assembly.cpp \
-		../../Electronics/Electronics/Conductance/opcodes.cpp \
 		../../Electronics/Electronics/Conductance/virtualmachine.cpp \
 		../../Electronics/Electronics/Conductance/vmtype.cpp \
 		../../Electronics/Electronics/Conductance/vmvalue.cpp \
@@ -692,20 +689,6 @@ assembly.o: ../../Electronics/Electronics/Conductance/assembly.cpp ../../Electro
 		../../Electronics/Electronics/Tools/binarywriter.hpp \
 		../../Electronics/Electronics/Tools/binaryreader.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o assembly.o ../../Electronics/Electronics/Conductance/assembly.cpp
-
-opcodes.o: ../../Electronics/Electronics/Conductance/opcodes.cpp ../../Electronics/Electronics/Conductance/opcodes.hpp \
-		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
-		/home/felix/projects/trainOS/include/kernel.h \
-		/home/felix/projects/trainOS/include/ker/pair.hpp \
-		/home/felix/projects/trainOS/include/ker/vector.hpp \
-		/home/felix/projects/trainOS/include/kstdlib.h \
-		/home/felix/projects/trainOS/include/varargs.h \
-		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h \
-		/home/felix/projects/trainOS/include/ker/new.hpp \
-		/home/felix/projects/trainOS/include/ker/string.hpp \
-		../../Electronics/Electronics/Tools/fixedstring.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o opcodes.o ../../Electronics/Electronics/Conductance/opcodes.cpp
 
 virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp /home/felix/projects/trainOS/include/kstdlib.h \
 		/home/felix/projects/trainOS/include/varargs.h \

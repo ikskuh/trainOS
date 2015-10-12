@@ -55,35 +55,6 @@ ExceptionCode printArguments(VMValue &, const VMArray &args)
     return ExceptionCode::None;
 }
 
-#include <io.h>
-
-ExceptionCode vmOutB(VMValue &, const VMArray &args)
-{
-    if(args.length() != 2)
-        return ExceptionCode::InvalidArgument;
-    if(args[0].type() != VMType::UInt16)
-        return ExceptionCode::InvalidArgument;
-    if(args[1].type() != VMType::UInt8)
-        return ExceptionCode::InvalidArgument;
-
-    outb(args[0].value<VMUInt16>(), args[1].value<VMUInt8>());
-
-    return ExceptionCode::None;
-}
-
-ExceptionCode vmInB(VMValue &result, const VMArray &args)
-{
-    if(args.length() != 1)
-        return ExceptionCode::InvalidArgument;
-    if(args[0].type() != VMType::UInt16)
-        return ExceptionCode::InvalidArgument;
-
-    result = VMValue::UInt8(
-        inb(args[0].value<VMUInt16>()));
-
-    return ExceptionCode::None;
-}
-
 struct dtortest {
     void *mem;
 
@@ -146,90 +117,111 @@ const char *execptionName(ExceptionCode ex)
     }
 }
 
+static bool shutdownRequested = false;
+
+ExceptionCode shutdown(VMValue &, const VMArray &)
+{
+	shutdownRequested = true;
+	return ExceptionCode::None;
+}
+
+int ReferenceCounted::counter = 0;
+
 extern "C" void vm_start()
 {
 	// intr_set_handler(0x20, vm_handle_interrupt);
     intr_set_handler(0x21, vm_handle_interrupt);
 
-    VirtualMachine machine;
-	machine.type("CPUSTATE") = csl::CpuStateType;
-    machine.import("print") = printArguments;
-	machine.import("inb") = csl::inb;
-	machine.import("outb") = csl::outb;
+	{
+		VirtualMachine machine;
+		machine.type("CPUSTATE") = csl::CpuStateType;
+		machine.import("print") = printArguments;
+		machine.import("shutdown") = shutdown;
 
-	machine.import("toInt8") = csl::toInt8;
-	machine.import("toInt16") = csl::toInt16;
-	machine.import("toInt32") = csl::toInt32;
-	machine.import("toUInt8") = csl::toUInt8;
-	machine.import("toUInt16") = csl::toUInt16;
-	machine.import("toUInt32") = csl::toUInt32;
+		machine.import("inb") = csl::inb;
+		machine.import("outb") = csl::outb;
 
-    Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
-    if(assembly == nullptr) {
-        kprintf("failed to load assembly :(\n");
-        return;
-    }
+		machine.import("toInt8") = csl::toInt8;
+		machine.import("toInt16") = csl::toInt16;
+		machine.import("toInt32") = csl::toInt32;
+		machine.import("toUInt8") = csl::toUInt8;
+		machine.import("toUInt16") = csl::toUInt16;
+		machine.import("toUInt32") = csl::toUInt32;
 
-    Process *irqService = machine.createProcess(assembly, true);
-    if(irqService == nullptr) {
-        kprintf("Failed to create process.\n");
-        return;
-    }
+		Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
+		if(assembly == nullptr) {
+			kprintf("failed to load assembly :(\n");
+			return;
+		}
 
-    Thread *mainThread = irqService->mainThread();
+		Process *irqService = machine.createProcess(assembly, true);
+		if(irqService == nullptr) {
+			kprintf("Failed to create process.\n");
+			return;
+		}
 
-    uint32_t irqRoutine = irqService->assembly()->exports()["irq"];
+		Thread *mainThread = irqService->mainThread();
 
-    bool osIsFailed = false;
+		uint32_t irqRoutine = irqService->assembly()->exports()["irq"];
 
-    while(machine.step())
-    {
-        // check for IRQ requests
-        do
-        {
-            // atomic checking for existing IRQ item
-            irq_disable();
-            bool hasItem = (irqFiFo.read < irqFiFo.write);
-            irq_enable();
+		bool osIsFailed = false;
 
-            if(hasItem == false) {
-                break; // we don't have anything to read
-            }
+		while((shutdownRequested == false) && machine.step())
+		{
+			// check for IRQ requests
+			do
+			{
+				// atomic checking for existing IRQ item
+				irq_disable();
+				bool hasItem = (irqFiFo.read < irqFiFo.write);
+				irq_enable();
 
-            CpuState *cpu = &irqFiFo.items[irqFiFo.read];
+				if(hasItem == false) {
+					break; // we don't have anything to read
+				}
 
-            auto *thread = irqService->createThread(irqRoutine);
-			thread->start({
-				VMValue::Int32(cpu->intr),
-				csl::createCpuState(cpu)
-			});
+				CpuState *cpu = &irqFiFo.items[irqFiFo.read];
 
-            irqFiFo.read += 1;
+				/*
+				Thread *thread = irqService->createThread(irqRoutine);
+				thread->start({
+					VMValue::Int32(cpu->intr),
+					csl::createCpuState(cpu)
+				});
+				thread->release();
+				// */
+				irqFiFo.read += 1;
 
-            irq_disable();
-            // When fifo is emptied, reset list pointers
-            if(irqFiFo.read == irqFiFo.write) {
-                irqFiFo.read = 0;
-                irqFiFo.write = 0;
-            }
-            irq_enable();
-        } while(true);
+				irq_disable();
+				// When fifo is emptied, reset list pointers
+				if(irqFiFo.read == irqFiFo.write) {
+					irqFiFo.read = 0;
+					irqFiFo.write = 0;
+				}
+				irq_enable();
+			} while(true);
 
-        if(mainThread->isRunning() == false) {
-            if(osIsFailed == false) {
-                osIsFailed = true;
+			if(mainThread->isRunning() == false) {
+				if(osIsFailed == false) {
+					osIsFailed = true;
 
-                kprintf("OS failed with: %s\n", execptionName(mainThread->exception()));
-            }
-        }
-    }
-    mainThread->release();
+					kprintf("OS failed with: %s\n", execptionName(mainThread->exception()));
 
-    irqService->release();
-    irqService = nullptr;
+					shutdownRequested = true;
+				}
+			}
+		}
+		mainThread->release();
+		mainThread = nullptr;
 
-    assembly->release();
+		irqService->release();
+		irqService = nullptr;
 
+		assembly->release();
+		assembly = nullptr;
+	}
     kprintf("\n");
+	kprintf("unreleased objects: %d\n", ReferenceCounted::counter);
+	kprintf("\n");
 }
 

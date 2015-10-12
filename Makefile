@@ -30,8 +30,8 @@ all: kernel
 clean:
 	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/cpp-test.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o conductance/assembly.o conductance/compoundtype.o conductance/instructions.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/kstdlib.h \
@@ -99,7 +99,7 @@ obj/cpp-test.o: src/cpp-test.cpp include/console.h include/ker/string.hpp \
 obj/vm.o: src/vm.cpp include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/timer.h include/dynamic.h include/console.h \
  include/interrupts.h include/cpustate.h src/../csl/cpustatetype.hpp \
- src/../csl/io.hpp src/../csl/casts.hpp include/io.h
+ src/../csl/io.hpp src/../csl/casts.hpp
 	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # csl/casts.cpp

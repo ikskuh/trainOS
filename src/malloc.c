@@ -10,6 +10,8 @@
 
 static const uint32_t magic = 0xDEADBEEF;
 
+#define STACKDEPTH 8
+
 typedef struct List
 {
 #if defined(USE_MAGIC_SECURED_MALLOC)
@@ -21,6 +23,7 @@ typedef struct List
 #if defined(ENABLE_MALLOC_MONITORING)
 	const char *allocationFile;
 	int allocationLine;
+	void *stacktrace[STACKDEPTH];
 #endif
 } List;
 
@@ -77,6 +80,16 @@ void malloc_print_list(int freeList)
 					list->used ? list->allocationLine : 0,
 					list->used,
 					list->length);
+			serial_printf(SERIAL_COM1,"    ");
+			for(int i = 0; i < STACKDEPTH; i++) {
+				serial_printf(SERIAL_COM1, "%x ", list->stacktrace[i]);
+			}
+			serial_printf(SERIAL_COM1,"\n");
+
+			serial_printf(SERIAL_COM1,"[");
+			serial_write(SERIAL_COM1, (char*)list + sizeof(List), list->length);
+			serial_printf(SERIAL_COM1,"]");
+
 			/*
 			kprintf("[%x -> %x] (%s:%d) %d %d\n",
 					list,
@@ -191,6 +204,14 @@ void *malloc(size_t len)
 		newl->next = cursor->next;
 #if defined(USE_MAGIC_SECURED_MALLOC)
 		newl->hash = hash(newl);
+		newl->stacktrace[0] = __builtin_return_address(1);
+		newl->stacktrace[1] = __builtin_return_address(2);
+		newl->stacktrace[2] = __builtin_return_address(3);
+		newl->stacktrace[3] = __builtin_return_address(4);
+		newl->stacktrace[4] = __builtin_return_address(5);
+		newl->stacktrace[5] = __builtin_return_address(6);
+		newl->stacktrace[6] = __builtin_return_address(7);
+		newl->stacktrace[7] = __builtin_return_address(8);
 #endif
 
 		cursor->next = newl;
