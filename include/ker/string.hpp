@@ -8,38 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// itoa is not ANSI C
-/**
- * C++ version 0.4 char* style "itoa":
- * Written by Lukás Chmela
- * Released under GPLv3.
- */
-static inline char* itoa(int value, char* result, int base) {
-	// check that the base if valid
-	if (base < 2 || base > 36) { *result = '\0'; return result; }
-
-	char* ptr = result, *ptr1 = result, tmp_char;
-	int tmp_value;
-
-	do {
-		tmp_value = value;
-		value /= base;
-		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
-	} while ( value );
-
-	// Apply negative sign
-	if (tmp_value < 0) *ptr++ = '-';
-	*ptr-- = '\0';
-	while(ptr1 < ptr) {
-		tmp_char = *ptr;
-		*ptr--= *ptr1;
-		*ptr1++ = tmp_char;
-	}
-	return result;
-}
-
-
 #endif
+
+#include "config.hpp"
 
 #define KER_STRING_AVAILABLE
 
@@ -48,9 +19,111 @@ namespace ker
 	class String
 	{
 	private:
+#if defined(ENABLE_SHARED_STRING)
+		uint32_t *mReferences;
+#endif
 		uint8_t *mText;
 		size_t mLength;
+
+#if !defined(ENABLE_SHARED_STRING)
+		void copyFrom(const uint8_t *bytes, size_t length)
+		{
+			if(this->mText != nullptr) {
+				free(this->mText);
+			}
+			this->mText = (uint8_t*)malloc(length + 1);
+			memcpy(this->mText, bytes, length);
+			this->mLength = length;
+			this->mText[this->mLength] = 0; // last byte is always 0
+		}
+#endif
 	public:
+#if defined(ENABLE_SHARED_STRING)
+		String() :
+			mReferences(nullptr),
+			mText(nullptr),
+			mLength(0)
+		{
+
+		}
+
+		// Here just plain copy the string resources and increase the reference counter
+		String(const String &other) :
+			mReferences(other.mReferences),
+			mText(other.mText),
+			mLength(other.mLength)
+		{
+			// Increase reference count
+			if(this->mReferences != nullptr) {
+				*this->mReferences += 1;
+			}
+		}
+
+		// Here move the string resources and don't modify reference counter
+		String(String &&other) :
+			mReferences(other.mReferences),
+			mText(other.mText),
+			mLength(other.mLength)
+		{
+			other.mReferences = nullptr;
+			other.mText = nullptr;
+			other.mLength = 0;
+		}
+
+		String(const uint8_t *bytes, size_t length)
+		{
+			// Allocate memory for n bytes + nulltermination + length
+			this->mReferences = reinterpret_cast<uint32_t*>(malloc(sizeof(*this->mReferences) + sizeof(uint8_t) * (length + 1)));
+			this->mText = reinterpret_cast<uint8_t *>(&this->mReferences[1]);
+			this->mLength = length;
+
+			// We have a single reference
+			*this->mReferences = 1;
+
+			// Initialize string
+			memcpy(this->mText, bytes, length);
+			this->mText[length] = 0;
+		}
+
+		~String()
+		{
+			if(this->mReferences != nullptr) {
+				*this->mReferences -= 1;
+				if(this->mReferences == 0) {
+					// Last reference was released, now destroy the memory.
+					free(this->mReferences);
+				}
+			}
+			this->mReferences = nullptr;
+			this->mText = nullptr;
+			this->mLength = 0;
+		}
+
+		String & operator = (const String &other)
+		{
+			if(this->mReferences == other.mReferences) {
+				// We have copied the string in circles.
+				// Everything is just fine
+				return *this;
+			}
+			if(this->mReferences != nullptr) {
+				*this->mReferences -= 1;
+				if(this->mReferences == 0) {
+					free(this->mReferences);
+				}
+			}
+
+			this->mReferences = other.mReferences;
+			this->mText = other.mText;
+			this->mLength = other.mLength;
+
+			if(this->mReferences != nullptr) {
+				*this->mReferences += 1;
+			}
+
+			return *this;
+		}
+#else
 		String() :
 			mText(nullptr),
 			mLength(0)
@@ -72,19 +145,6 @@ namespace ker
             other.mLength = 0;
 		}
 
-		String(const char *text) :
-			mText(nullptr),
-			mLength(0)
-        {
-            this->copyFrom(reinterpret_cast<const uint8_t*>(text), strlen(text));
-		}
-
-		String(const char *bytes, size_t length) :
-			String(reinterpret_cast<const uint8_t *>(bytes), length)
-		{
-
-		}
-
 		String(const uint8_t *bytes, size_t length) :
             mText(nullptr),
 			mLength(length)
@@ -99,6 +159,26 @@ namespace ker
             }
 		}
 
+
+		String & operator = (const String &other)
+		{
+			this->copyFrom(other.mText, other.mLength);
+			return *this;
+		}
+#endif
+
+		String(const char *text) :
+			String(text, strlen(text))
+		{
+
+		}
+
+		String(const char *bytes, size_t length) :
+			String(reinterpret_cast<const uint8_t *>(bytes), length)
+		{
+
+		}
+
 		uint8_t at(size_t index) const
 		{
 			return this->mText[index];
@@ -111,6 +191,12 @@ namespace ker
 
 		bool equals(const String &other) const
 		{
+#if defined(ENABLE_SHARED_STRING)
+			if(this->mText == other.mText) {
+				// This is a quite useful equality test.
+				return true;
+			}
+#endif
 			if(this->mLength != other.mLength) {
 				return false;
 			}
@@ -167,12 +253,6 @@ namespace ker
 			return this->mText[index];
 		}
 
-		String & operator = (const String &other)
-		{
-			this->copyFrom(other.mText, other.mLength);
-			return *this;
-		}
-
 		bool operator ==(const String &other) const
 		{
 			return this->equals(other);
@@ -197,30 +277,19 @@ namespace ker
 		{
 			return this->append(other);
 		}
-
-    private:
-        void copyFrom(const uint8_t *bytes, size_t length)
-        {
-            if(this->mText != nullptr) {
-				free(this->mText);
-			}
-            this->mText = (uint8_t*)malloc(length + 1);
-            memcpy(this->mText, bytes, length);
-            this->mLength = length;
-            this->mText[this->mLength] = 0; // last byte is always 0
-        }
 	public:
 		static String concat(const String &lhs, const String &rhs)
 		{
 			return lhs.append(rhs);
 		}
-
+/*
 		static String fromNumber(int32_t number, int radix = 10)
 		{
 			static char buffer[64];
 			itoa(number, buffer, radix);
 			return String(buffer);
 		}
+*/
 
         template<typename T>
 		static String from(const T &);

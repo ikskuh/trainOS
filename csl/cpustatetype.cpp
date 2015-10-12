@@ -4,9 +4,7 @@
 
 #include <console.h>
 
-VMText text("hello!");
-
-static CompoundType type {
+CompoundType type {
 	"CPUSTATE",
 	{
 		{ "eax", &VMType::UInt32 },

@@ -80,8 +80,12 @@ typedef void (*destructor)();
 extern "C" destructor start_dtors;
 extern "C" destructor end_dtors;
 
+#include <types/compoundtype.hpp>
+extern CompoundType type;
+
 extern "C" void cpp_exit()
 {
 	for (destructor* i = &start_dtors; i != &end_dtors;++i)
 		(*i)();
+	type.~CompoundType(); // TODO: Remove this. This is dirty. Get the destructor to make a clean exit.
 }

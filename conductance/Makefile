@@ -613,6 +613,7 @@ compoundtype.o: ../../Electronics/Electronics/Conductance/types/compoundtype.cpp
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
 		../../Electronics/Electronics/Conductance/opcodes.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp
@@ -626,6 +627,7 @@ vmpointertype.o: ../../Electronics/Electronics/Conductance/types/vmpointertype.c
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
 		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -642,6 +644,7 @@ vmprimitivetype.o: ../../Electronics/Electronics/Conductance/types/vmprimitivety
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
 		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
@@ -662,6 +665,7 @@ vmvoidtype.o: ../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp ../
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
 		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -683,6 +687,7 @@ assembly.o: ../../Electronics/Electronics/Conductance/assembly.cpp ../../Electro
 		/home/felix/projects/trainOS/include/malloc.h \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		../../Electronics/Electronics/Tools/refcounted.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp \
@@ -697,6 +702,7 @@ virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp /
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -719,6 +725,7 @@ vmtype.o: ../../Electronics/Electronics/Conductance/vmtype.cpp ../../Electronics
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
 		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -738,6 +745,7 @@ vmvalue.o: ../../Electronics/Electronics/Conductance/vmvalue.cpp ../../Electroni
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
 		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
@@ -752,7 +760,8 @@ string.o: ../ker/string.cpp ../include/ker/string.hpp \
 		/home/felix/projects/trainOS/include/kstdlib.h \
 		/home/felix/projects/trainOS/include/varargs.h \
 		/home/felix/projects/trainOS/include/config.h \
-		/home/felix/projects/trainOS/include/malloc.h
+		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o string.o ../ker/string.cpp
 
 thread.o: ../../Electronics/Electronics/Conductance/thread.cpp /home/felix/projects/trainOS/include/kstdlib.h \
@@ -762,6 +771,7 @@ thread.o: ../../Electronics/Electronics/Conductance/thread.cpp /home/felix/proje
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -784,6 +794,7 @@ process.o: ../../Electronics/Electronics/Conductance/process.cpp /home/felix/pro
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -806,6 +817,7 @@ instructions.o: ../../Electronics/Electronics/Conductance/instructions.cpp /home
 		../../Electronics/Electronics/Conductance/vmtype.hpp \
 		../../Electronics/Electronics/Conductance/vmtypes.hpp \
 		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
 		/home/felix/projects/trainOS/include/ker/vector.hpp \
 		/home/felix/projects/trainOS/include/ker/new.hpp \
 		../../Electronics/Electronics/Conductance/vmvalue.hpp \

@@ -58,9 +58,9 @@ ExceptionCode printArguments(VMValue &, const VMArray &args)
 struct dtortest {
     void *mem;
 
-    dtortest() : mem(malloc(42)) { }
-    ~dtortest() { free(mem); }
-};
+	dtortest() : mem(malloc(42)) { kprintf("[alloc]"); }
+	~dtortest() { free(mem); kprintf("[free]"); }
+} ;// object;
 
 
 struct {
