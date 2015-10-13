@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #endif
 
 #include "config.hpp"
@@ -73,12 +75,12 @@ namespace ker
 		String(const uint8_t *bytes, size_t length)
 		{
 			// Allocate memory for n bytes + nulltermination + length
-			this->mReferences = reinterpret_cast<uint32_t*>(malloc(sizeof(*this->mReferences) + sizeof(uint8_t) * (length + 1)));
+			this->mReferences = static_cast<uint32_t*>(malloc(sizeof(*this->mReferences) + sizeof(uint8_t) * (length + 1)));
 			this->mText = reinterpret_cast<uint8_t *>(&this->mReferences[1]);
 			this->mLength = length;
 
 			// We have a single reference
-			*this->mReferences = 1;
+			(*this->mReferences) = 1;
 
 			// Initialize string
 			memcpy(this->mText, bytes, length);
@@ -88,8 +90,8 @@ namespace ker
 		~String()
 		{
 			if(this->mReferences != nullptr) {
-				*this->mReferences -= 1;
-				if(this->mReferences == 0) {
+				(*this->mReferences) -= 1;
+				if((*this->mReferences) == 0) {
 					// Last reference was released, now destroy the memory.
 					free(this->mReferences);
 				}

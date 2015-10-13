@@ -177,15 +177,25 @@ namespace ker
 			if(this->mReserved >= space) {
 				return;
 			}
+			if((this->mReserved + initialCap) > space) {
+				space = this->mReserved + initialCap;
+			}
 			const size_t newSize = sizeof(T) * space;
 
 			T *newData = (T*)malloc(newSize);
 			if(this->mData != nullptr) {
-				memcpy(newData, this->mData, newSize);
+				// Ermahgerd, what a leak. Not obvious but it leaks.
+				// memcpy(newData, this->mData, newSize);
+				// Fix: copy construct all objects into the new memory, then destroy the original data.
+				for(size_t i = 0; i < this->mLength; i++) {
+					new (&newData[i]) T (this->mData[i]);
+					this->mData[i].~T();
+				}
+
 				free(this->mData);
 			}
 			this->mData = newData;
-            this->mReserved = space;
+			this->mReserved = space;
 		}
 
 		T& operator [](size_t idx)

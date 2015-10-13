@@ -87,7 +87,7 @@ void malloc_print_list(int freeList)
 			serial_printf(SERIAL_COM1,"\n");
 
 			serial_printf(SERIAL_COM1,"[");
-			serial_write(SERIAL_COM1, (char*)list + sizeof(List), list->length);
+			serial_write(SERIAL_COM1, (const uint8_t*)(list) + sizeof(List), list->length);
 			serial_printf(SERIAL_COM1,"]");
 
 			/*
