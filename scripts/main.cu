@@ -66,7 +66,8 @@ BEGIN
 		IF scancode = 1u8 THEN
 			shutdown();
 		END
-    END
+	END
+	~data;
 END
 
 #!
@@ -81,4 +82,7 @@ Was noch gemacht werden muss, bis der Tastatur-Treiber funktionieren könnte:
     ☑ Bitwise Operations
     ☑ outb und inb
     ☐ eventuell hex literals für Copper
+	☐ NEW/DELETE
+		☐ [TYPE] →
+		☐ ~()
 !#

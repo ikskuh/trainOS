@@ -182,7 +182,7 @@ extern "C" void vm_start()
 
 				CpuState *cpu = &irqFiFo.items[irqFiFo.read];
 
-				/*
+				//*
 				Thread *thread = irqService->createThread(irqRoutine);
 				thread->start({
 					VMValue::Int32(cpu->intr),
@@ -207,7 +207,7 @@ extern "C" void vm_start()
 
 					kprintf("OS failed with: %s\n", execptionName(mainThread->exception()));
 
-					shutdownRequested = true;
+					// shutdownRequested = true;
 				}
 			}
 		}

@@ -54,6 +54,5 @@ namespace csl
 #undef COPY
 
 		return VMValue(CpuStateType, &object);
-
 	}
 }
