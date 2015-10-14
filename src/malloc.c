@@ -264,14 +264,18 @@ void free(void *ptr)
 	freeCount++;
 
 	List *entry = (List*)((char*)ptr - sizeof(List));
-	if(entry->used == 0) {
-		die_extra("free.InvalidBlock", itoa((int)ptr, nullptr, 16));
-	}
+
 #if defined(USE_MAGIC_SECURED_MALLOC)
 	if(isValid(entry) == 0) {
 		die_extra("free.InvalidBlockMagic: ", itoa(entry->hash, nullptr, 16));
 	}
 #endif
+
+	if(entry->used == 0) {
+		static char buffer[16];
+		itoa((int)ptr, buffer, 16);
+		die_extra("free.InvalidBlock", buffer);
+	}
 
 	if(entry->length > 0x5000) {
 		die_extra("free.InvalidSizedBlock: ", itoa(entry->length, nullptr, 10));

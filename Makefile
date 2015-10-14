@@ -17,11 +17,11 @@ SRCS_CXX = src/cplusplus.cpp src/vm.cpp csl/casts.cpp csl/cpustatetype.cpp csl/i
 OBJS     = obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/casts.o obj/cpustatetype.o obj/io.o obj/main.o
 
 # Flags
-FLAGS    = -m32 -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
+FLAGS    = -g -Wall -Wextra -m32 -DCIRCUIT_OS -Dnullptr=0 -D__cdecl="__attribute__((cdecl))" -mno-sse -mno-sse2 -mno-mmx -I/home/felix/projects/Electronics/Electronics/Conductance -I/home/felix/projects/Electronics/Electronics/Tools
 ASFLAGS  = -masm=intel
-CCFLAGS  = -g -std=c11 -Dnullptr=0 -Wall -g -fno-stack-protector -ffreestanding -Iinclude
-CXXFLAGS = -g -std=c++11 -Wall -g -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -Wall -Wextra -ffreestanding -Wno-unused-function -Iinclude
-LDFLAGS  = -g -m32 -nostdlib -fno-builtin -Tkernel.ld
+CCFLAGS  = -std=c11 -Dnullptr=0 -fno-stack-protector -ffreestanding -Iinclude
+CXXFLAGS = -std=c++11 -fno-stack-protector -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -ffreestanding -Wno-unused-function -Iinclude
+LDFLAGS  = -nostdlib -fno-builtin -Tkernel.ld
 
 # Targets
 all: kernel

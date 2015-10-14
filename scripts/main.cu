@@ -55,7 +55,7 @@ BEGIN
 	initKeyboard();
 
     print("Hello World!\n");
-    1 → i;
+	1 → i;
     WHILE i <= 5 DO
         print(i, "\n");
         (i + 1) → i;
@@ -90,6 +90,11 @@ BEGIN
 	IF ((scancode & 0x80u8) =/= 0u8) & ((e1Code =/= 0) | (scancode =/= 0xE1u8)) & (e0Code | (scancode =/= 0xE0u8)) THEN
 		TRUE → breakcode;
 		(scancode & 127u8) → scancode;
+	END
+
+	IF scancode = 0x01u8 THEN
+		shutdown();
+		RETURN;
 	END
 
 #	print("[scancode=", scancode, ",breakcode=", breakcode, "]");

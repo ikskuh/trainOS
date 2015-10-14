@@ -72,8 +72,6 @@ extern "C" void cpp_init()
     initialiseConstructors();
 }
 
-
-
 typedef void (*destructor)();
 
 // Im Linkerskript definiert
@@ -85,7 +83,9 @@ extern CompoundType type;
 
 extern "C" void cpp_exit()
 {
-	for (destructor* i = &start_dtors; i != &end_dtors;++i)
+	for (destructor* i = &start_dtors; i != &end_dtors;++i) {
+		kprintf("[dtor:%x]", *i);
 		(*i)();
+	}
 	type.~CompoundType(); // TODO: Remove this. This is dirty. Get the destructor to make a clean exit.
 }

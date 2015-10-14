@@ -32,7 +32,7 @@ SECTIONS
         end_ctors = .;
 
 		start_dtors = .;
-		*(.dtors)
+		KEEP(*( .fini_array ));
 		end_dtors = .;
 
         *(.data)
