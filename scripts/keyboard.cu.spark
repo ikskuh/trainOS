@@ -1,0 +1,313 @@
+; =============================================
+; compiled with Copper 1.0
+; 2015-10-16 13:36:11
+; =============================================
+
+.asmtype DRIVER
+.name KEYBOARDDRIVER
+; native method: print(…)
+; native method: outb(…)
+; native method: inb(…) → UINT8
+; native method: toInt32(…) → INT32
+; native method: toUInt16(…) → UINT16
+.type CpuState {
+	eax : UINT32;
+	ebx : UINT32;
+	ecx : UINT32;
+}
+.global e0Code BOOL
+.global e1Code INT32
+.global e1Prev UINT16
+
+
+
+
+
+
+
+
+; 0, sendCommand
+sendCommand:
+	pushnil ; return value
+_private_0:
+	pushi 4 100
+	callnr  inb 1
+	pushi 3 2
+	op2 12
+	pushi 3 0
+	op2 6
+	jmp_if_not _private_1
+	jmp _private_0
+_private_1:
+
+	load -1
+	pushi 2 96
+	callnr  toUInt16 1
+	calln outb 2
+
+	ret
+; end of sendCommand
+
+; 0, initKeyboard
+initKeyboard:
+	pushnil ; return value
+_private_2:
+	pushi 4 100
+	callnr  inb 1
+	pushi 3 1
+	op2 12
+	pushi 3 0
+	op2 6
+	jmp_if_not _private_3
+	pushi 4 96
+	calln inb 1
+
+	jmp _private_2
+_private_3:
+
+	ret
+; end of initKeyboard
+
+; 0, handleKeyPress
+handleKeyPress:
+	pushnil ; return value
+	load -2
+	pushi 6 0
+	op2 5
+	jmp_if_not _private_4
+	pusht "]\n"
+	load -1
+	pusht "[keycode="
+	calln print 3
+
+_private_4:
+
+	ret
+; end of handleKeyPress
+
+; 1, main
+.export main
+main:
+	pushnil ; return value
+	pushnil ; i:INT32
+	pusht "Initialize keyboard...\n"
+	calln print 1
+
+	call initKeyboard 0
+
+	ret
+; end of main
+
+
+
+
+; 0, translateKeyCode
+translateKeyCode:
+	pushnil ; return value
+	pusht "]\n"
+	load -2
+	pusht ",scancode="
+	load -1
+	pusht "[extend="
+	calln print 5
+
+	pushi 2 0
+	store 0
+
+	load -1
+	pushi 2 0
+	op2 5
+	jmp_if_not _private_5
+	load -2
+	pushi 2 10
+	op2 5
+	jmp_if_not _private_6
+	pushi 2 1
+	store 0
+
+	load 0
+	retr
+
+_private_6:
+
+_private_5:
+
+	load 0
+	retr
+; end of translateKeyCode
+
+; 0, handleKeyboardIRQ
+handleKeyboardIRQ:
+	pushnil ; return value
+	pushnil ; scancode:UINT8
+	pushnil ; keycode:INT32
+	pushnil ; breakcode:BOOL
+	pushi 2 0
+	store 2
+
+	pushi 6 0
+	store 3
+
+	pushi 4 96
+	callnr  inb 1
+	store 1
+
+	load 1
+	pushi 3 128
+	op2 12
+	pushi 3 0
+	op2 6
+	loadg e1Code
+	pushi 2 0
+	op2 6
+	load 1
+	pushi 3 225
+	op2 6
+	op2 11
+	loadg e0Code
+	load 1
+	pushi 3 224
+	op2 6
+	op2 11
+	op2 12
+	op2 12
+	jmp_if_not _private_7
+	pushi 6 1
+	store 3
+
+	load 1
+	pushi 3 127
+	op2 12
+	store 1
+
+_private_7:
+
+	loadg e0Code
+	jmp_if_not _private_8
+	load 1
+	pushi 3 42
+	op2 5
+	load 1
+	pushi 3 54
+	op2 5
+	op2 11
+	jmp_if_not _private_10
+	pushi 6 0
+	storeg e0Code
+
+	ret
+
+_private_10:
+
+	load 1
+	callnr  toInt32 1
+	pushi 2 1
+	callr  translateKeyCode 2
+	store 2
+
+	pushi 6 0
+	storeg e0Code
+
+	jmp _private_9
+_private_8:
+	loadg e1Code
+	pushi 2 2
+	op2 5
+	jmp_if_not _private_11
+	loadg e1Prev
+	load 1
+	pushi 3 256
+	op2 2
+	callnr  toUInt16 1
+	op2 11
+	storeg e1Prev
+
+	loadg e1Prev
+	callnr  toInt32 1
+	pushi 2 2
+	callr  translateKeyCode 2
+	store 2
+
+	pushi 2 0
+	storeg e1Code
+
+	jmp _private_12
+_private_11:
+	loadg e1Code
+	pushi 2 1
+	op2 5
+	jmp_if_not _private_13
+	load 1
+	callnr  toUInt16 1
+	storeg e1Prev
+
+	pushi 2 2
+	storeg e1Code
+
+	jmp _private_14
+_private_13:
+	load 1
+	pushi 3 224
+	op2 5
+	jmp_if_not _private_15
+	pushi 6 1
+	storeg e0Code
+
+	jmp _private_16
+_private_15:
+	load 1
+	pushi 3 225
+	op2 5
+	jmp_if_not _private_17
+	pushi 2 1
+	storeg e1Code
+
+	jmp _private_18
+_private_17:
+	load 1
+	callnr  toInt32 1
+	pushi 2 0
+	callr  translateKeyCode 2
+	store 2
+
+_private_18:
+
+_private_16:
+
+_private_14:
+
+_private_12:
+
+_private_9:
+
+	load 2
+	pushi 2 0
+	op2 6
+	jmp_if_not _private_19
+	load 3
+	load 2
+	call handleKeyPress 2
+
+_private_19:
+
+	ret
+; end of handleKeyboardIRQ
+
+; 1, irq
+.export irq
+irq:
+	pushnil ; return value
+	load -1
+	pushi 2 33
+	op2 5
+	jmp_if_not _private_20
+	call handleKeyboardIRQ 0
+
+_private_20:
+
+	load -2
+	destruct
+
+	ret
+; end of irq
+

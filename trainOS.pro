@@ -59,7 +59,8 @@ DISTFILES += \
     asm/dynamic.S \
 	README.md \
     scripts/main.spark \
-    scripts/main.cu
+    scripts/main.cu \
+    scripts/keyboard.cu
 
 INCLUDEPATH += include
 DEPENDPATH += include

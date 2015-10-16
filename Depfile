@@ -2,8 +2,10 @@
 Artifact=kernel
 TempDir=obj
 SourceDir=asm src csl
-AdditionalObjects=obj/main.o
+AdditionalObjects=
 ExternalObjects=conductance/|*.o
+
+AdditionalDependencies=obj/main.in obj/keyboard.in
 
 LexUseCpp
 YaccUseCpp
@@ -28,25 +30,28 @@ LDFLAGS=-nostdlib -fno-builtin -Tkernel.ld
 
 TOOLS=/home/felix/projects/Electronics/build-Electronics-Clang-Debug/bin
 
-obj/main.o: scripts/main.cu
+obj/main.in: scripts/main.cu
 	$(TOOLS)/copper \
 		scripts/main.cu > \
 		scripts/main.cu.spark
 	$(TOOLS)/spark \
 		scripts/main.cu.spark \
 		obj/main.in
-	objcopy -B i386 -I binary -O elf32-i386 \
-		obj/main.in obj/main.o
-	objcopy  \
-		--redefine-sym _binary_obj_main_in_start=mainscript_start \
-		--redefine-sym _binary_obj_main_in_end=mainscript_end \
-		--redefine-sym _binary_obj_main_in_size=mainscript_size \
-		obj/main.o
+
+obj/keyboard.in: scripts/keyboard.cu
+	$(TOOLS)/copper \
+		scripts/keyboard.cu > \
+		scripts/keyboard.cu.spark
+	$(TOOLS)/spark \
+		scripts/keyboard.cu.spark \
+		obj/keyboard.in
+
+QEMUFLAGS=-serial stdio -kernel kernel -initrd obj/main.in,obj/keyboard.in
 
 .PHONY: run
 run:
-	qemu-system-i386 -serial stdio -kernel kernel
+	qemu-system-i386 $(QEMUFLAGS)
 
 .PHONY: debug
 debug:
-	qemu-system-i386 -s -S -serial stdio -kernel kernel
+	qemu-system-i386 -s -S $(QEMUFLAGS)

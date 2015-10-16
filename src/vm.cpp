@@ -2,6 +2,7 @@
 #include <timer.h>
 #include <dynamic.h>
 #include <console.h>
+#include <multiboot.h>
 
 #include <virtualmachine.hpp>
 #include <vmtype.hpp>
@@ -12,16 +13,6 @@
 #include "../csl/cpustatetype.hpp"
 #include "../csl/io.hpp"
 #include "../csl/casts.hpp"
-
-extern "C" {
-	extern const char mainscript_start;
-	extern const char mainscript_end;
-	extern const char mainscript_size;
-
-    extern const char firstrun_start;
-    extern const char firstrun_end;
-    extern const char firstrun_size;
-}
 
 void printVMValue(const VMValue &value)
 {
@@ -61,15 +52,6 @@ struct dtortest {
 	dtortest() : mem(malloc(42)) { kprintf("[alloc]"); }
 	~dtortest() { free(mem); kprintf("[free]"); }
 } ;// object;
-
-
-struct {
-    const char *ptr;
-    uint32_t size;
-} mainAssembly {
-    &mainscript_start,
-    (uint32_t)&mainscript_size
-};
 
 struct IrqList {
     static const size_t length = 64;
@@ -127,7 +109,7 @@ ExceptionCode shutdown(VMValue &, const VMArray &)
 
 int ReferenceCounted::counter = 0;
 
-extern "C" void vm_start()
+extern "C" void vm_start(const MultibootStructure *mbHeader)
 {
 	// intr_set_handler(0x20, vm_handle_interrupt);
     intr_set_handler(0x21, vm_handle_interrupt);
@@ -148,26 +130,83 @@ extern "C" void vm_start()
 		machine.import("toUInt16") = csl::toUInt16;
 		machine.import("toUInt32") = csl::toUInt32;
 
-		Assembly *assembly = machine.load(mainAssembly.ptr, mainAssembly.size);
-		if(assembly == nullptr) {
-			kprintf("failed to load assembly :(\n");
-			return;
+		using DriverProcess = ker::Pair<Process*,uint32_t>;
+		ker::Vector<DriverProcess> drivers;
+
+		const MultibootModule *mod = (const MultibootModule *)mbHeader->modules;
+		for(size_t i = 0; i < mbHeader->moduleCount; i++)
+		{
+			kprintf("Loading Module '%s'...\n", (const char*)mod[i].name);
+
+			size_t len = mod[i].end - mod[i].start;
+
+			Assembly *assembly = machine.load(reinterpret_cast<void*>(mod[i].start), len);
+			if(assembly == nullptr) {
+				die("Failed to load assembly.");
+				return;
+			}
+			switch(assembly->type())
+			{
+				case AssemblyType::Library:
+				{
+					// Assemblies don't need special treatment
+					break;
+				}
+				case AssemblyType::Executable:
+				{
+					Process *program = machine.createProcess(assembly, false);
+					if(program == nullptr) {
+						die("Failed to create process.");
+						return;
+					}
+					program->release();
+					break;
+				}
+				case AssemblyType::Service:
+				{
+					Process *program = machine.createProcess(assembly, true);
+					if(program == nullptr) {
+						die("Failed to create service process.");
+						return;
+					}
+					program->release();
+					break;
+				}
+				case AssemblyType::Driver:
+				{
+					Process *program = machine.createProcess(assembly, true);
+					if(program == nullptr) {
+						die("Failed to create driver process.");
+						return;
+					}
+					if(assembly->exports().contains("irq")) {
+						drivers.append({ program, assembly->exports()["irq"] });
+					} else {
+						program->release();
+					}
+					break;
+				}
+				default:
+				{
+					die("OS.UnknownAssemblyType");
+					break;
+				}
+			}
+			assembly->release();
 		}
-
-		Process *irqService = machine.createProcess(assembly, true);
-		if(irqService == nullptr) {
-			kprintf("Failed to create process.\n");
-			return;
-		}
-
-		Thread *mainThread = irqService->mainThread();
-
-		uint32_t irqRoutine = irqService->assembly()->exports()["irq"];
-
-		bool osIsFailed = false;
 
 		while((shutdownRequested == false) && machine.step())
 		{
+			// Remove all terminated drivers
+			for(size_t i = 0; i < drivers.length(); ) {
+				if(drivers[i].first->isRunning()) {
+					i++;
+				} else {
+					drivers[i].first->release();
+					drivers.remove(i);
+				}
+			}
+
 			// check for IRQ requests
 			do
 			{
@@ -182,14 +221,14 @@ extern "C" void vm_start()
 
 				CpuState *cpu = &irqFiFo.items[irqFiFo.read];
 
-				//*
-				Thread *thread = irqService->createThread(irqRoutine);
-				thread->start({
-					VMValue::Int32(cpu->intr),
-					csl::createCpuState(cpu)
-				});
-				thread->release();
-				// */
+				for(const auto &driver : drivers) {
+					Thread *thread = driver.first->createThread(driver.second);
+					thread->start({
+						VMValue::Int32(cpu->intr),
+						csl::createCpuState(cpu)
+					});
+					thread->release();
+				}
 				irqFiFo.read += 1;
 
 				irq_disable();
@@ -200,25 +239,7 @@ extern "C" void vm_start()
 				}
 				irq_enable();
 			} while(true);
-
-			if(mainThread->isRunning() == false) {
-				if(osIsFailed == false) {
-					osIsFailed = true;
-
-					kprintf("OS failed with: %s\n", execptionName(mainThread->exception()));
-
-					// shutdownRequested = true;
-				}
-			}
 		}
-		mainThread->release();
-		mainThread = nullptr;
-
-		irqService->release();
-		irqService = nullptr;
-
-		assembly->release();
-		assembly = nullptr;
 	}
     kprintf("\n");
 	kprintf("unreleased objects: %d\n", ReferenceCounted::counter);

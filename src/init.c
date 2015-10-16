@@ -8,6 +8,13 @@
 #include <config.h>
 #include <serial.h>
 
+static void halt()
+{
+	while(1) {
+		__asm__ volatile ("cli; hlt;");
+	}
+}
+
 void die(const char *msg)
 {
 	die_extra(msg, "");
@@ -23,10 +30,7 @@ void die_extra(const char *msg, const char *extra)
 		kputs(extra);
 		kputc('\'');
 	}
-	while(1)
-	{
-		__asm__ volatile ("cli; hlt;");
-	}
+	halt();
 }
 
 extern size_t mallocCount;
@@ -93,42 +97,42 @@ static void debug_test()
 
 static void dumpMB(const MultibootStructure *mbHeader)
 {
-    kputs("Multiboot Information:\n");
+	serial_printf(SERIAL_COM1, "Multiboot Information:\n");
     if(mbHeader->flags & MB_MEMSIZE)
     {
-        kprintf("Lower Memory: %d kB\n", mbHeader->memLower);
-        kprintf("Upper Memory: %d kB\n", mbHeader->memUpper);
+		serial_printf(SERIAL_COM1, "  Lower Memory: %d kB\n", mbHeader->memLower);
+		serial_printf(SERIAL_COM1, "  Upper Memory: %d kB\n", mbHeader->memUpper);
     }
     // TODO: MB_BOOTDEVICE
     if(mbHeader->flags & MB_COMMANDLINE)
     {
-		kprintf("Commandline: %s\n", (const char*)mbHeader->commandline);
+		serial_printf(SERIAL_COM1, "  Commandline: %s\n", (const char*)mbHeader->commandline);
     }
     if(mbHeader->flags & MB_MODULES)
     {
         const MultibootModule *mod = (const MultibootModule *)mbHeader->modules;
         for(size_t i = 0; i < mbHeader->moduleCount; i++)
         {
-			kprintf("Module %s [%d - %d]\n", (const char*)mod[i].name, mod[i].start, mod[i].end);
+			serial_printf(SERIAL_COM1, "  Module %s [%d - %d]\n", (const char*)mod[i].name, mod[i].start, mod[i].end);
         }
     }
     if(mbHeader->flags & MB_SYMS_AOUT)
     {
-        kputs("Kernel File Format: a.out\n");
+		serial_printf(SERIAL_COM1, "  Kernel File Format: a.out\n");
     }
     if(mbHeader->flags & MB_SYMS_ELF)
     {
-        kputs("Kernel File Format: ELF\n");
+		serial_printf(SERIAL_COM1, "  Kernel File Format: ELF\n");
     }
     if(mbHeader->flags & MB_MEMORYMAP)
     {
         uintptr_t it = mbHeader->memoryMap;
-        kprintf("Memory Map: %d entries\n", mbHeader->memoryMapLength);
+		serial_printf(SERIAL_COM1, "  Memory Map: %d entries\n", mbHeader->memoryMapLength);
         for(size_t i = 0; i < mbHeader->memoryMapLength; i++)
         {
             const MultibootMemoryMap *mmap = (const MultibootMemoryMap *)it;
             if(mmap->type == 1)
-                kprintf("Memory Map: [%d + %d] %s\n", (uint32_t)mmap->base, (uint32_t)mmap->length, mmap->type == 1 ? "free" : "preserved");
+				serial_printf(SERIAL_COM1, "    Memory Map: [%d + %d] %s\n", (uint32_t)mmap->base, (uint32_t)mmap->length, mmap->type == 1 ? "free" : "preserved");
             it += mmap->entry_size + 4; // Stupid offset :P
         }
     }
@@ -136,7 +140,7 @@ static void dumpMB(const MultibootStructure *mbHeader)
     // TODO: MB_CONFIG_TABLE
     if(mbHeader->flags & MB_BOOTLOADER_NAME)
     {
-		kprintf("Bootloader Name: %s\n", (const char*)mbHeader->bootLoaderName);
+		serial_printf(SERIAL_COM1, "  Bootloader Name: %s\n", (const char*)mbHeader->bootLoaderName);
     }
     // TODO: MB_APS_TABLE
 }
@@ -152,7 +156,7 @@ void putsuccess()
 	kputs("[success]");
 }
 
-extern void vm_start();
+extern void vm_start(const MultibootStructure *mbHeader);
 
 void init(const MultibootStructure *mbHeader)
 {
@@ -166,7 +170,11 @@ void init(const MultibootStructure *mbHeader)
 	serial_init(SERIAL_COM1, 9600, SERIAL_PARITY_NONE, 8);
 	serial_write_str(SERIAL_COM1, "Debug Console Ready\n");
 
-    //dumpMB(mbHeader);
+	dumpMB(mbHeader);
+
+	if(((mbHeader->flags & MB_MODULES) == 0) || (mbHeader->moduleCount == 0)) {
+		die_extra("BootProcessFailed", "No initial OS modules found.");
+	}
 
     kputs("Initialize physical memory management: ");
 	pmm_init(mbHeader);
@@ -210,7 +218,7 @@ void init(const MultibootStructure *mbHeader)
 
     kputs("\n");
 
-	vm_start();
+	vm_start(mbHeader);
 
 	irq_disable();
 
@@ -222,7 +230,7 @@ void init(const MultibootStructure *mbHeader)
 	malloc_print_list(0);
 #endif
 
-	while(1);
+	halt();
 }
 
 int main(int argc, char **argv)
