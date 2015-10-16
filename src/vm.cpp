@@ -12,7 +12,9 @@
 
 #include "../csl/cpustatetype.hpp"
 #include "../csl/io.hpp"
-#include "../csl/casts.hpp"
+
+// Some static assertions
+static_assert(sizeof(uint32_t) == sizeof(void*), "void* is not 32 bit wide.");
 
 void printVMValue(const VMValue &value)
 {
@@ -46,13 +48,6 @@ ExceptionCode printArguments(VMValue &, const VMArray &args)
     return ExceptionCode::None;
 }
 
-struct dtortest {
-    void *mem;
-
-	dtortest() : mem(malloc(42)) { kprintf("[alloc]"); }
-	~dtortest() { free(mem); kprintf("[free]"); }
-} ;// object;
-
 struct IrqList {
     static const size_t length = 64;
     volatile uint32_t read;
@@ -67,7 +62,7 @@ extern "C" void vm_handle_interrupt(CpuState *state)
     irqFiFo.items[irqFiFo.write] = *state;
     irqFiFo.write += 1;
 	if(irqFiFo.write >= irqFiFo.length) {
-		// TODO: Don't die!
+		// TODO: No, don't die!
 		// Logging, statistics...
 		die("irqFiFo overflow.");
 	}
@@ -122,13 +117,6 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 
 		machine.import("inb") = csl::inb;
 		machine.import("outb") = csl::outb;
-
-		machine.import("toInt8") = csl::toInt8;
-		machine.import("toInt16") = csl::toInt16;
-		machine.import("toInt32") = csl::toInt32;
-		machine.import("toUInt8") = csl::toUInt8;
-		machine.import("toUInt16") = csl::toUInt16;
-		machine.import("toUInt32") = csl::toUInt32;
 
 		using DriverProcess = ker::Pair<Process*,uint32_t>;
 		ker::Vector<DriverProcess> drivers;

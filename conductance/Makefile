@@ -56,7 +56,9 @@ SOURCES       = ../../Electronics/Electronics/Conductance/types/compoundtype.cpp
 		../ker/string.cpp \
 		../../Electronics/Electronics/Conductance/thread.cpp \
 		../../Electronics/Electronics/Conductance/process.cpp \
-		../../Electronics/Electronics/Conductance/instructions.cpp 
+		../../Electronics/Electronics/Conductance/instructions.cpp \
+		../../Electronics/Electronics/Conductance/types/vmprocessidtype.cpp \
+		../../Electronics/Electronics/Conductance/csl/casts.cpp 
 OBJECTS       = compoundtype.o \
 		vmpointertype.o \
 		vmprimitivetype.o \
@@ -68,7 +70,9 @@ OBJECTS       = compoundtype.o \
 		string.o \
 		thread.o \
 		process.o \
-		instructions.o
+		instructions.o \
+		vmprocessidtype.o \
+		casts.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -225,7 +229,9 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		../Tools/binaryreader.hpp \
 		../Tools/binarywriter.hpp \
 		../Tools/fixedstring.hpp \
-		../Tools/refcounted.hpp ../../Electronics/Electronics/Conductance/types/compoundtype.cpp \
+		../Tools/refcounted.hpp \
+		types/vmprocessidtype.hpp \
+		csl/casts.hpp ../../Electronics/Electronics/Conductance/types/compoundtype.cpp \
 		../../Electronics/Electronics/Conductance/types/vmpointertype.cpp \
 		../../Electronics/Electronics/Conductance/types/vmprimitivetype.cpp \
 		../../Electronics/Electronics/Conductance/types/vmvoidtype.cpp \
@@ -236,7 +242,9 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		../ker/string.cpp \
 		../../Electronics/Electronics/Conductance/thread.cpp \
 		../../Electronics/Electronics/Conductance/process.cpp \
-		../../Electronics/Electronics/Conductance/instructions.cpp
+		../../Electronics/Electronics/Conductance/instructions.cpp \
+		../../Electronics/Electronics/Conductance/types/vmprocessidtype.cpp \
+		../../Electronics/Electronics/Conductance/csl/casts.cpp
 QMAKE_TARGET  = Conductance
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = libConductance.a
@@ -715,7 +723,10 @@ virtualmachine.o: ../../Electronics/Electronics/Conductance/virtualmachine.cpp /
 		../../Electronics/Electronics/Tools/binaryreader.hpp \
 		../../Electronics/Electronics/Tools/refcounted.hpp \
 		../../Electronics/Electronics/Conductance/assembly.hpp \
-		../../Electronics/Electronics/Conductance/types/compoundtype.hpp
+		../../Electronics/Electronics/Conductance/types/compoundtype.hpp \
+		../../Electronics/Electronics/Conductance/types/vmprocessidtype.hpp \
+		../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp \
+		../../Electronics/Electronics/Conductance/csl/casts.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o virtualmachine.o ../../Electronics/Electronics/Conductance/virtualmachine.cpp
 
 vmtype.o: ../../Electronics/Electronics/Conductance/vmtype.cpp ../../Electronics/Electronics/Conductance/vmtype.hpp \
@@ -735,7 +746,8 @@ vmtype.o: ../../Electronics/Electronics/Conductance/vmtype.cpp ../../Electronics
 		/home/felix/projects/trainOS/include/ker/pair.hpp \
 		../../Electronics/Electronics/Tools/fixedstring.hpp \
 		../../Electronics/Electronics/Conductance/types/vmvoidtype.hpp \
-		../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp
+		../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp \
+		../../Electronics/Electronics/Conductance/types/vmprocessidtype.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmtype.o ../../Electronics/Electronics/Conductance/vmtype.cpp
 
 vmvalue.o: ../../Electronics/Electronics/Conductance/vmvalue.cpp ../../Electronics/Electronics/Conductance/vmvalue.hpp \
@@ -832,6 +844,45 @@ instructions.o: ../../Electronics/Electronics/Conductance/instructions.cpp /home
 		../../Electronics/Electronics/Conductance/assembly.hpp \
 		../../Electronics/Electronics/Conductance/types/compoundtype.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o instructions.o ../../Electronics/Electronics/Conductance/instructions.cpp
+
+vmprocessidtype.o: ../../Electronics/Electronics/Conductance/types/vmprocessidtype.cpp ../../Electronics/Electronics/Conductance/types/vmprocessidtype.hpp \
+		../../Electronics/Electronics/Conductance/types/vmprimitivetype.hpp \
+		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/kstdlib.h \
+		/home/felix/projects/trainOS/include/varargs.h \
+		/home/felix/projects/trainOS/include/config.h \
+		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
+		../../Electronics/Electronics/Conductance/vmtype.hpp \
+		../../Electronics/Electronics/Conductance/vmtypes.hpp \
+		/home/felix/projects/trainOS/include/ker/vector.hpp \
+		/home/felix/projects/trainOS/include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
+		/home/felix/projects/trainOS/include/kernel.h \
+		/home/felix/projects/trainOS/include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vmprocessidtype.o ../../Electronics/Electronics/Conductance/types/vmprocessidtype.cpp
+
+casts.o: ../../Electronics/Electronics/Conductance/csl/casts.cpp ../../Electronics/Electronics/Conductance/csl/casts.hpp \
+		../../Electronics/Electronics/Conductance/vmvalue.hpp \
+		../../Electronics/Electronics/Conductance/vmtypes.hpp \
+		/home/felix/projects/trainOS/include/ker/string.hpp \
+		/home/felix/projects/trainOS/include/kstdlib.h \
+		/home/felix/projects/trainOS/include/varargs.h \
+		/home/felix/projects/trainOS/include/config.h \
+		/home/felix/projects/trainOS/include/malloc.h \
+		/home/felix/projects/trainOS/include/ker/config.hpp \
+		/home/felix/projects/trainOS/include/ker/vector.hpp \
+		/home/felix/projects/trainOS/include/ker/new.hpp \
+		../../Electronics/Electronics/Conductance/vmtype.hpp \
+		../../Electronics/Electronics/Conductance/opcodes.hpp \
+		/home/felix/projects/trainOS/include/ker/dictionary.hpp \
+		/home/felix/projects/trainOS/include/kernel.h \
+		/home/felix/projects/trainOS/include/ker/pair.hpp \
+		../../Electronics/Electronics/Tools/fixedstring.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o casts.o ../../Electronics/Electronics/Conductance/csl/casts.cpp
 
 ####### Install
 

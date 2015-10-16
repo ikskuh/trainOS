@@ -16,7 +16,6 @@ SOURCES += \
     src/vm.cpp \
 	src/serial.c \
     csl/cpustatetype.cpp \
-    csl/casts.cpp \
     csl/io.cpp
 
 HEADERS += \
@@ -43,7 +42,6 @@ HEADERS += \
     include/serial.h \
 	include/malloc.h \
     csl/cpustatetype.hpp \
-    csl/casts.hpp \
     csl/io.hpp \
     include/ker/config.hpp
 
