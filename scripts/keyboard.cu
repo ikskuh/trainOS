@@ -2,13 +2,12 @@
 .asmtype DRIVER
 .name KEYBOARDDRIVER
 
+USE standard;
+
 NATIVE print(...);
 
 NATIVE outb(port : UINT16, value : UINT8);
 NATIVE inb(port : UINT16) → UINT8;
-
-NATIVE toInt32(…) → INT32;
-NATIVE toUInt16(…) → UINT16;
 
 TYPE CpuState IS
 	eax : UINT32;

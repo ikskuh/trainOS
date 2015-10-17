@@ -1,15 +1,26 @@
 ; =============================================
 ; compiled with Copper 1.0
-; 2015-10-16 13:36:11
+; 2015-10-17 10:35:30
 ; =============================================
+
+; USE /home/felix/projects/Electronics/libs/standard.cul
+; native method: toInt8(…) → INT8
+; native method: toInt16(…) → INT16
+; native method: toInt32(…) → INT32
+; native method: toUInt8(…) → UINT8
+; native method: toUInt16(…) → UINT16
+; native method: toUInt32(…) → UINT32
+
+
+
+
+
 
 .asmtype DRIVER
 .name KEYBOARDDRIVER
 ; native method: print(…)
 ; native method: outb(…)
 ; native method: inb(…) → UINT8
-; native method: toInt32(…) → INT32
-; native method: toUInt16(…) → UINT16
 .type CpuState {
 	eax : UINT32;
 	ebx : UINT32;
@@ -18,7 +29,6 @@
 .global e0Code BOOL
 .global e1Code INT32
 .global e1Prev UINT16
-
 
 
 
