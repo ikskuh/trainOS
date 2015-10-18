@@ -8,7 +8,6 @@ CXX  = g++
 LD   = g++
 LEX  = flex
 YACC = bison
-TEMPLE = mono temple.exe
 
 # File Lists
 SRCS_AS  = asm/dynamic.S asm/intr_common_handler.S asm/multiboot.S asm/start.S
@@ -30,80 +29,80 @@ all: kernel
 clean:
 	$(RM) obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/cpustatetype.o obj/io.o
 
-kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/cpustatetype.o obj/io.o conductance/assembly.o conductance/casts.o conductance/compoundtype.o conductance/instructions.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmprocessidtype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o obj/main.in obj/keyboard.in
-	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/cpustatetype.o obj/io.o conductance/assembly.o conductance/casts.o conductance/compoundtype.o conductance/instructions.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmprocessidtype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+kernel: obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/cpustatetype.o obj/io.o conductance/assembly.o conductance/casts.o conductance/compoundtype.o conductance/instructions.o conductance/module.o conductance/object.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmprocessidtype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
+	$(LD) $(FLAGS) $(LDFLAGS) -o $@ obj/dynamic.o obj/intr_common_handler.o obj/multiboot.o obj/start.o obj/console.o obj/init.o obj/interrupts.o obj/malloc.o obj/pmm.o obj/serial.o obj/stdlib.o obj/timer.o obj/vmm.o obj/cplusplus.o obj/vm.o obj/cpustatetype.o obj/io.o conductance/assembly.o conductance/casts.o conductance/compoundtype.o conductance/instructions.o conductance/module.o conductance/object.o conductance/opcodes.o conductance/process.o conductance/string.o conductance/thread.o conductance/virtualmachine.o conductance/vmpointertype.o conductance/vmprimitivetype.o conductance/vmprocessidtype.o conductance/vmtype.o conductance/vmvalue.o conductance/vmvoidtype.o
 
 # src/console.c
 obj/console.o: src/console.c include/console.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/console.c
 
 # src/init.c
 obj/init.o: src/init.c include/kernel.h include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/interrupts.h \
  include/cpustate.h include/pmm.h include/multiboot.h include/vmm.h \
  include/timer.h include/serial.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/init.c
 
 # src/interrupts.c
 obj/interrupts.o: src/interrupts.c include/interrupts.h include/cpustate.h \
  include/console.h include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/io.h src/intr_stubs.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/interrupts.c
 
 # src/malloc.c
 obj/malloc.o: src/malloc.c include/config.h include/kernel.h \
  include/kstdlib.h include/varargs.h include/malloc.h include/console.h \
  include/serial.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/malloc.c
 
 # src/pmm.c
 obj/pmm.o: src/pmm.c include/pmm.h include/multiboot.h include/kernel.h \
  include/kstdlib.h include/varargs.h include/config.h include/malloc.h \
  include/console.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/pmm.c
 
 # src/serial.c
 obj/serial.o: src/serial.c include/io.h include/serial.h include/kstdlib.h \
  include/varargs.h include/config.h include/malloc.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/serial.c
 
 # src/stdlib.c
 obj/stdlib.o: src/stdlib.c include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/kernel.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/stdlib.c
 
 # src/timer.c
 obj/timer.o: src/timer.c include/timer.h include/kernel.h \
  include/interrupts.h include/cpustate.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/timer.c
 
 # src/vmm.c
 obj/vmm.o: src/vmm.c include/config.h include/vmm.h include/pmm.h \
  include/multiboot.h include/kstdlib.h include/varargs.h include/malloc.h \
  include/console.h include/kernel.h
-	$(CC) -iquoteobj  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
+	$(CC)  $(FLAGS) $(CCFLAGS) -o $@ -c src/vmm.c
 
 # src/cplusplus.cpp
 obj/cplusplus.o: src/cplusplus.cpp include/kstdlib.h include/varargs.h \
  include/config.h include/malloc.h include/console.h include/ker/new.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/cplusplus.cpp
 
 # src/vm.cpp
 obj/vm.o: src/vm.cpp include/kstdlib.h include/varargs.h include/config.h \
  include/malloc.h include/timer.h include/dynamic.h include/console.h \
  include/multiboot.h include/interrupts.h include/cpustate.h \
  src/../csl/cpustatetype.hpp src/../csl/io.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c src/vm.cpp
 
 # csl/cpustatetype.cpp
 obj/cpustatetype.o: csl/cpustatetype.cpp csl/cpustatetype.hpp \
  include/cpustate.h include/console.h
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/cpustatetype.cpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/cpustatetype.cpp
 
 # csl/io.cpp
 obj/io.o: csl/io.cpp include/io.h csl/io.hpp
-	$(CXX) -iquoteobj  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/io.cpp
+	$(CXX)  $(FLAGS) $(CXXFLAGS) -o $@ -c csl/io.cpp
 
 # asm/dynamic.S
 obj/dynamic.o: asm/dynamic.S

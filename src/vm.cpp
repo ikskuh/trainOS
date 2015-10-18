@@ -128,12 +128,12 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 
 			size_t len = mod[i].end - mod[i].start;
 
-			Assembly *assembly = machine.load(reinterpret_cast<void*>(mod[i].start), len);
-			if(assembly == nullptr) {
+            Module *module = machine.load(reinterpret_cast<void*>(mod[i].start), len);
+            if(module == nullptr) {
 				die("Failed to load assembly.");
 				return;
 			}
-			switch(assembly->type())
+            switch(module->type())
 			{
 				case AssemblyType::Library:
 				{
@@ -142,7 +142,7 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 				}
 				case AssemblyType::Executable:
 				{
-					Process *program = machine.createProcess(assembly, false);
+                    Process *program = machine.createProcess(module, false);
 					if(program == nullptr) {
 						die("Failed to create process.");
 						return;
@@ -152,7 +152,7 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 				}
 				case AssemblyType::Service:
 				{
-					Process *program = machine.createProcess(assembly, true);
+                    Process *program = machine.createProcess(module, true);
 					if(program == nullptr) {
 						die("Failed to create service process.");
 						return;
@@ -162,13 +162,13 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 				}
 				case AssemblyType::Driver:
 				{
-					Process *program = machine.createProcess(assembly, true);
+                    Process *program = machine.createProcess(module, true);
 					if(program == nullptr) {
 						die("Failed to create driver process.");
 						return;
-					}
-					if(assembly->exports().contains("irq")) {
-						drivers.append({ program, assembly->exports()["irq"] });
+                    }
+                    if(module->exports().contains("irq")) {
+                        drivers.append({ program, module->exports()["irq"] });
 					} else {
 						program->release();
 					}
@@ -180,7 +180,7 @@ extern "C" void vm_start(const MultibootStructure *mbHeader)
 					break;
 				}
 			}
-			assembly->release();
+            module->release();
 		}
 
 		while((shutdownRequested == false) && machine.step())
