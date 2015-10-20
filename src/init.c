@@ -39,6 +39,7 @@ extern size_t allocatedMemory;
 
 void update_statusbar(time_t t)
 {
+	(void)t;
     size_t a, b;
     static char tmp[64];
     static char buffer[CONSOLE_WIDTH];

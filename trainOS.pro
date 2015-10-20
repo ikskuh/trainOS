@@ -43,7 +43,8 @@ HEADERS += \
 	include/malloc.h \
     csl/cpustatetype.hpp \
     csl/io.hpp \
-    include/ker/config.hpp
+    include/ker/config.hpp \
+    include/ker/todo.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \
