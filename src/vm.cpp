@@ -5,6 +5,9 @@
 #include <multiboot.h>
 
 #include <virtualmachine.hpp>
+#include <process.hpp>
+#include <thread.hpp>
+
 #include <vmtype.hpp>
 #include <types/vmprimitivetype.hpp>
 
