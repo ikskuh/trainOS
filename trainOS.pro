@@ -2,6 +2,8 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += ker_shared_string
+CONFIG += ker_standalone
 
 SOURCES += \
     src/console.c \
@@ -31,10 +33,6 @@ HEADERS += \
 	include/varargs.h \
 	include/vmm.h \
 	include/timer.h \
-    include/ker/string.hpp \
-    include/ker/pair.hpp \
-    include/ker/vector.hpp \
-    include/ker/dictionary.hpp \
 	include/kstring.h \
     include/ker/new.hpp \
     include/dynamic.h \
@@ -42,9 +40,7 @@ HEADERS += \
     include/serial.h \
 	include/malloc.h \
     csl/cpustatetype.hpp \
-    csl/io.hpp \
-    include/ker/config.hpp \
-    include/ker/todo.hpp
+	csl/io.hpp
 
 DISTFILES += \
     asm/intr_common_handler.S \
@@ -67,8 +63,9 @@ DEPENDPATH += include
 INCLUDEPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")
 DEPENDPATH += $$quote("/home/felix/projects/Electronics/Electronics/Conductance")
 
-
 QMAKE_CFLAGS = -m32 -Dnullptr=0 -std=c11 -Wall -fno-stack-protector -ffreestanding
 
 QMAKE_LINK = ld
 QMAKE_LFLAGS = -g -melf_i386 -Tkernel.ld
+
+include("/home/felix/projects/ker/ker.pri")
